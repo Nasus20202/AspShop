@@ -1,0 +1,18 @@
+﻿@using ShopWebApp
+@{
+    Layout = "_Layout";
+}
+Kategorie w bazie danych:
+@{
+    string categoryString = "";
+    List<Category> categoryList;
+    using (var db = new ShopDatabase())
+    {
+        categoryList = (from c in db.Categories select c).ToList<Category>();
+    }
+    foreach(Category c in categoryList) {
+        categoryString += c.Name + "<br>";
+    }
+}
+
+@categoryString
