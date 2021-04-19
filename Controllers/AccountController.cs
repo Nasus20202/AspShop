@@ -61,8 +61,16 @@ namespace ShopWebApp.Controllers
                         new Claim(ClaimTypes.Email, user.Email),
                         new Claim(ClaimTypes.Role, user.Role),
                     };
+                    bool rememberMe = input.RememberMe;
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Email, ClaimTypes.Role);
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+                    if (rememberMe) {
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), new AuthenticationProperties
+                        {
+                            IsPersistent = true,
+                            ExpiresUtc = DateTime.UtcNow.AddMonths(1)
+                        }) ;
+                    }
+                    else { await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity)); }
                     return Redirect(Url.Action("index", "home"));
                 }
             }
@@ -95,6 +103,12 @@ namespace ShopWebApp.Controllers
                 }
                 else
                 {
+                    if(input.User.Email == null || !input.User.Email.Contains('@') || input.User.Email.Length > 128 || input.User.Name == null || input.User.Name.Length > 64 || input.User.Surname == null || input.User.Surname.Length > 64 || input.Password == null || input.Password.Length > 128)
+                    {
+                        input.Message = "Niepoprawne dane";
+                        input.Title = "Zarejestruj się";
+                        return View(input);
+                    }
                     var user = new User();
                     user.Email = input.User.Email;
                     user.Name = input.User.Name;
@@ -131,6 +145,18 @@ namespace ShopWebApp.Controllers
         public IActionResult Denied()
         {
             var model = new BaseViewModel("Odmowa dostępu");
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                }
+            }
             return View(model);
         }
 

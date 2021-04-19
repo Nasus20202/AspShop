@@ -11,7 +11,7 @@
 <form controller="Account" action="Register" method="post">
     <div class="row">
         <div class="col">
-            <label for="User.Name" asp-for="@Model.User.Name"">Imię*</label>
+            <label for="User.Name" asp-for="@Model.User.Name">Imię*</label>
             <input type="text" name="User.Name" class="form-control" asp-for="@Model.User.Name"  pattern=".{3,64}" required>
         </div>
         <div class="col">
