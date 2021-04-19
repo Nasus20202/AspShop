@@ -1,24 +1,25 @@
-﻿@model ShopWebApp.LoginModel
+﻿@model ShopWebApp.AccountModel
 @{
     Layout = "_Layout";
 }
 <br /><br />
 <h2 style="text-align:center">Zaloguj się</h2>
 <br />
-
+<span class="text-danger">@Model.Message</span>
+<br />
 <form asp-controller="Account" asp-action="Login" method="post">
     <div class="form-group">
-        <label for="exampleInputEmail1" asp-for="Login">Adres email</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+        <label for="email" asp-for="@Model.Login">Adres email</label>
+        <input type="email" class="form-control" id="email" asp-for="@Model.Login" name="Login"><!--aria-describedby="emailHelp"-->
         <!--<small id="emailHelp" class="form-text text-muted"></small>-->
     </div>
     <div class="form-group">
-        <label for="exampleInputPassword1" asp-for="Password">Hasło</label>
-        <input type="password" class="form-control" id="exampleInputPassword1">
+        <label for="password" asp-for="@Model.Password">Hasło</label>
+        <input type="password" class="form-control" id="password" asp-for="@Model.Password" name="Password">
     </div>
     <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="exampleCheck1" asp-for="RememberMe">
-        <label class="form-check-label" for="exampleCheck1">Zapamiętaj mnie</label>
+        <input type="checkbox" class="form-check-input" id="rememberMe" asp-for="@Model.RememberMe" name="RememberMe" value="true">
+        <label class="form-check-label" for="rememberMe" asp-for="@Model.RememberMe">Zapamiętaj mnie</label>
     </div>
     <br />
     <button type="submit" class="btn btn-primary btn-lg btn-block">Zaloguj się</button>

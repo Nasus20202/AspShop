@@ -48,11 +48,11 @@ namespace ShopWebApp
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouting();
             app.UseStaticFiles();
+            app.UseRouting();
+            
             app.UseAuthentication();
             app.UseAuthorization();
-
             var db = new ShopDatabase();
             db.Database.EnsureCreated();
 

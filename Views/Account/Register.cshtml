@@ -1,4 +1,4 @@
-﻿
+﻿@model ShopWebApp.AccountModel
 @{
     Layout = "_Layout";
 }
@@ -6,3 +6,41 @@
 <br />
 <h2 style="text-align:center">Utwórz konto</h2>
 <br />
+<span class="text-danger">@Model.Message</span>
+<br />
+<form controller="Account" action="Register" method="post">
+    <div class="row">
+        <div class="col">
+            <label for="User.Name" asp-for="@Model.User.Name"">Imię*</label>
+            <input type="text" name="User.Name" class="form-control" asp-for="@Model.User.Name"  pattern=".{3,64}" required>
+        </div>
+        <div class="col">
+            <label for="User.Surname" asp-for="@Model.User.Surname">Nazwisko*</label>
+            <input type="text" name="User.Surname" asp-for="@Model.User.Surname" pattern=".{3,64}" class="form-control" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="User.Email" asp-for="@Model.User.Email">Adres email*</label>
+        <input type="email" class="form-control" asp-for="@Model.User.Email" name="User.Email" pattern=".{5,128}" required>
+    </div>
+    Hasło* (co najmniej 8 znaków)
+    <div class="row">
+        <div class="col">
+            <input type="password" name="Password" asp-for="@Model.Password" pattern=".{8,128}"  class="form-control" placeholder="Hasło" required>
+        </div>
+        <div class="col">
+            <input type="password" name="Password2" asp-for="@Model.Password2" pattern=".{8,128}"  class="form-control" placeholder="Powtórz hasło" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="User.Address" asp-for="@Model.User.Address">Adres</label>
+        <input type="text" class="form-control" name="User.Address" asp-for="@Model.User.Address" placeholder="Ulica, Kod pocztowy, Miasto" pattern=".{5,128}">
+    </div>
+    <div class="form-group">
+        <label for="User.Phone" asp-for="@Model.User.Phone">Numer telefonu</label>
+        <input type="text" class="form-control" name="User.Phone" asp-for="@Model.User.Phone" pattern=".{9,16}">
+        <span class="text-info" style="font-size: small">* - pola obowiązkowe</span>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg btn-block">Zarejestruj się</button>
+</form>
+<a href="@Url.Action("login", "account")" class="btn btn-outline-primary btn-lg btn-block" style="margin-top: 7px">Masz już konto? Zaloguj się</a>
