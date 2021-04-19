@@ -19,25 +19,5 @@ namespace ShopWebApp
         {
             optionsBuilder.UseMySQL(ConnectionString);
         }
-
-        /*protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Category>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Name).IsRequired();
-            });
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Email).IsRequired();
-                entity.Property(e => e.Name);
-                entity.Property(e => e.Surname);
-                entity.Property(e => e.Address);
-                entity.Property(e => e.Password).IsRequired();
-            });
-        }*/
-        }
+    }
 }
