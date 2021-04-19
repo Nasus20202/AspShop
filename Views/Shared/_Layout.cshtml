@@ -9,16 +9,18 @@
     <title>@Model.Title</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="style.css" rel="stylesheet" />
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="~/css/style.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="~/js/javascript.js"></script>
 </head>
-<body>
+<body onload="onStart()">
     <nav class="navbar navbar-expand-md bg-dark navbar-dark">
         <!-- Brand -->
-        <a class="navbar-brand" href="#">Sklep</a>
+        <a class="navbar-brand" href="@Url.Action("index", "home")">Sklep</a>
 
         <!-- Toggler/collapsibe Button -->
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
@@ -47,8 +49,24 @@
 
             </ul>
             <ul class="navbar-nav justify-content-right">
-                <li class="nav-item mr-1">
-                    <a class="nav-link text-light" href="@Url.Action("login", "account")">Zaloguj się</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="navbardrop" data-toggle="dropdown">
+                        Konto
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a class="dropdown-item" href="@Url.Action("index", "account")">@Model.User.Name @Model.User.Surname</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="@Url.Action("logout", "account")">Wyloguj się</a>
+                        }
+                        else
+                        {
+                            <a class="dropdown-item" href="@Url.Action("login", "account")">Zaloguj się</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="@Url.Action("register", "account")">Załóż konto</a>
+                        }
+                    </div>
                 </li>
                 <li class="nav-item mr-1">
                     <a class="nav-link text-light" href="#">Koszyk</a>
@@ -70,12 +88,13 @@
         </div>
     </div>
 
-   
-
-
     <div style="margin-top:50px"></div>
-    <div class="navbar fixed-bottom bg-dark navbar-dark text-light" style="margin-top:10px">
+    <div class="navbar fixed-bottom bg-dark navbar-dark text-light" style="margin-top:15px">
         Sklep &copy 2021
+        <div class="float-left" id="cookieInfo">
+            Ta strona korzysta z ciasteczek. Dalsze korzystaniej ze strony oznacza, że zgadzasz się na ich użycie.
+            <a href="#" class="btn btn-sm btn-outline-success" onclick="hideCookies()" style="margin-left: 10px">OK</a>
+        </div>
     </div>
 
 
