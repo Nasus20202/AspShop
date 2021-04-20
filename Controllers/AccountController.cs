@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace ShopWebApp.Controllers
                     model.User.Email = user.Email;
                 }
             }
+            
             return View(model);
         }
 
@@ -113,7 +115,7 @@ namespace ShopWebApp.Controllers
                     user.Email = input.User.Email;
                     user.Name = input.User.Name;
                     user.Surname = input.User.Surname;
-                    user.Password = input.Password;
+                    user.Password = Sha256Hash(input.Password);
                     user.Role = "user";
                     if (input.User.Address == null)
                         user.Address = "";
@@ -167,7 +169,7 @@ namespace ShopWebApp.Controllers
                 var user = (from c in db.Users
                             where c.Email == login
                             select c).FirstOrDefault();
-                if (user == null || user.Password != password)
+                if (user == null || user.Password != Sha256Hash(password))
                 {
                     return false;
                 }
@@ -187,6 +189,26 @@ namespace ShopWebApp.Controllers
                 else
                     return false;
             }
+        }
+        private string Sha256Hash(string password)
+        {
+            byte[] bytes = new byte[password.Length];
+            for(int i = 0; i < password.Length; i++)
+            {
+                bytes[i] = Convert.ToByte(password[i]);
+            }
+            
+            byte[] hashed;
+            string hashedString = String.Empty;
+            using (SHA256 hasher = SHA256.Create())
+            {
+                hashed = hasher.ComputeHash(bytes);
+            }
+            foreach(byte b in hashed)
+            {
+                hashedString += b.ToString("X");
+            }
+            return hashedString;
         }
     }
 }
