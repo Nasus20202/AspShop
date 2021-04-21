@@ -3,7 +3,6 @@
     Layout = "_Layout";
 }
 <br />
-<br />
 <h2 style="text-align:center">Utwórz konto</h2>
 <br />
 <span class="text-danger">@Model.Message</span>
@@ -34,7 +33,7 @@
     </div>
     <div class="form-group">
         <label for="User.Address" asp-for="@Model.User.Address">Adres</label>
-        <input type="text" class="form-control" name="User.Address" asp-for="@Model.User.Address" placeholder="Ulica, Kod pocztowy, Miasto" pattern=".{5,128}">
+        <input type="text" class="form-control" name="User.Address" asp-for="@Model.User.Address" placeholder="Ulica, Kod pocztowy, Miasto" pattern=".{5,256}">
     </div>
     <div class="form-group">
         <label for="User.Phone" asp-for="@Model.User.Phone">Numer telefonu</label>

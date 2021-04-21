@@ -1,0 +1,51 @@
+﻿@model ShopWebApp.AccountModel
+@{
+    Layout = "_Layout";
+}
+<br />
+<h2 style="text-align:center">Edytuj informacje o koncie</h2>
+<br />
+<span class="text-success">@Model.Message</span>
+<br />
+<form controller="Account" action="Edit" method="post">
+    <div class="row">
+        <div class="col">
+            <label for="User.Name" asp-for="@Model.User.Name">Imię</label>
+            <input type="text" name="User.Name" class="form-control" asp-for="@Model.User.Name" pattern=".{3,64}" value="@Model.User.Name">
+        </div>
+        <div class="col">
+            <label for="User.Surname" asp-for="@Model.User.Surname">Nazwisko</label>
+            <input type="text" name="User.Surname" asp-for="@Model.User.Surname" pattern=".{3,64}" class="form-control" value="@Model.User.Surname">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="User.Email" asp-for="@Model.User.Email">Adres email</label>
+        <input type="email" class="form-control" asp-for="@Model.User.Email" name="User.Email" pattern=".{5,128}" value="@Model.User.Email">
+    </div>
+
+    <div class="form-group">
+        <label for="User.Address" asp-for="@Model.User.Address">Adres</label>
+        <input type="text" class="form-control" name="User.Address" asp-for="@Model.User.Address" placeholder="Ulica, Kod pocztowy, Miasto" pattern=".{5,128}" value="@Model.User.Address">
+    </div>
+    <div class="form-group">
+        <label for="User.Phone" asp-for="@Model.User.Phone">Numer telefonu</label>
+        <input type="text" class="form-control" name="User.Phone" asp-for="@Model.User.Phone" pattern=".{9,16}" value="@Model.User.Phone">
+    </div>
+    <button type="button" class="btn btn-outline-primary btn-sm btn-block" id="passwordShow" onclick="showPasswordChange()" style="margin-bottom:7px">Zmień hasło</button>
+    <div class="form-group" id="changePassword" style="display:none">
+        Nowe hasło (co najmiej 8 znaków)
+        <div class="form-group">
+            <input type="password" name="Password" asp-for="@Model.Password" pattern=".{8,128}" class="form-control" placeholder="Nowe hasło">
+        </div>
+        Powtórz hasło
+        <div class="form-group">
+            <input type="password" name="Password2" asp-for="@Model.Password2" pattern=".{8,128}" class="form-control" placeholder="Powtórz hasło">
+        </div>
+        Obecne hasło
+        <div class="form-group">
+            <input type="password" name="OldPassword" asp-for="@Model.OldPassword" pattern=".{8,128}" class="form-control" placeholder="Stare hasło">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg btn-block">Zaaktualizuj dane konta</button>
+</form>
+<a href="@Url.Action("index", "account")" class="btn btn-outline-primary btn-lg btn-block" style="margin-top: 7px">Powrót do konta</a>

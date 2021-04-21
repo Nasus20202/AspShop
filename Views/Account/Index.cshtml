@@ -2,5 +2,31 @@
 @{
     Layout = "_Layout";
 }
-
+<br />
 <h2 style="text-align:center">Twoje konto</h2>
+<br />
+<table class="table">
+    <tbody>
+        <tr>
+            <th scope="row">Imię</th>
+            <td>@Model.User.Name</td>
+        </tr>
+        <tr>
+            <th scope="row">Nazwisko</th>
+            <td>@Model.User.Surname</td>
+        </tr>
+        <tr>
+            <th scope="row">Adres email</th>
+            <td>@Model.User.Email</td>
+        </tr>
+        <tr>
+            <th scope="row">Numer telefonu</th>
+            <td>@Model.User.Phone</td>
+        </tr>
+        <tr>
+            <th scope="row">Adres domowy</th>
+            <td>@Model.User.Address</td>
+        </tr>
+    </tbody>
+</table>
+<a href="@Url.Action("edit", "account")" class="btn btn-outline-primary btn-lg btn-block">Zmień dane konta</a>

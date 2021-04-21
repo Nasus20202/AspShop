@@ -17,13 +17,16 @@ function checkIfCookiesAccepted() {
     return false;
 }
 
-
 function onStart() {
-    //alert(checkIfCookiesAccepted())
-    //alert(getCookie("acceptedCookies"));
     if (checkIfCookiesAccepted()) {
         var info = document.getElementById("cookieInfo");
         info.style.display = "none";
     }
+}
 
+function showPasswordChange() {
+    var button = document.getElementById("passwordShow");
+    var seciton = document.getElementById("changePassword");
+    button.style.display = "none";
+    seciton.style.display = "inline";
 }

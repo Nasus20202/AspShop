@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Cryptography;
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -27,10 +28,87 @@ namespace ShopWebApp.Controllers
                     model.User.Name = user.Name;
                     model.User.Surname = user.Surname;
                     model.User.Email = user.Email;
+                    model.User.Address = user.Address;
+                    model.User.Phone = user.Phone;
                 }
             }
             
             return View(model);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult Edit(AccountModel input)
+        {
+            if (input == null)
+                input = new AccountModel();
+            input.Title = "Edytuj konto";
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    input.User.Name = user.Name;
+                    input.User.Surname = user.Surname;
+                    input.User.Email = user.Email;
+                    input.User.Address = user.Address;
+                    input.User.Phone = user.Phone;
+                }
+            }
+
+            return View(input);
+        }
+        [HttpPost]
+        [Authorize]
+        [ActionName("Edit")]
+        public async Task<IActionResult> TryEdit(AccountModel input)
+        {
+            string currentEmail = User.Identity.Name;
+            var currentUser = DbFunctions.FindUserByEmail(currentEmail);
+            bool needRelog = false, changedPass = false, changedEmail = false;
+            if (input.User.Name != null && input.User.Name.Length >= 3 && input.User.Name.Length <= 128)
+                currentUser.Name = input.User.Name;
+            if (input.User.Surname != null && input.User.Surname.Length >= 3 && input.User.Surname.Length <= 128)
+                currentUser.Surname = input.User.Surname;
+            if (input.User.Phone != null && input.User.Phone.Length >= 9 && input.User.Phone.Length <= 16)
+                currentUser.Phone = input.User.Phone;
+            if (input.User.Phone == null || (input.User.Phone.Length >= 9 && input.User.Phone.Length <= 16))
+                currentUser.Phone = input.User.Phone == null ? "" :input.User.Phone;
+            if (input.User.Address == null || input.User.Address.Length <= 256)
+                currentUser.Address = input.User.Address == null ? "" : input.User.Address;
+            if (input.User.Email != null && input.User.Email.Contains('@') && input.User.Email.Length < 128 && IsEmailFree(input.User.Email))
+            {
+                currentUser.Email = input.User.Email; needRelog = true;
+                changedEmail = true;
+            }
+            if (input.Password!=null && input.Password2 != null && input.OldPassword != null && input.Password == input.Password2 && input.Password.Length >= 8 && input.Password.Length <= 128 && Sha256Hash(input.OldPassword) == currentUser.Password)
+            {
+                currentUser.Password = Sha256Hash(input.Password);  needRelog = true;
+                changedPass = true;
+            }
+            DbFunctions.UpdateUser(currentUser);
+            if (needRelog)
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                var claims = new[]
+                {
+                 new Claim(ClaimTypes.Email, currentUser.Email),
+                 new Claim(ClaimTypes.Role, currentUser.Role),
+                };
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Email, ClaimTypes.Role);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+                input.Title = "Edytuj konto";
+                if(changedPass && changedEmail)
+                    input.Message = "Pomyślnie zmieniono adres email i hasło";
+                else if (changedEmail)
+                    input.Message = "Pomyślnie zmieniono adres email";
+                else
+                    input.Message = "Pomyślnie zmieniono hasło";
+                return View(input);
+            }
+            return Redirect(Url.Action("index", "account"));
         }
 
         [HttpGet]
@@ -117,11 +195,11 @@ namespace ShopWebApp.Controllers
                     user.Surname = input.User.Surname;
                     user.Password = Sha256Hash(input.Password);
                     user.Role = "user";
-                    if (input.User.Address == null)
+                    if (input.User.Address == null || input.User.Address.Length > 256)
                         user.Address = "";
                     else
                         user.Address = input.User.Address;
-                    if (input.User.Phone == null)
+                    if (input.User.Phone == null || input.User.Phone.Length > 16 || input.User.Phone.Length < 9)
                         user.Phone = "";
                     else
                         user.Phone = input.User.Phone;
@@ -192,12 +270,7 @@ namespace ShopWebApp.Controllers
         }
         private string Sha256Hash(string password)
         {
-            byte[] bytes = new byte[password.Length];
-            for(int i = 0; i < password.Length; i++)
-            {
-                bytes[i] = Convert.ToByte(password[i]);
-            }
-            
+            byte[] bytes = Encoding.UTF8.GetBytes(password);
             byte[] hashed;
             string hashedString = String.Empty;
             using (SHA256 hasher = SHA256.Create())
