@@ -13,6 +13,7 @@ namespace ShopWebApp
         public string Login { get; set; }
         public string Password { get; set; }
         public string Password2 { get; set; }
+        public string OldPassword { get; set; }
         public string Message { get; set; }
         public bool RememberMe { get; set; }
     }
