@@ -44,6 +44,16 @@ namespace ShopWebApp
                 return user;
             }
         }
+        public static User FindUserByEmail(string email)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var user = (from c in db.Users
+                            where c.Email == email
+                            select c).FirstOrDefault();
+                return user;
+            }
+        }
         public static void AddUser(User user)
         {
             if (user == null)
@@ -58,6 +68,32 @@ namespace ShopWebApp
                 catch
                 {
                     return;
+                }
+            }
+        }
+        public static void UpdateUser(User updatedUser)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var user = (from c in db.Users
+                            where c.Id == updatedUser.Id
+                            select c).FirstOrDefault();
+                if (user == null)
+                    return;
+                user.Name = updatedUser.Name;
+                user.Surname = updatedUser.Surname;
+                user.Email = updatedUser.Email;
+                user.Phone = updatedUser.Phone;
+                user.Password = updatedUser.Password;
+                user.Address = updatedUser.Address;
+                user.Modified = DateTime.UtcNow;
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch
+                {
+
                 }
             }
         }

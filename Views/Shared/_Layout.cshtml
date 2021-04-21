@@ -18,7 +18,7 @@
     <script src="~/js/javascript.js"></script>
 </head>
 <body onload="onStart()">
-    <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
         <!-- Brand -->
         <a class="navbar-brand" href="@Url.Action("index", "home")">Sklep</a>
 
@@ -74,7 +74,7 @@
             </ul>
         </div>
     </nav>
-    <div class="container">
+    <div class="container" style="padding-top:65px">
         <div class="row">
             <div class="col-sm-2">
                 @RenderSection("left", false)
@@ -87,7 +87,6 @@
             </div>
         </div>
     </div>
-
     <div style="margin-top:50px"></div>
     <div class="navbar fixed-bottom bg-dark navbar-dark text-light" style="margin-top:15px">
         Sklep &copy 2021
