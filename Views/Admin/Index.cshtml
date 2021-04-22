@@ -1,18 +1,15 @@
 ﻿@using ShopWebApp
 @{
-    Layout = "_Layout";
+    Layout = "_AdminLayout";
 }
-Kategorie w bazie danych:
+Użytkownicy sklepu:<br />
 @{
-    string categoryString = "";
-    List<Category> categoryList;
+    List<User> categoryList;
     using (var db = new ShopDatabase())
     {
-        categoryList = (from c in db.Categories select c).ToList<Category>();
+        categoryList = (from c in db.Users select c).ToList<User>();
     }
-    foreach(Category c in categoryList) {
-        categoryString += c.Name + "<br>";
+    foreach(User c in categoryList) {
+        @c.Name;@:<br />
     }
 }
-
-@categoryString
