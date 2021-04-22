@@ -4,7 +4,7 @@
     Layout = "_AdminLayout";
 }
 <br />
-<h2 style="text-align:center">Lista użytkowników - strona @Model.Page</h2>
+<h2 style="text-align:center">Tabela @Model.Tablename - strona @Model.Page</h2>
 <br />
 
 
@@ -38,10 +38,6 @@
         if (Model.Page > 1)
         {
             @:<a class="float-left text-dark" href="?page=@prev"><i class="bi-arrow-left"></i> Poprzednia</a>
-
-
-
-
         }
         if (Model.Page < Model.LastPage)
         {

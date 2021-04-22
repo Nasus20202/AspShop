@@ -1,0 +1,29 @@
+﻿@using ShopWebApp
+@model AdminModel
+@{
+    Layout = "_AdminLayout";
+}
+<br />
+<h2 style="text-align:center">@Model.Tablename - @Model.Name</h2>
+<br />
+<table class="table">
+    <tbody>
+        @{
+            foreach (KeyValuePair<string, string> kvp in Model.Dict)
+            {
+                @:<tr>
+                    @:<th>
+                        @kvp.Key
+                @:</th>
+                @:<td>
+                    @kvp.Value
+            @:</td>
+        @:</tr>
+    }
+        }
+    </tbody>
+</table>
+@{ 
+    string path = Url.Action("Table", "Admin")+"/" + Model.Tablename;
+}
+<a href="@path" class="btn btn-outline-primary btn-lg btn-block" style="margin-top: 7px">Lista rekordów tabeli @Model.Tablename</a>
