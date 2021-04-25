@@ -10,9 +10,10 @@ namespace ShopWebApp
     public class Category : EntityBase
     {
         [Key]
-        public int Id { get; set; }
+        public int CategoryId { get; set; }
 
         public string Name { get; set; }
+        public string About { get; set; }
 
     }
 }
