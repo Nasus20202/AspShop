@@ -66,7 +66,7 @@ namespace ShopWebApp
                 }
                 if (user == null)
                     return Redirect("/Error/404");
-                model.Dict.Add("ID", user.Id.ToString());
+                model.Dict.Add("ID", user.UserId.ToString());
                 model.Dict.Add("Imię", user.Name);
                 model.Dict.Add("Nazwisko", user.Surname);
                 model.Dict.Add("Email", user.Email);
