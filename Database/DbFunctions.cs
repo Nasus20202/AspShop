@@ -47,6 +47,7 @@ namespace ShopWebApp
                 if (category == null)
                     return;
                 category.Name = updatedCategory.Name;
+                category.Code = updatedCategory.Code;
                 category.About = updatedCategory.About;
 
 
@@ -103,11 +104,72 @@ namespace ShopWebApp
                 if (subcategory == null)
                     return;
                 subcategory.Name = updatedSubcategory.Name;
+                subcategory.Code = updatedSubcategory.Code;
                 subcategory.About = updatedSubcategory.About;
                 subcategory.Tags = updatedSubcategory.Tags;
 
 
                 subcategory.Modified = DateTime.UtcNow;
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+
+        //Products
+
+
+        public static Product FindProductById(int id)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var product = (from c in db.Products
+                                where c.ProductId == id
+                                select c).FirstOrDefault();
+                return product;
+            }
+        }
+        public static void AddProduct(Product product)
+        {
+            if (product == null)
+                return;
+            using (var db = new ShopDatabase())
+            {
+                db.Products.Add(product);
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch
+                {
+                    return;
+                }
+            }
+        }
+        public static void UpdateProduct(Product updatedProduct)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var product = (from c in db.Products
+                                where c.ProductId == updatedProduct.ProductId
+                                select c).FirstOrDefault();
+                if (product == null)
+                    return;
+                product.Name = updatedProduct.Name;
+                product.Code = updatedProduct.Code;
+                product.About = updatedProduct.About;
+                product.Price = updatedProduct.Price;
+                product.RatingSum = updatedProduct.RatingSum;
+                product.RatingVotes = updatedProduct.RatingSum;
+                //Photo - no changes, file path is not static. May be changed in the future
+
+                product.Modified = DateTime.UtcNow;
                 try
                 {
                     db.SaveChanges();
