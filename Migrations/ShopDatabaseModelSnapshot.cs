@@ -49,6 +49,9 @@ namespace ShopWebApp.Migrations
                     b.Property<string>("About")
                         .HasColumnType("text");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Enabled")
                         .HasColumnType("tinyint(1)");
 
@@ -62,6 +65,8 @@ namespace ShopWebApp.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("SubcategoryId");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Subcategories");
                 });
@@ -102,6 +107,15 @@ namespace ShopWebApp.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("ShopWebApp.Subcategory", b =>
+                {
+                    b.HasOne("ShopWebApp.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

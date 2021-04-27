@@ -8,3 +8,24 @@
 }
 <br />
 <h3>Sklep</h3>
+
+@{ 
+    using (var db = new ShopDatabase())
+    {
+        var categories = db.Categories.ToList();
+        foreach (Category category in categories)
+        {
+            @:<h5>@category.Name:</h5>
+            var subcategories = db.Entry(category)
+                .Collection(c => c.Subcategories)
+                .Query()
+                //.Where(s => s.SubcategoryId > 0)
+                .ToList();
+            foreach (Subcategory subcategory in subcategories)
+            {
+                @subcategory.Name@:<br />
+            }
+            @:<br /><br />
+        }
+    }
+}
