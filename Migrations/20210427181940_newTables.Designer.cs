@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopWebApp;
 
 namespace ShopWebApp.Migrations
 {
     [DbContext(typeof(ShopDatabase))]
-    partial class ShopDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20210427181940_newTables")]
+    partial class newTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,9 +109,6 @@ namespace ShopWebApp.Migrations
                     b.Property<int?>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Photo")
-                        .HasColumnType("text");
-
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
@@ -119,14 +118,9 @@ namespace ShopWebApp.Migrations
                     b.Property<int>("RatingVotes")
                         .HasColumnType("int");
 
-                    b.Property<int>("SubcategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("ProductId");
 
                     b.HasIndex("OrderId");
-
-                    b.HasIndex("SubcategoryId");
 
                     b.ToTable("Products");
                 });
@@ -217,12 +211,6 @@ namespace ShopWebApp.Migrations
                     b.HasOne("ShopWebApp.Order", null)
                         .WithMany("Products")
                         .HasForeignKey("OrderId");
-
-                    b.HasOne("ShopWebApp.Subcategory", "Subcategory")
-                        .WithMany("Products")
-                        .HasForeignKey("SubcategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ShopWebApp.Subcategory", b =>

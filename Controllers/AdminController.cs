@@ -31,6 +31,9 @@ namespace ShopWebApp
             return View(model);
         }
 
+
+        // Detailed view
+
         [Route("/admin/{table}/{name}")]
         public IActionResult Info(string table, string name)
         {
@@ -75,14 +78,59 @@ namespace ShopWebApp
                 model.Dict.Add("Rola", user.Role);
                 model.Dict.Add("Ostatnia edycja", user.Modified.ToString());
                 model.Dict.Add("Hash hasła (SHA256)", user.Password);
-
+                ViewData["Name"] = "Użytkownik";
+                ViewData["ObjectName"] = user.Email;
             } else if(table == "categories")
             {
-                model.Title = "Kategoria : " + name; 
+                
+                var category = new Category();
+                using (var db = new ShopDatabase())
+                {
+                    category = (from c in db.Categories
+                                where c.Name == name
+                                select c).FirstOrDefault();
+                    if (category == null)
+                    {
+                        int id;
+                        if (int.TryParse(name, out id))
+                            category = DbFunctions.FindCategoryById(id);
+                    }
+                    if(category == null)
+                    {
+                        category = (from c in db.Categories
+                                    where c.Code == name
+                                    select c).FirstOrDefault();
+                    }
+                }
+                model.Title = "Kategoria : " + category.Name;
+                if (category == null)
+                    return Redirect("/Error/404");
+                model.Dict.Add("ID", category.CategoryId.ToString());
+                model.Dict.Add("Nazwa", category.Name);
+                model.Dict.Add("Kod", category.Code);
+                model.Dict.Add("Opis", category.About);
+
+                using (var db = new ShopDatabase())
+                {
+                    var loadedCategory = db.Categories.Single(c => c.CategoryId == category.CategoryId);
+                    var subcategories = db.Entry(loadedCategory)
+                               .Collection(c => c.Subcategories)
+                                .Query()
+                                .ToList();
+                    ViewData["type"] = "subcategory";
+                    if (subcategories == null)
+                        ViewBag.ChildObjects = new List<Subcategory>();
+                    ViewBag.ChildObjects = subcategories;
+                }
+
+                ViewData["Name"] = "Kategoria";
+                ViewData["ObjectName"] = category.Name;
             } else { return Redirect("/Error/404"); }
 
             return View(model);
         }
+
+        // Category objects list
 
         [Route("/admin/table/{tablename}")]
         public IActionResult DatabaseTable(string tablename, [FromQuery] int page = 1)
@@ -128,6 +176,7 @@ namespace ShopWebApp
                     table.Path = "/admin/users/";
                     model.Table = table;
                     model.Page = page; model.LastPage = lastPage;
+                    ViewData["Name"] = "użytkownicy";
                 }
             }
             else if(tablename.ToLower() == "categories")
@@ -154,6 +203,7 @@ namespace ShopWebApp
                     table.Path = "/admin/categories/";
                     model.Table = table;
                     model.Page = page; model.LastPage = lastPage;
+                    ViewData["Name"] = "Kategorie";
                 }
             }
             else

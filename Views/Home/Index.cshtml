@@ -19,7 +19,6 @@
             var subcategories = db.Entry(category)
                 .Collection(c => c.Subcategories)
                 .Query()
-                //.Where(s => s.SubcategoryId > 0)
                 .ToList();
             foreach (Subcategory subcategory in subcategories)
             {
