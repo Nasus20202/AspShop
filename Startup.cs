@@ -48,6 +48,56 @@ namespace ShopWebApp
                 app.UseDeveloperExceptionPage();
             }
 
+            // Populate PC Parts
+            using (var context = new ShopDatabase())
+            {
+                var category = new Category
+                {
+                    Name = "Podzespo³y Komputerowe",
+                    About = "PC Parts",
+                    Subcategories = new List<Subcategory>()
+                    {
+                        new Subcategory { Name = "Procesory", About="CPUs", Tags=""},
+                        new Subcategory { Name = "Karty graficzne", About="GPU", Tags=""},
+                        new Subcategory { Name = "P³yty g³ówne", About="MOBOs", Tags=""}
+                    }
+
+                };
+                context.Add(category);
+                //context.SaveChanges();
+            }
+            // Populate Keyboards
+            using (var context = new ShopDatabase())
+            {
+                var category = new Category
+                {
+                    Name = "Klawiatury",
+                    About = "Keyboards",
+                    Subcategories = new List<Subcategory>()
+                    {
+                        new Subcategory { Name = "Klawiatury 60%", About="60", Tags=""},
+                        new Subcategory { Name = "Klawiatury TKL", About="80", Tags=""},
+                        new Subcategory { Name = "Klawiatury 100%", About="100", Tags=""}
+                    }
+
+                };
+                context.Add(category);
+                //context.SaveChanges();
+            }
+            // Move Subcategories between Categories
+            using (var context = new ShopDatabase())
+            {
+                var category = (from c in context.Categories
+                                where c.CategoryId == 2
+                                select c).FirstOrDefault();
+                var subcategory = (from c in context.Subcategories
+                                   where c.SubcategoryId == 6
+                                   select c).FirstOrDefault();
+                subcategory.Category = category;
+                //context.SaveChanges();
+            }
+
+
             app.UseStaticFiles();
             app.UseRouting();
             

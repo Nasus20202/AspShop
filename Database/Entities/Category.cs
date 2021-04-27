@@ -15,5 +15,7 @@ namespace ShopWebApp
         public string Name { get; set; }
         public string About { get; set; }
 
+        public IList<Subcategory> Subcategories { get; set; }
+
     }
 }
