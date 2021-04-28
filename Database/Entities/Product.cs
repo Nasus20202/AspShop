@@ -22,5 +22,6 @@ namespace ShopWebApp
 
         public int SubcategoryId { get; set; }
         public Subcategory Subcategory { get; set; }
+        public IList<ProductOrder> ProductOrders { get; set; }
     }
 }
