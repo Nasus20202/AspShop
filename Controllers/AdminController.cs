@@ -125,7 +125,52 @@ namespace ShopWebApp
 
                 ViewData["Name"] = "Kategoria";
                 ViewData["ObjectName"] = category.Name;
-            } else { return Redirect("/Error/404"); }
+            }
+            else if(table == "subcategories")
+            {
+                var subcategory = new Subcategory();
+                using (var db = new ShopDatabase())
+                {
+                    subcategory = (from c in db.Subcategories
+                                where c.Name == name
+                                select c).FirstOrDefault();
+                    if (subcategory == null)
+                    {
+                        int id;
+                        if (int.TryParse(name, out id))
+                            subcategory = DbFunctions.FindSubcategoryById(id);
+                    }
+                    if (subcategory == null)
+                    {
+                        subcategory = (from c in db.Subcategories
+                                       where c.Code == name
+                                    select c).FirstOrDefault();
+                    }
+                }
+                model.Title = "Podkategoria : " + subcategory.Name;
+                if (subcategory == null)
+                    return Redirect("/Error/404");
+                model.Dict.Add("ID", subcategory.SubcategoryId.ToString());
+                model.Dict.Add("Nazwa", subcategory.Name);
+                model.Dict.Add("Kod", subcategory.Code);
+                model.Dict.Add("Tagi", subcategory.Tags);
+                model.Dict.Add("Opis", subcategory.About);
+                using (var db = new ShopDatabase())
+                {
+                    var loadedSubcategory = db.Subcategories.Single(s => s.SubcategoryId == subcategory.SubcategoryId);
+                    var products = db.Entry(loadedSubcategory)
+                               .Collection(c => c.Products)
+                                .Query()
+                                .ToList();
+                    ViewData["type"] = "products";
+                    if (products == null)
+                        ViewBag.ChildObjects = new List<Product>();
+                    ViewBag.ChildObjects = products;
+                }
+                ViewData["Name"] = "Podkategoria";
+                ViewData["ObjectName"] = subcategory.Name;
+            }
+            else { return Redirect("/Error/404"); }
 
             return View(model);
         }
@@ -135,6 +180,7 @@ namespace ShopWebApp
         [Route("/admin/table/{tablename}")]
         public IActionResult DatabaseTable(string tablename, [FromQuery] int page = 1)
         {
+            const int objectsPerPage = 10;
             var model = new AdminModel("Tabela " + tablename);
             if (User.Identity.IsAuthenticated)
             {
@@ -161,12 +207,13 @@ namespace ShopWebApp
                                       select c).ToList();
                     
                     AdminModel.AdminList table = new AdminModel.AdminList();
-                    int start = (page - 1) * 10, end = Math.Min(page * 10, userList.Count()), lastPage = userList.Count()/10;
-                    if (userList.Count() % 10 != 0) { lastPage++; }
+                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, userList.Count()), lastPage = userList.Count()/ objectsPerPage;
+                    if (userList.Count() % objectsPerPage != 0) { lastPage++; }
                     if(start < userList.Count())
                     {
                         for (int i = start; i < end; i++) {
                             table.Names.Add(userList[i].Email);
+                            table.Codes.Add(userList[i].UserId.ToString());
                         }
                     }
                     if (table.Names.Count() == 0)
@@ -187,13 +234,14 @@ namespace ShopWebApp
                                            select c).ToList();
 
                     AdminModel.AdminList table = new AdminModel.AdminList();
-                    int start = (page - 1) * 10, end = Math.Min(page * 10, categoryList.Count()), lastPage = categoryList.Count() / 10;
-                    if (categoryList.Count() % 10 != 0) { lastPage++; }
+                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, categoryList.Count()), lastPage = categoryList.Count() / objectsPerPage;
+                    if (categoryList.Count() % objectsPerPage != 0) { lastPage++; }
                     if (start < categoryList.Count())
                     {
                         for (int i = start; i < end; i++)
                         {
                             table.Names.Add(categoryList[i].Name);
+                            table.Codes.Add(categoryList[i].Code);
                         }
                     }
                     if (table.Names.Count() == 0)
@@ -204,6 +252,32 @@ namespace ShopWebApp
                     model.Table = table;
                     model.Page = page; model.LastPage = lastPage;
                     ViewData["Name"] = "Kategorie";
+                }
+            }
+            else if(tablename.ToLower() == "subcategories")
+            {
+                using (var db = new ShopDatabase())
+                {
+                    List<Subcategory> subcategoryList = (from c in db.Subcategories
+                                                         select c).ToList();
+                    AdminModel.AdminList table = new AdminModel.AdminList();
+                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, subcategoryList.Count()), lastPage = subcategoryList.Count() / objectsPerPage;
+                    if (start < subcategoryList.Count())
+                    {
+                        for(int i = start; i < end; i++)
+                        {
+                            table.Names.Add(subcategoryList[i].Name);
+                            table.Codes.Add(subcategoryList[i].Code);
+                        }
+                    }
+                    if(table.Names.Count() == 0)
+                    {
+                        return Redirect("/Error/404");
+                    }
+                    table.Path = "/admin/subcategories/";
+                    model.Table = table;
+                    model.Page = page; model.LastPage = lastPage;
+                    ViewData["Name"] = "Podkategorie";
                 }
             }
             else

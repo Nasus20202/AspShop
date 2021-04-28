@@ -8,12 +8,13 @@
 <br />
 
 @{ 
-    string ordersPath = "#";
-    string customOrdersPath = "#";
-    string usersPath = Url.Action("table", "admin") + "/users/";
-    string productsPath = "#";
-    string subcategoriesPath = "#";
-    string categoriesPath = Url.Action("table", "admin") + "/categories/";
+    string rootPath = Url.Action("table", "admin");
+    string ordersPath = rootPath + "/orders/";
+    string customOrdersPath = rootPath + "/customOrders/";
+    string usersPath =  rootPath + "/users/";
+    string productsPath = rootPath + "/products/";
+    string subcategoriesPath = rootPath + "/subcategories/";
+    string categoriesPath = rootPath + "/categories/";
 }
 
 <ul class="list-group">

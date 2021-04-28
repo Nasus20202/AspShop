@@ -26,10 +26,12 @@ namespace ShopWebApp
             public AdminList()
             {
                 Names = new List<string>();
+                Codes = new List<string>();
                 Path = "";
             }
 
             public List<string> Names { get; }
+            public List<string> Codes { get; }
             public string Path { get; set; }
         }
     }
