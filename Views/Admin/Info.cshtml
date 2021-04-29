@@ -35,8 +35,8 @@
                   {
                       string id = "", type = ViewData["type"].ToString();
                       if (type == "users")
-                          id = child.Email;
-                      else if (type == "categories" || type == "subcategory" || type == "products" || type == "orders")
+                          id = child.UserId;
+                      else if (type == "categories" || type == "subcategories" || type == "products" || type == "orders")
                           id = child.Code;
                       @:<tr>
                           @:<td>
