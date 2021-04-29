@@ -96,9 +96,21 @@ namespace ShopWebApp
                 subcategory.Category = category;
                 //context.SaveChanges();
             }
+            // Add products
+            using (var context = new ShopDatabase())
+            {
+                var subcategory = context.Subcategories
+                                .Single(s => s.SubcategoryId == 4);
+                context.Entry(subcategory)
+                    .Collection(s => s.Products)
+                    .Load();
+                var product = new Product { Name = "GK61", Brand= "HK Gaming", Code = "gk61", Price = 25000, Tags="", About = "", Photo = "" };
+                subcategory.Products.Add(product);
+                //context.SaveChanges();
+            }
 
 
-            app.UseStaticFiles();
+                app.UseStaticFiles();
             app.UseRouting();
             
             app.UseAuthentication();

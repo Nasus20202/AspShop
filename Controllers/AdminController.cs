@@ -80,7 +80,8 @@ namespace ShopWebApp
                 model.Dict.Add("Hash hasła (SHA256)", user.Password);
                 ViewData["Name"] = "Użytkownik";
                 ViewData["ObjectName"] = user.Email;
-            } else if(table == "categories")
+            } 
+            else if(table == "categories")
             {
                 
                 var category = new Category();
@@ -117,7 +118,7 @@ namespace ShopWebApp
                                .Collection(c => c.Subcategories)
                                 .Query()
                                 .ToList();
-                    ViewData["type"] = "subcategory";
+                    ViewData["type"] = "subcategories";
                     if (subcategories == null)
                         ViewBag.ChildObjects = new List<Subcategory>();
                     ViewBag.ChildObjects = subcategories;
@@ -170,7 +171,10 @@ namespace ShopWebApp
                 ViewData["Name"] = "Podkategoria";
                 ViewData["ObjectName"] = subcategory.Name;
             }
-            else { return Redirect("/Error/404"); }
+            else
+            { 
+                return Redirect("/Error/404"); 
+            }
 
             return View(model);
         }
@@ -195,6 +199,7 @@ namespace ShopWebApp
                     model.User.Role = user.Role;
                 }
             }
+
             if (tablename.ToLower() == "users")
             {
                 if (model.User.Role == null || Functions.permissionLevel(model.User.Role) < 3)

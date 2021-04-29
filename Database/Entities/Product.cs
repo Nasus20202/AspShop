@@ -9,11 +9,18 @@ namespace ShopWebApp
 {
     public class Product : EntityBase
     {
+        public Product() : base()
+        {
+            RatingSum = 0;
+            RatingVotes = 0;
+        }
         [Key]
         public int ProductId { get; set; }
         public string Name { get; set; }
+        public string Brand { get; set; }
         public string Code { get; set; }
         public int Price { get; set; }
+        public string Tags { get; set; }
         public string About { get; set; }
         public int RatingSum { get; set; }
         public int RatingVotes { get; set; }
