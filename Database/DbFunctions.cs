@@ -7,12 +7,15 @@ namespace ShopWebApp
 {
     public class DbFunctions
     {
+
+        //Categories
+
         public static Category FindCategoryById(int id)
         {
             using(var db = new ShopDatabase())
             {
                 var category = (from c in db.Categories
-                                where c.Id == id
+                                where c.CategoryId == id
                                 select c).FirstOrDefault();
                 return category;
             }
@@ -34,12 +37,159 @@ namespace ShopWebApp
                 }
             }
         }
+        public static void UpdateCategory(Category updatedCategory)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var category = (from c in db.Categories
+                            where c.CategoryId == updatedCategory.CategoryId
+                            select c).FirstOrDefault();
+                if (category == null)
+                    return;
+                category.Name = updatedCategory.Name;
+                category.Code = updatedCategory.Code;
+                category.About = updatedCategory.About;
+
+
+                category.Modified = DateTime.UtcNow;
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+
+        //Subcategories
+
+
+        public static Subcategory FindSubcategoryById(int id)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var subcategory = (from c in db.Subcategories
+                                where c.SubcategoryId == id
+                                select c).FirstOrDefault();
+                return subcategory;
+            }
+        }
+        public static void AddSubcategory(Subcategory subcategory)
+        {
+            if (subcategory == null)
+                return;
+            using (var db = new ShopDatabase())
+            {
+                db.Subcategories.Add(subcategory);
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch
+                {
+                    return;
+                }
+            }
+        }
+        public static void UpdateSubategory(Subcategory updatedSubcategory)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var subcategory = (from c in db.Subcategories
+                                where c.SubcategoryId == updatedSubcategory.SubcategoryId
+                                select c).FirstOrDefault();
+                if (subcategory == null)
+                    return;
+                subcategory.Name = updatedSubcategory.Name;
+                subcategory.Code = updatedSubcategory.Code;
+                subcategory.About = updatedSubcategory.About;
+                subcategory.Tags = updatedSubcategory.Tags;
+
+
+                subcategory.Modified = DateTime.UtcNow;
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+
+        //Products
+
+
+        public static Product FindProductById(int id)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var product = (from c in db.Products
+                                where c.ProductId == id
+                                select c).FirstOrDefault();
+                return product;
+            }
+        }
+        public static void AddProduct(Product product)
+        {
+            if (product == null)
+                return;
+            using (var db = new ShopDatabase())
+            {
+                db.Products.Add(product);
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch
+                {
+                    return;
+                }
+            }
+        }
+        public static void UpdateProduct(Product updatedProduct)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var product = (from c in db.Products
+                                where c.ProductId == updatedProduct.ProductId
+                                select c).FirstOrDefault();
+                if (product == null)
+                    return;
+                product.Name = updatedProduct.Name;
+                product.Code = updatedProduct.Code;
+                product.About = updatedProduct.About;
+                product.Price = updatedProduct.Price;
+                product.RatingSum = updatedProduct.RatingSum;
+                product.RatingVotes = updatedProduct.RatingSum;
+                //Photo - no changes, file path is not static. May be changed in the future
+
+                product.Modified = DateTime.UtcNow;
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+
+        //Users
+
         public static User FindUserById(int id)
         {
             using (var db = new ShopDatabase())
             {
                 var user = (from c in db.Users
-                                where c.Id == id
+                                where c.UserId == id
                                 select c).FirstOrDefault();
                 return user;
             }
@@ -76,7 +226,7 @@ namespace ShopWebApp
             using (var db = new ShopDatabase())
             {
                 var user = (from c in db.Users
-                            where c.Id == updatedUser.Id
+                            where c.UserId == updatedUser.UserId
                             select c).FirstOrDefault();
                 if (user == null)
                     return;

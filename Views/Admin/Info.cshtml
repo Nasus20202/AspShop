@@ -1,0 +1,56 @@
+﻿@using ShopWebApp
+@model AdminModel
+@{
+    Layout = "_AdminLayout";
+}
+<br />
+<h2 style="text-align:center">@ViewData["Name"] - @ViewData["ObjectName"]</h2>
+<br />
+<table class="table">
+    <tbody>
+        @{
+            foreach (KeyValuePair<string, string> kvp in Model.Dict)
+            {
+                @:<tr>
+                    @:<th>
+                        @kvp.Key
+                @:</th>
+                @:<td>
+                    @kvp.Value
+            @:</td>
+        @:</tr>
+    }
+        }
+    </tbody>
+</table>
+
+@if (ViewBag.ChildObjects != null && ViewBag.ChildObjects.Count > 0)
+{
+    var childObjects = ViewBag.ChildObjects;
+    @:<h4>Obiekty dziedziczące</h4>
+      <table class="table">
+          <tbody>
+              @{
+                  foreach (var child in childObjects)
+                  {
+                      string id = "", type = ViewData["type"].ToString();
+                      if (type == "users")
+                          id = child.UserId;
+                      else if (type == "categories" || type == "subcategories" || type == "products" || type == "orders")
+                          id = child.Code;
+                      @:<tr>
+                          @:<td>
+                              <a href="/admin/@type/@id">@child.Name</a>
+                          @:</td>
+                      @:</tr>
+                  }
+              }
+          </tbody>
+      </table>
+}
+
+
+@{ 
+    string path = Url.Action("Table", "Admin")+"/" + Model.Tablename;
+}
+<a href="@path" class="btn btn-outline-primary btn-lg btn-block" style="margin-top: 7px">Lista rekordów tabeli @Model.Tablename</a>

@@ -1,18 +1,48 @@
 ﻿@using ShopWebApp
 @{
-    Layout = "_Layout";
-}
-Kategorie w bazie danych:
-@{
-    string categoryString = "";
-    List<Category> categoryList;
-    using (var db = new ShopDatabase())
-    {
-        categoryList = (from c in db.Categories select c).ToList<Category>();
-    }
-    foreach(Category c in categoryList) {
-        categoryString += c.Name + "<br>";
-    }
+    Layout = "_AdminLayout";
 }
 
-@categoryString
+<br />
+<h2 style="text-align:center">Obsługa klientów</h2>
+<br />
+
+@{ 
+    string rootPath = Url.Action("table", "admin");
+    string ordersPath = rootPath + "/orders/";
+    string customOrdersPath = rootPath + "/customOrders/";
+    string usersPath =  rootPath + "/users/";
+    string productsPath = rootPath + "/products/";
+    string subcategoriesPath = rootPath + "/subcategories/";
+    string categoriesPath = rootPath + "/categories/";
+}
+
+<ul class="list-group">
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="@ordersPath" class="text-dark">Zamówienia</a>
+        <span class="badge badge-success badge-pill">3</span>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="@customOrdersPath" class="text-dark">Zamówienia niestandardowe</a>
+        <span class="badge badge-success badge-pill">1</span>
+    </li>
+    @if (Functions.permissionLevel(Model.User.Role) >= 3){ 
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="@usersPath" class="text-info">Użytkownicy</a>
+    </li>
+    }
+</ul>
+<br />
+<h2 style="text-align:center">Struktura sklepu</h2>
+<br />
+<ul class="list-group">
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="@productsPath" class="text-dark">Produkty</a>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="@subcategoriesPath" class="text-info">Podkategorie</a>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="@categoriesPath" class="text-info">Kategorie</a>
+    </li>
+</ul>

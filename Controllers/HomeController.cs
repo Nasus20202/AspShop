@@ -26,5 +26,31 @@ namespace ShopWebApp
             }
             return View(model);
         }
+
+        [Route("/Error/{code:int}")]
+        public IActionResult Error(int code)
+        {
+            var model = new BaseViewModel("Sklep");
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                }
+            }
+            ViewData["errorCode"] = code;
+            ViewData["aboutError"] = "";
+            if(code == 404)
+            {
+                ViewData["aboutError"] = "Przepraszamy, ale strona o podanym adresie nie istnieje";
+            }
+            model.Title = "Wystąpił błąd";
+            return View(model);
+        }
     }
 }

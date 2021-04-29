@@ -1,0 +1,51 @@
+﻿@using ShopWebApp
+@model AdminModel
+@{
+    Layout = "_AdminLayout";
+}
+<br />
+<h2 style="text-align:center">Tabela @ViewData["Name"] - strona @Model.Page</h2>
+<br />
+
+
+<table class="table">
+    <tbody>
+        @{
+            for(int i = 0; i < Model.Table.Names.Count(); i++)
+            {
+                string name = Model.Table.Names[i];
+                string id = Model.Table.Codes[i];
+                @:<tr>
+                    @:<td>
+                        <a href="@Model.Table.Path@id">@name</a>
+                        <br />
+                    @:</td>
+                @:</tr>
+            }
+        }
+    </tbody>
+</table>
+
+<form class="form-inline" method="get">
+    <div class="form-group mx-sm-3 mb-2">
+        <label for="inputPage" class="sr-only">Numer strony</label>
+        <input type="text" class="form-control form-control-sm" id="inputPage" name="page" placeholder="Numer strony">
+    </div>
+    <button type="submit" class="btn btn-primary btn-primary-outline mb-2 btn-sm">Idź do strony</button>
+</form>
+@{
+    int prev = Model.Page - 1, next = Model.Page + 1;
+    if (Model.Page >= 1)
+    {
+        if (Model.Page > 1)
+        {
+            @:<a class="float-left text-dark" href="?page=@prev"><i class="bi-arrow-left"></i> Poprzednia</a>
+        }
+        if (Model.Page < Model.LastPage)
+        {
+            @:<a class="float-right text-dark" href="?page=@next">Następna <i class="bi-arrow-right"></i></a>
+        }
+    }
+}
+
+
