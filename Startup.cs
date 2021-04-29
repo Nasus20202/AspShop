@@ -48,7 +48,69 @@ namespace ShopWebApp
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseStaticFiles();
+            // Populate PC Parts
+            using (var context = new ShopDatabase())
+            {
+                var category = new Category
+                {
+                    Name = "Podzespo³y Komputerowe",
+                    About = "PC Parts",
+                    Subcategories = new List<Subcategory>()
+                    {
+                        new Subcategory { Name = "Procesory", About="CPUs", Tags=""},
+                        new Subcategory { Name = "Karty graficzne", About="GPU", Tags=""},
+                        new Subcategory { Name = "P³yty g³ówne", About="MOBOs", Tags=""}
+                    }
+
+                };
+                context.Add(category);
+                //context.SaveChanges();
+            }
+            // Populate Keyboards
+            using (var context = new ShopDatabase())
+            {
+                var category = new Category
+                {
+                    Name = "Klawiatury",
+                    About = "Keyboards",
+                    Subcategories = new List<Subcategory>()
+                    {
+                        new Subcategory { Name = "Klawiatury 60%", About="60", Tags=""},
+                        new Subcategory { Name = "Klawiatury TKL", About="80", Tags=""},
+                        new Subcategory { Name = "Klawiatury 100%", About="100", Tags=""}
+                    }
+
+                };
+                context.Add(category);
+                //context.SaveChanges();
+            }
+            // Move Subcategories between Categories
+            using (var context = new ShopDatabase())
+            {
+                var category = (from c in context.Categories
+                                where c.CategoryId == 2
+                                select c).FirstOrDefault();
+                var subcategory = (from c in context.Subcategories
+                                   where c.SubcategoryId == 6
+                                   select c).FirstOrDefault();
+                subcategory.Category = category;
+                //context.SaveChanges();
+            }
+            // Add products
+            using (var context = new ShopDatabase())
+            {
+                var subcategory = context.Subcategories
+                                .Single(s => s.SubcategoryId == 4);
+                context.Entry(subcategory)
+                    .Collection(s => s.Products)
+                    .Load();
+                var product = new Product { Name = "GK61", Brand= "HK Gaming", Code = "gk61", Price = 25000, Tags="", About = "", Photo = "" };
+                subcategory.Products.Add(product);
+                //context.SaveChanges();
+            }
+
+
+                app.UseStaticFiles();
             app.UseRouting();
             
             app.UseAuthentication();
@@ -56,12 +118,13 @@ namespace ShopWebApp
             var db = new ShopDatabase();
             db.Database.EnsureCreated();
 
+            app.UseStatusCodePagesWithRedirects("/Error/{0}");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapControllerRoute(
                 "default", "{controller=Home}/{action=Index}/{id?}");
-            });
+            });         
         }
     }
 }

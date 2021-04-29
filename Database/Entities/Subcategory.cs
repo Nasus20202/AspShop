@@ -7,16 +7,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ShopWebApp
 {
-    public class Category : EntityBase
+    public class Subcategory : EntityBase
     {
         [Key]
-        public int CategoryId { get; set; }
+        public int SubcategoryId { get; set;  }
         public string Code { get; set; }
-
         public string Name { get; set; }
         public string About { get; set; }
+        public string Tags { get; set; }
 
-        public IList<Subcategory> Subcategories { get; set; }
 
+        public int CategoryId { get; set; }
+        public Category Category { get; set; }
+
+        public IList<Product> Products { get; set; }
     }
 }
