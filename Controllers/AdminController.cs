@@ -184,6 +184,8 @@ namespace ShopWebApp
         [Route("/admin/table/{tablename}")]
         public IActionResult DatabaseTable(string tablename, [FromQuery] int page = 1)
         {
+            if (page < 1)
+                return Redirect("/Error/404");
             const int objectsPerPage = 10;
             var model = new AdminModel("Tabela " + tablename);
             if (User.Identity.IsAuthenticated)
@@ -237,7 +239,6 @@ namespace ShopWebApp
                 {
                     List<Category> categoryList = (from c in db.Categories
                                            select c).ToList();
-
                     AdminModel.AdminList table = new AdminModel.AdminList();
                     int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, categoryList.Count()), lastPage = categoryList.Count() / objectsPerPage;
                     if (categoryList.Count() % objectsPerPage != 0) { lastPage++; }

@@ -1,8 +1,6 @@
 ﻿@using ShopWebApp
 @model BaseViewModel
-@{
 
-}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,23 +29,37 @@
         <!-- Navbar links -->
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                        Dropdown link
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">Link 1</a>
-                        <a class="dropdown-item" href="#">Link 2</a>
-                        <a class="dropdown-item" href="#">Link 3</a>
-                    </div>
-                </li>
+                @{
+                    using (var db = new ShopDatabase())
+                    {
+                        List<Category> categories = (from c in db.Categories
+                                                     select c).ToList();
+                        foreach (Category cat in categories)
+                        {
+                            @:<li class="nav-item dropdown">
+                                @:<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                    @cat.Name
+                                @:</a>
+                                db.Entry(cat)
+                                    .Collection(c => c.Subcategories)
+                                    .Load();
+                                var subcategories = cat.Subcategories.ToList();
+                                @:<div class="dropdown-menu">
+                                    @:<a class="dropdown-item font-weight-bold" href="/s/@cat.Code">Wszystkie</a>
+                                    @:<div class="dropdown-divider"></div>
+                                    foreach (Subcategory subcat in subcategories)
+                                    {
+                                        @:<a class="dropdown-item" href="/s/@cat.Code/@subcat.Code">@subcat.Name</a>
+                                    }
+                                @:</div>
+                            @:</li>
+                        }
+                    }
+                }
 
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Custom</a>
+                </li>
             </ul>
             <ul class="navbar-nav justify-content-right">
                 <li class="nav-item dropdown">
@@ -75,15 +87,15 @@
             </ul>
         </div>
     </nav>
-    <div class="container" style="padding-top:65px">
+    <div class="container-fluid" style="padding-top:65px; padding-left: 5vw; padding-right: 5vw">
         <div class="row">
-            <div class="col-sm-2">
+            <div class="col-md-2">
                 @RenderSection("left", false)
             </div>
-            <div class="col-sm-8">
+            <div class="col-md-8">
                 @RenderBody()
             </div>
-            <div class="col-sm-2">
+            <div class="col-md-2">
                 @RenderSection("right", false)
             </div>
         </div>
