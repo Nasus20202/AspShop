@@ -22,9 +22,12 @@ namespace ShopWebApp
         public int Price { get; set; }
         public string Tags { get; set; }
         public string About { get; set; }
+        public string LongAbout { get; set; }
         public int RatingSum { get; set; }
         public int RatingVotes { get; set; }
         public string Photo { get; set; }
+        public string OtherPhotos { get; set; }
+
 
 
         public int SubcategoryId { get; set; }

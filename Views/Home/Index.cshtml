@@ -7,22 +7,32 @@
     @Model.User.Name
 }
 <br />
-<h3>Sklep</h3>
 
-@{ 
+@{
     using (var db = new ShopDatabase())
     {
         var categories = db.Categories.ToList();
         foreach (Category category in categories)
         {
-            @:<h5>@category.Name:</h5>
+            @:<p>@category.Name:</p>
             var subcategories = db.Entry(category)
                 .Collection(c => c.Subcategories)
                 .Query()
                 .ToList();
             foreach (Subcategory subcategory in subcategories)
             {
-                @subcategory.Name@:<br />
+                @:<p style="margin-left: 20px">@subcategory.Name</p>
+                var products = db.Entry(subcategory)
+                    .Collection(s => s.Products)
+                    .Query()
+                    .ToList();
+                foreach (Product product in products)
+                {
+                    @:<div class="row">                     
+                        @:<p class="col-8" style="margin-left: 40px">@product.Name</p><br />
+                        @:<img class="img-fluid float-right col-4" style="max-width:20%" src="/images/@product.Photo" alt="@product.Code" />
+                    @:</div>
+                }
             }
             @:<br /><br />
         }
