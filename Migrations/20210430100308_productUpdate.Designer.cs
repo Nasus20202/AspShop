@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopWebApp;
 
 namespace ShopWebApp.Migrations
 {
     [DbContext(typeof(ShopDatabase))]
-    partial class ShopDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20210430100308_productUpdate")]
+    partial class productUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,9 +125,6 @@ namespace ShopWebApp.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("RatingVotes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.Property<int>("SubcategoryId")

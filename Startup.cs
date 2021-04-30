@@ -75,9 +75,10 @@ namespace ShopWebApp
                     About = "Keyboards",
                     Subcategories = new List<Subcategory>()
                     {
-                        new Subcategory { Name = "Klawiatury 60%", About="60", Tags=""},
-                        new Subcategory { Name = "Klawiatury TKL", About="80", Tags=""},
-                        new Subcategory { Name = "Klawiatury 100%", About="100", Tags=""}
+                        new Subcategory { Name = "Klawiatury 60%", About="60", Tags="",  Code="keyboard60"},
+                        new Subcategory { Name = "Klawiatury TKL", About="80", Tags="", Code="keyboard80"},
+                        new Subcategory { Name = "Klawiatury 100%", About="100", Tags="", Code="keyboard100"},
+                        new Subcategory { Name = "Prze³¹czniki", About="Switches", Tags="", Code="switch"}
                     }
 
                 };
@@ -104,13 +105,12 @@ namespace ShopWebApp
                 context.Entry(subcategory)
                     .Collection(s => s.Products)
                     .Load();
-                var product = new Product { Name = "GK61", Brand= "HK Gaming", Code = "gk61", Price = 25000, Tags="", About = "", Photo = "" };
+                var product = new Product { Name = "K87", Brand= "Womier", Code = "k87", Price = 37999, Tags="", About = "", Photo = "k87.webp", OtherPhotos = "", LongAbout ="" };
                 subcategory.Products.Add(product);
                 //context.SaveChanges();
             }
 
-
-                app.UseStaticFiles();
+            app.UseStaticFiles();
             app.UseRouting();
             
             app.UseAuthentication();

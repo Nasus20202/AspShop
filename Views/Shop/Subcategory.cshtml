@@ -1,0 +1,53 @@
+﻿@using ShopWebApp
+@model SubcategoryModel
+@{
+    Layout = "_Layout";
+    int c = 0;
+}
+<div class="row">
+    @foreach (Product prod in Model.Products)
+    {
+        if (c == 3)
+        {
+        @:</div>
+        @:<div class="row">
+            c = 0;
+        }
+        c++;
+        <div class="col-lg-4 d-flex align-items-stretch" style="padding-left: 5px; padding-right: 5px">
+            <div class="card" style="margin-top: 10px;">
+                <img class="card-img-top" src="/images/@prod.Photo" alt="@prod.Code" style="margin-top: 10px; padding-left:5px; padding-right:5px">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">@prod.Brand @prod.Name</h5>
+                    <p class="card-text">@prod.About</p>
+                    @{
+                        double price = prod.Price / 100.0;
+                    }
+                    @if (prod.Stock > 0)
+                    {
+                        <div class="btn-group mt-auto">
+                            <a href="#" class="btn btn-outline-primary">@price zł</a>
+                            <a href="#" class="btn btn-outline-success"><i class="bi-cart-plus-fill"></i></a>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="#" class="btn btn-outline-warning mt-auto">Niedostępny</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@{
+    int prev = Model.Page - 1, next = Model.Page + 1;
+}
+<br />
+@if (Model.Page > 1) 
+{
+    @:<a class="float-left text-dark" href="?page=@prev"><i class="bi-arrow-left"></i> Poprzednia</a>
+}
+@if (Model.Page < Model.LastPage)
+{
+    @:<a class="float-right text-dark" href="?page=@next">Następna <i class="bi-arrow-right"></i></a>
+}
