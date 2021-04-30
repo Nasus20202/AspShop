@@ -7,8 +7,11 @@ namespace ShopWebApp
 {
     public class SubcategoryModel : BaseViewModel
     {
-        public SubcategoryModel() : base() { }
+        public SubcategoryModel() : base() {}
         public IList<Product> Products { get; set; }
+
+        public int Page { get; set; }
+        public int LastPage { get; set; }
         public Subcategory Subcategory { get; set; }
         public int SubcategoryId { get; set; }
 

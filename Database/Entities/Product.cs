@@ -13,6 +13,10 @@ namespace ShopWebApp
         {
             RatingSum = 0;
             RatingVotes = 0;
+            About = "";
+            LongAbout = "";
+            Photo = "";
+            OtherPhotos = "";
         }
         [Key]
         public int ProductId { get; set; }
@@ -27,6 +31,7 @@ namespace ShopWebApp
         public int RatingVotes { get; set; }
         public string Photo { get; set; }
         public string OtherPhotos { get; set; }
+        public int Stock { get; set; }
 
 
 

@@ -105,13 +105,12 @@ namespace ShopWebApp
                 context.Entry(subcategory)
                     .Collection(s => s.Products)
                     .Load();
-                var product = new Product { Name = "K320", Brand= "Durgod", Code = "", Price = 37999, Tags="", About = "", Photo = "k320.webp", OtherPhotos = "", LongAbout ="" };
+                var product = new Product { Name = "K87", Brand= "Womier", Code = "k87", Price = 37999, Tags="", About = "", Photo = "k87.webp", OtherPhotos = "", LongAbout ="" };
                 subcategory.Products.Add(product);
                 //context.SaveChanges();
             }
 
-
-                app.UseStaticFiles();
+            app.UseStaticFiles();
             app.UseRouting();
             
             app.UseAuthentication();
