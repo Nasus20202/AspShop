@@ -1,0 +1,99 @@
+﻿<div>
+    @using ShopWebApp
+@model SearchModel
+@{
+    Layout = "_Layout";
+    int c = 0;
+}
+@section top{
+    <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
+        <h3 class="text-center display-4 align-bottom">@Model.SearchFor</h3>
+        <p class="text-center">@Model.Count wyników</p>
+    </div>
+}
+<div style="text-align:center">
+    <h4 class="text-info">@ViewData["message"]</h4>
+</div>
+
+<div class="row">
+    @foreach (Product prod in Model.Products)
+    {
+        if (c == 3)
+        {
+        @:</div>
+        @:<div class="row">
+            c = 0;
+        }
+        c++;
+        <div class="col-lg-4 d-flex align-items-stretch" style="padding-left: 5px; padding-right: 5px">
+            <div class="card" style="margin-top: 10px;">
+                <img class="card-img-top" src="/images/@prod.Photo" alt="@prod.Code" style="margin-top: 10px; padding-left:5px; padding-right:5px">
+                <div class="card-body d-flex flex-column">
+                    @{
+                        double price = prod.Price / 100.0;
+                        double rate = -1;
+                        int stars = 0, halfStars = 0;
+                        if (prod.RatingVotes > 0)
+                        {
+                            rate = Math.Round(prod.RatingSum / (double)prod.RatingVotes, 2);
+                            halfStars = Convert.ToInt32(rate / 0.5);
+                            double rest = rate - halfStars * 0.5;
+                            if (rest >= 0.5)
+                                halfStars++;
+                            stars = halfStars / 2;
+                            if (halfStars % 2 == 1)
+                                halfStars = 1;
+                            else
+                                halfStars = 0;
+                        }
+                    }
+                    <h5 class="card-title">@prod.Brand @prod.Name</h5>
+                    <p class="card-text">@prod.About</p>
+                    <p class="text-warning mt-auto">
+                        @if (rate != -1)
+                        {
+                            @for (int i = 0; i < stars; i++)
+                            {
+                                @:<i class="bi-star-fill"></i>
+                            }
+                            @if (halfStars == 1)
+                            {
+                                @:<i class="bi-star-half"></i>
+                            }
+                            @for (int i = stars + halfStars; i < 5; i++)
+                            {
+                                @:<i class="bi-star"></i>
+                            }
+                            @:(@prod.RatingVotes)
+                        }
+                    </p>
+
+                    @if (prod.Stock != 0)
+                    {
+                        <div class="btn-group mt-auto">
+                            <a href="/p/@prod.Code" class="btn btn-outline-primary">@price zł</a>
+                            <a href="#" class="btn btn-outline-success"><i class="bi-cart-plus-fill"></i></a>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="#" class="btn btn-outline-warning mt-auto">Niedostępny</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@{
+    int prev = Model.Page - 1, next = Model.Page + 1;
+}
+<br />
+@if (Model.Page > 1)
+{
+    @:<a class="float-left text-dark" href="?name=@Model.SearchFor&page=@prev"><i class="bi-arrow-left"></i> Poprzednia</a>
+}
+@if (Model.Page < Model.LastPage)
+{
+    @:<a class="float-right text-dark" href="?name=@Model.SearchFor&page=@next">Następna <i class="bi-arrow-right"></i></a>
+}
+</div>

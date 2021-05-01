@@ -177,5 +177,51 @@ namespace ShopWebApp.Controllers
             model.Title = product.Brand + " " + product.Name;
             return View(model);
         }
+        [Route("/search")]
+        public IActionResult Search([FromQuery] string name = " ", [FromQuery] int page = 1)
+        {
+            if (name == null)
+                return Redirect("/Error/404");
+            var model = new SearchModel();
+            model.SearchFor = name;
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                }
+            }
+            using (var db = new ShopDatabase()) {
+                var products = db.Products
+                    .Where(p => p.Name.Contains(name) || p.Brand.Contains(name))
+                    .ToList();
+                products = products.OrderByDescending(p => p.RatingVotes).ToList();
+                model.Count = products.Count;
+                var cutProductList = new List<Product>();
+                if(products.Count == 0)
+                {
+                    ViewData["message"] = "Brak wyników! Polecamy inne produkty dostępne w naszym sklepie";
+                    products = db.Products.OrderByDescending(p => p.RatingVotes).ToList();
+                }
+                else if (page <= 0 || page > products.Count / productsPerPage + (products.Count % productsPerPage != 0 ? 1 : 0))
+                    return Redirect("/Error/404");
+                for (int i = (page - 1) * productsPerPage; i < Math.Min(page * productsPerPage, products.Count); i++)
+                {
+                    cutProductList.Add(products[i]);
+                }
+                model.LastPage = products.Count / productsPerPage;
+                if (products.Count % productsPerPage != 0)
+                    model.LastPage++;
+                model.Page = page;
+                model.Products = cutProductList;
+            }
+            model.Title = "Szukaj: " + name;
+            return View(model);
+        }
     }
 }
