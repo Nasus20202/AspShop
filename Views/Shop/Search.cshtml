@@ -4,11 +4,19 @@
 @{
     Layout = "_Layout";
     int c = 0;
+    int count = Model.Count;
+    string result = count.ToString() + " ";
+    if (count == 1)
+        result += "wynik";
+    else if(count > 1 && count <=4)
+        result += "wyniki";
+    else
+        result += "wyników";
 }
 @section top{
     <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
         <h3 class="text-center display-4 align-bottom">@Model.SearchFor</h3>
-        <p class="text-center">@Model.Count wyników</p>
+        <p class="text-center">@result</p>
     </div>
 }
 <div style="text-align:center">

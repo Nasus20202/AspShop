@@ -38,7 +38,7 @@ namespace ShopWebApp
         public IActionResult Info(string table, string name)
         {
             var model = new AdminModel();
-
+            table = table.ToLower();
             if (User.Identity.IsAuthenticated)
             {
                 using (var db = new ShopDatabase())
@@ -60,13 +60,14 @@ namespace ShopWebApp
                 {
                     return Forbid();
                 }
-                model.Title = "Użytkownik : " + name;
+                
                 var user = DbFunctions.FindUserByEmail(name);
                 if (user == null) {
                     int id;
                     if(int.TryParse(name, out id))
                         user = DbFunctions.FindUserById(id);
                 }
+                model.Title = "Użytkownik : " + user.Email;
                 if (user == null)
                     return Redirect("/Error/404");
                 model.Dict.Add("ID", user.UserId.ToString());
@@ -171,6 +172,38 @@ namespace ShopWebApp
                 ViewData["Name"] = "Podkategoria";
                 ViewData["ObjectName"] = subcategory.Name;
             }
+            else if(table == "products")
+            {
+                Product product = new Product();
+                using(var db = new ShopDatabase())
+                {
+                    product = (from p in db.Products
+                               where p.Code == name
+                               select p).FirstOrDefault();
+                }
+                if(product == null)
+                {
+                    int id;
+                    if (int.TryParse(name, out id))
+                        product = DbFunctions.FindProductById(id);
+                }
+                if (product == null)
+                    return Redirect("/Erorr/404");
+                model.Dict.Add("ID", product.ProductId.ToString());
+                model.Dict.Add("Nazwa", product.Name);
+                model.Dict.Add("Producent", product.Brand);
+                model.Dict.Add("Kod", product.Code);
+                model.Dict.Add("Cena", (product.Price / 100.0).ToString() + " zł");
+                model.Dict.Add("Ilość dostępnych", product.Stock.ToString());
+                model.Dict.Add("Zdjęcie główne", product.Photo);
+                model.Dict.Add("Dodatkowe zdjęcia", product.OtherPhotos);
+                model.Dict.Add("Ocena produktu", product.RatingVotes > 0 ? Math.Round(product.RatingSum / (double)product.RatingVotes, 2).ToString() + " (" + product.RatingVotes + ")" : "Brak ocen");
+                model.Dict.Add("Tagi", product.Tags);
+                model.Dict.Add("Krótki opis", product.About);
+                model.Dict.Add("Długi opis", product.LongAbout);
+                ViewData["Name"] = "Produkt";
+                ViewData["ObjectName"] = product.Brand + " " + product.Name;
+            }
             else
             { 
                 return Redirect("/Error/404"); 
@@ -184,9 +217,13 @@ namespace ShopWebApp
         [Route("/admin/table/{tablename}")]
         public IActionResult DatabaseTable(string tablename, [FromQuery] int page = 1)
         {
+
+            // Number of objects displayed on one page
+            const int objectsPerPage = 50;
+
+
             if (page < 1)
                 return Redirect("/Error/404");
-            const int objectsPerPage = 10;
             var model = new AdminModel("Tabela " + tablename);
             if (User.Identity.IsAuthenticated)
             {
@@ -202,7 +239,8 @@ namespace ShopWebApp
                 }
             }
 
-            if (tablename.ToLower() == "users")
+            tablename = tablename.ToLower();
+            if (tablename == "users")
             {
                 if (model.User.Role == null || Functions.permissionLevel(model.User.Role) < 3)
                 {
@@ -210,8 +248,7 @@ namespace ShopWebApp
                 }
                 using (var db = new ShopDatabase())
                 {
-                    List<User> userList = (from c in db.Users
-                                      select c).ToList();
+                    List<User> userList = db.Users.OrderBy(u => u.Email).ToList();
                     
                     AdminModel.AdminList table = new AdminModel.AdminList();
                     int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, userList.Count()), lastPage = userList.Count()/ objectsPerPage;
@@ -233,14 +270,13 @@ namespace ShopWebApp
                     ViewData["Name"] = "użytkownicy";
                 }
             }
-            else if(tablename.ToLower() == "categories")
+            else if(tablename == "categories")
             {
                 using (var db = new ShopDatabase())
                 {
-                    List<Category> categoryList = (from c in db.Categories
-                                           select c).ToList();
+                    List<Category> categoryList = db.Categories.OrderBy(c => c.Name).ToList();
                     AdminModel.AdminList table = new AdminModel.AdminList();
-                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, categoryList.Count()), lastPage = categoryList.Count() / objectsPerPage;
+                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, categoryList.Count()), lastPage = categoryList.Count() / objectsPerPage + (categoryList.Count() % objectsPerPage == 0 ? 0 : 1);
                     if (categoryList.Count() % objectsPerPage != 0) { lastPage++; }
                     if (start < categoryList.Count())
                     {
@@ -260,14 +296,13 @@ namespace ShopWebApp
                     ViewData["Name"] = "Kategorie";
                 }
             }
-            else if(tablename.ToLower() == "subcategories")
+            else if(tablename == "subcategories")
             {
                 using (var db = new ShopDatabase())
                 {
-                    List<Subcategory> subcategoryList = (from c in db.Subcategories
-                                                         select c).ToList();
+                    List<Subcategory> subcategoryList = db.Subcategories.OrderBy(s => s.Name).ToList();
                     AdminModel.AdminList table = new AdminModel.AdminList();
-                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, subcategoryList.Count()), lastPage = subcategoryList.Count() / objectsPerPage;
+                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, subcategoryList.Count()), lastPage = subcategoryList.Count() / objectsPerPage + (subcategoryList.Count() % objectsPerPage == 0 ? 0 : 1);
                     if (start < subcategoryList.Count())
                     {
                         for(int i = start; i < end; i++)
@@ -286,6 +321,31 @@ namespace ShopWebApp
                     ViewData["Name"] = "Podkategorie";
                 }
             }
+            else if(tablename == "products")
+            {
+                using (var db = new ShopDatabase())
+                {
+                    List<Product> productList = db.Products.OrderBy(p => p.Brand).ToList();
+                    AdminModel.AdminList table = new AdminModel.AdminList();
+                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, productList.Count()), lastPage = productList.Count() / objectsPerPage + (productList.Count()%objectsPerPage == 0 ? 0 : 1);
+                    if (start < productList.Count())
+                    {
+                        for (int i = start; i < end; i++)
+                        {
+                            table.Names.Add(productList[i].Brand + " " + productList[i].Name);
+                            table.Codes.Add(productList[i].Code);
+                        }
+                    }
+                    if (table.Names.Count() == 0)
+                    {
+                        return Redirect("/Error/404");
+                    }
+                    table.Path = "/admin/products/";
+                    model.Table = table;
+                    model.Page = page; model.LastPage = lastPage;
+                    ViewData["Name"] = "Produkty";
+                }
+            }
             else
             {
                 return Redirect("/Error/404");
@@ -293,5 +353,62 @@ namespace ShopWebApp
             model.Tablename = tablename;
             return View(model);
         }
+
+        // Edit object
+
+        [Route("/admin/{table}/{name}/edit")]
+        public IActionResult Edit(string table, string name)
+        {
+            var model = new BaseViewModel();
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                    model.User.Role = user.Role;
+                }
+            }
+            if (table == "categories")
+            {
+
+            }
+            else if (table == "subcategories")
+            {
+
+            }
+            else if (table == "products")
+            {
+
+            }
+            else
+                return Redirect("/Error/404");
+            model.Title = "Edytuj " + name + " w " + table;
+            return View(model);
+        }
+
+        /*[Route("/admin/search")]
+        public IActionResult Search([FromQuery] string name, [FromQuery] int page)
+        {
+            var model = new BaseViewModel();
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                    model.User.Role = user.Role;
+                }
+            }
+            return View(, model);
+        }*/
     }
 }
