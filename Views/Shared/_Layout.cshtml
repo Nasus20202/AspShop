@@ -63,8 +63,21 @@
             </ul>
             <ul class="navbar-nav justify-content-right">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-light" href="#" id="navbardrop" data-toggle="dropdown">
-                        Konto
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Szukaj  <i class="bi-search text-light"  style="margin-left:2px"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <form class="px-2 py-1" action="/search" method="get">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="name" placeholder="Szukaj..." required>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-block btn-outline-success">Szukaj</button>
+                        </form>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Konto  <i class="bi-person-circle text-light" style="margin-left:2px"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
                         @if (User.Identity.IsAuthenticated)
@@ -82,7 +95,7 @@
                     </div>
                 </li>
                 <li class="nav-item mr-1">
-                    <a class="nav-link text-light" href="#">Koszyk</a>
+                    <a class="nav-link" href="#">Koszyk  <i class="bi-cart  text-light"  style="margin-left:2px"></i></a>
                 </li>
             </ul>
         </div>
