@@ -137,5 +137,45 @@ namespace ShopWebApp.Controllers
             model.Title = model.Subcategory.Name;
             return View(model);
         }
+        [Route("/p/{productName}")]
+        public IActionResult Product(string productName)
+        {
+            var model = new BaseViewModel();
+            var product = new Product();
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                }
+            }
+            using (var db = new ShopDatabase())
+            {
+                product = (from c in db.Products
+                           where c.Code == productName
+                           select c).FirstOrDefault();
+                if (product == null)
+                    product = (from c in db.Products
+                               where c.Name == productName
+                               select c).FirstOrDefault();
+                if (product == null)
+                {
+                    int id;
+                    if (int.TryParse(productName, out id))
+                        product = DbFunctions.FindProductById(id);
+                }
+                if (product == null)
+                    return Redirect("/Error/404");
+            }
+            ViewBag.Product = product;
+            ViewData["subcategory"] = DbFunctions.FindSubcategoryById(product.SubcategoryId).Name;
+            model.Title = product.Brand + " " + product.Name;
+            return View(model);
+        }
     }
 }
