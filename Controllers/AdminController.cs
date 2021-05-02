@@ -201,6 +201,7 @@ namespace ShopWebApp
                 model.Dict.Add("Tagi", product.Tags);
                 model.Dict.Add("Krótki opis", product.About);
                 model.Dict.Add("Długi opis", product.LongAbout);
+                model.Title = "Produkt: " + product.Brand + " " + product.Name;
                 ViewData["Name"] = "Produkt";
                 ViewData["ObjectName"] = product.Brand + " " + product.Name;
             }
@@ -391,9 +392,13 @@ namespace ShopWebApp
             return View(model);
         }
 
-        /*[Route("/admin/search")]
-        public IActionResult Search([FromQuery] string name, [FromQuery] int page)
+        [Route("/admin/search")]
+        public IActionResult Search([FromQuery] string name, [FromQuery] int page = 1)
         {
+
+            if (name == null)
+                return Redirect("/Error/404");
+            const int objectsPerPage = 30;
             var model = new BaseViewModel();
             if (User.Identity.IsAuthenticated)
             {
@@ -408,7 +413,40 @@ namespace ShopWebApp
                     model.User.Role = user.Role;
                 }
             }
-            return View(, model);
-        }*/
+            model.Title = "Szukaj: " + name;
+            using (var db = new ShopDatabase()) {
+                Dictionary<string, string> products = new Dictionary<string, string>();
+                List<Product> productList = db.Products.Where(p => p.Name.Contains(name) || p.Brand.Contains(name) || p.Code == name || p.ProductId.ToString() == name).OrderBy(p => p.Brand).ToList();
+                if (page > 0 && page <= productList.Count / objectsPerPage + (productList.Count % objectsPerPage != 0 ? 1 : 0))
+                {
+                    for (int i = (page - 1) * objectsPerPage; i < Math.Min(page * objectsPerPage, productList.Count); i++)
+                    {
+                        Product prod = productList[i];
+                        products.Add(prod.Brand + " " + prod.Name, "/admin/products/" + prod.Code);
+                    }
+                }
+                ViewBag.products = products;
+                Dictionary<string, string> users = new Dictionary<string, string>();
+                List<User> usersList = db.Users.Where(u => u.Email.Contains(name) || u.Name.Contains(name) || u.Surname.Contains(name) || u.UserId.ToString() == name).OrderBy(u => u.Email).ToList();
+                if (page > 0 && page <= usersList.Count / objectsPerPage + (usersList.Count % objectsPerPage != 0 ? 1 : 0))
+                {
+                    for (int i = (page - 1) * objectsPerPage; i < Math.Min(page * objectsPerPage, usersList.Count); i++)
+                    {
+                        User user = usersList[i];
+                        users.Add(user.Email + " (" + user.Name + " " + user.Surname + ")", "/admin/users/" + user.UserId);
+                    }
+                }
+                if (page < 0 || page > Math.Max(usersList.Count / objectsPerPage + (usersList.Count % objectsPerPage != 0 ? 1 : 0), productList.Count / objectsPerPage + (productList.Count % objectsPerPage != 0 ? 1 : 0)))
+                    return Redirect("/Error/404");
+                ViewData["name"] = name;
+                if (User.Identity.IsAuthenticated && Functions.permissionLevel(model.User.Role) > 2)
+                    ViewBag.users = users;
+                else
+                    ViewBag.users = new Dictionary<string, string>();
+                ViewBag.page = page;
+                ViewBag.lastPage = Math.Max(productList.Count / objectsPerPage + (productList.Count % objectsPerPage != 0 ? 1 : 0), usersList.Count / objectsPerPage + (usersList.Count % objectsPerPage != 0 ? 1 : 0));
+            }
+            return View(model);
+        }
     }
 }
