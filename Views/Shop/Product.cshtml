@@ -3,7 +3,7 @@
 @{
     Layout = "_Layout";
     Product product = ViewBag.Product;
-    double price = product.Price / 100.0;
+    double price = product.Price / 100.0, oldPrice = product.OldPrice / 100.0, discount = oldPrice == 0 ? 0 :  Math.Round((oldPrice - price)/oldPrice, 2)*100;
     double rate = -1;
     int stars = 0, halfStars = 0;
     if (product.RatingVotes > 0)
@@ -43,7 +43,12 @@
                     </tr>
                     <tr>
                         <td class="text-secondary">Cena</td>
-                        <th>@price zł</th>
+                        <th>@price zł
+                        @if (product.OldPrice > product.Price)
+                        {
+                            <span class="ml-2" style="color: orangered; text-decoration: line-through; text-decoration-color: darkred">@oldPrice zł</span><br /><span style="color: forestgreen">- @discount%</span>
+                        }
+                        </th>
                     </tr>
                     <tr>
                         <td class="text-secondary">Dostępność</td>
@@ -96,5 +101,5 @@
 }
 else
 {
-    <a href="" class="btn btn-warning btn-lg btn-block">Produkt tymczasowo niedostępny <i class=" bi-exclamation-triangle"></i></a>
+    <a href="" class="btn btn-warning btn-lg btn-block" style="pointer-events: none;">Produkt tymczasowo niedostępny <i class=" bi-exclamation-triangle"></i></a>
 }

@@ -48,7 +48,7 @@
                     </div>
                 </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0" method="get">
+            <form class="form-inline my-2 my-lg-0" action="/admin/search" method="get">
                 <input class="form-control mr-sm-2 bg-dark text-white" type="search"  placeholder="Szukaj..." name="name" required>
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Szukaj</button>
             </form>
@@ -73,7 +73,7 @@
         </div>
     </div>
     <div style="margin-top:50px"></div>
-    <div class="navbar fixed-bottom bg-dark navbar-dark text-light" style="margin-top:15px">
+    <div class="navbar fixed-bottom bg-light navbar-light" style="margin-top:15px">
         Sklep - Admin &copy 2021
         <a class="btn btn-sm btn-outline-success float-left" href="@Url.Action("index", "home")">Sklep</a>
         <div class="float-left" id="cookieInfo">
