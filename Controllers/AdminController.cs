@@ -392,7 +392,6 @@ namespace ShopWebApp
             return View(model);
         }
 
-        [Route("/admin/search")]
         public IActionResult Search([FromQuery] string name, [FromQuery] int page = 1)
         {
 
@@ -446,6 +445,25 @@ namespace ShopWebApp
                 ViewBag.page = page;
                 ViewBag.lastPage = Math.Max(productList.Count / objectsPerPage + (productList.Count % objectsPerPage != 0 ? 1 : 0), usersList.Count / objectsPerPage + (usersList.Count % objectsPerPage != 0 ? 1 : 0));
             }
+            return View(model);
+        }
+        public IActionResult Photos()
+        {
+            var model = new BaseViewModel();
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                    model.User.Role = user.Role;
+                }
+            }
+            model.Title = "Zdjęcia";
             return View(model);
         }
     }

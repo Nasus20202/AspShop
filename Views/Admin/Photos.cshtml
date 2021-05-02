@@ -1,0 +1,39 @@
+﻿@model BaseViewModel
+@using ShopWebApp
+@using System.IO;
+@{
+    Layout = "_AdminLayout";
+    int c = 0;
+}
+
+@{
+    DirectoryInfo di = new DirectoryInfo(@"wwwroot/images/");
+    FileInfo[] fiArr = di.GetFiles();
+    <p class="text-info text-center h5">Na serwerze znajduje się @fiArr.Count() zdjęć</p>
+    <br />
+    @:<div class="row">
+        foreach (FileInfo f in fiArr)
+        {
+            if (c == 6)
+            {
+            @:</div>
+            @:<div class="row">
+                c = 0;
+            }
+            c++;
+            <div class="col-md-2 d-flex align-items-stretch" style="padding-left: 2px; padding-right: 2px">
+                <div class="card" style="margin-top: 10px;">
+                    <img class="card-img-top" src="~/images/@f.Name" style="margin-top: 5px; padding-left:2px; padding-right:2px">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">@f.Name</h5>
+                        <h6 class="card-text mb-2 text-muted">@Math.Round((f.Length/1024.0), 1) KB</h6>
+                        @if (Functions.permissionLevel(Model.User.Role) >= 3)
+                        {
+                            <a href="#" class="card-link text-danger mt-auto">Usuń <i class="bi-dash-circle-fill"></i></a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+}
+</div>
