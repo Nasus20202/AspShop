@@ -59,7 +59,8 @@
             </ul>
         </div>
     </nav>
-    <div class="container" style="padding-top:65px">
+    @RenderSection("top", false);
+    <div class="container-fluid" style="padding-top:65px">
         <div class="row">
             <div class="col-sm-2">
                 @RenderSection("left", false)
