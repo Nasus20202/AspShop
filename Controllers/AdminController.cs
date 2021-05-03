@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -252,16 +254,16 @@ namespace ShopWebApp
                     List<User> userList = db.Users.OrderBy(u => u.Email).ToList();
                     
                     AdminModel.AdminList table = new AdminModel.AdminList();
-                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, userList.Count()), lastPage = userList.Count()/ objectsPerPage;
-                    if (userList.Count() % objectsPerPage != 0) { lastPage++; }
-                    if(start < userList.Count())
+                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, userList.Count), lastPage = userList.Count/ objectsPerPage;
+                    if (userList.Count % objectsPerPage != 0) { lastPage++; }
+                    if(start < userList.Count)
                     {
                         for (int i = start; i < end; i++) {
                             table.Names.Add(userList[i].Email);
                             table.Codes.Add(userList[i].UserId.ToString());
                         }
                     }
-                    if (table.Names.Count() == 0)
+                    if (table.Names.Count == 0)
                     {
                         return Redirect("/Error/404");
                     }
@@ -277,9 +279,9 @@ namespace ShopWebApp
                 {
                     List<Category> categoryList = db.Categories.OrderBy(c => c.Name).ToList();
                     AdminModel.AdminList table = new AdminModel.AdminList();
-                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, categoryList.Count()), lastPage = categoryList.Count() / objectsPerPage + (categoryList.Count() % objectsPerPage == 0 ? 0 : 1);
-                    if (categoryList.Count() % objectsPerPage != 0) { lastPage++; }
-                    if (start < categoryList.Count())
+                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, categoryList.Count), lastPage = categoryList.Count / objectsPerPage + (categoryList.Count % objectsPerPage == 0 ? 0 : 1);
+                    if (categoryList.Count % objectsPerPage != 0) { lastPage++; }
+                    if (start < categoryList.Count)
                     {
                         for (int i = start; i < end; i++)
                         {
@@ -287,7 +289,7 @@ namespace ShopWebApp
                             table.Codes.Add(categoryList[i].Code);
                         }
                     }
-                    if (table.Names.Count() == 0)
+                    if (table.Names.Count == 0)
                     {
                         return Redirect("/Error/404");
                     }
@@ -304,7 +306,7 @@ namespace ShopWebApp
                     List<Subcategory> subcategoryList = db.Subcategories.OrderBy(s => s.Name).ToList();
                     AdminModel.AdminList table = new AdminModel.AdminList();
                     int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, subcategoryList.Count()), lastPage = subcategoryList.Count() / objectsPerPage + (subcategoryList.Count() % objectsPerPage == 0 ? 0 : 1);
-                    if (start < subcategoryList.Count())
+                    if (start < subcategoryList.Count)
                     {
                         for(int i = start; i < end; i++)
                         {
@@ -392,6 +394,7 @@ namespace ShopWebApp
             return View(model);
         }
 
+        // Users and products search
         public IActionResult Search([FromQuery] string name, [FromQuery] int page = 1)
         {
 
@@ -447,6 +450,8 @@ namespace ShopWebApp
             }
             return View(model);
         }
+        
+        // wwwroot/images browser
         public IActionResult Photos()
         {
             var model = new BaseViewModel();
@@ -466,5 +471,43 @@ namespace ShopWebApp
             model.Title = "Zdjęcia";
             return View(model);
         }
+
+        // Upload a new photo(s) to wwwroot/images
+        // Only for authenticated users with rank higher than employee
+        [HttpPost]
+        public async Task<IActionResult> Upload(List<IFormFile> files)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    var role = user.Role;
+                    if (Functions.permissionLevel(role) < 3)
+                        return Forbid();
+                }
+            }
+            long size = files.Sum(f => f.Length);
+            foreach(var formFile in files)
+            {
+                if(formFile.Length > 0)
+                {
+                    var fileName = Path.GetFileName(formFile.FileName);
+                    var fileExtension = Path.GetExtension(fileName);
+                    var filePath = @"wwwroot/images/" + fileName;
+                    if (fileExtension != ".webp" && fileExtension != ".png" && fileExtension != ".jpg" && fileExtension != ".jpeg" && fileExtension != ".gif" && fileExtension != ".bmp")
+                        continue;
+
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        await formFile.CopyToAsync(stream);
+                    }
+                }
+            }
+            return Redirect(Url.Action("photos", "admin"));
+        }
+
     }
 }
