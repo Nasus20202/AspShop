@@ -121,7 +121,7 @@ namespace ShopWebApp.Controllers
         }
         [HttpPost]
         [ActionName("Login")]
-        public async Task<IActionResult> TryLogin(AccountModel input)
+        public async Task<IActionResult> TryLogin(AccountModel input, [FromQuery] string ReturnUrl)
         {
             input.Title = "Zaloguj się";
             bool status = AreCredentialsValid(input.Login, input.Password);
@@ -151,7 +151,9 @@ namespace ShopWebApp.Controllers
                         }) ;
                     }
                     else { await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity)); }
-                    return Redirect(Url.Action("index", "home"));
+                    if(ReturnUrl == null)
+                        return Redirect(Url.Action("index", "home"));
+                    return Redirect(ReturnUrl);
                 }
             }
             return View(input);
