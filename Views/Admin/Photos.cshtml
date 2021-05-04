@@ -39,7 +39,7 @@
                         <h6 class="card-text mb-2 text-muted">@Math.Round((f.Length / 1024.0), 1) KB</h6>
                         @if (Functions.permissionLevel(Model.User.Role) >= 3)
                         {
-                            <a href="#" class="card-link text-danger mt-auto">Usuń <i class="bi-dash-circle-fill"></i></a>
+                            <a href="/admin/photos/remove/@f.Name" class="card-link text-danger mt-auto">Usuń <i class="bi-dash-circle-fill"></i></a>
                         }
                     </div>
                 </div>

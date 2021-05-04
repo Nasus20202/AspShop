@@ -279,8 +279,7 @@ namespace ShopWebApp
                 {
                     List<Category> categoryList = db.Categories.OrderBy(c => c.Name).ToList();
                     AdminModel.AdminList table = new AdminModel.AdminList();
-                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, categoryList.Count), lastPage = categoryList.Count / objectsPerPage + (categoryList.Count % objectsPerPage == 0 ? 0 : 1);
-                    if (categoryList.Count % objectsPerPage != 0) { lastPage++; }
+                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, categoryList.Count()), lastPage = categoryList.Count() / objectsPerPage + (categoryList.Count() % objectsPerPage == 0 ? 0 : 1);
                     if (start < categoryList.Count)
                     {
                         for (int i = start; i < end; i++)
@@ -506,6 +505,34 @@ namespace ShopWebApp
                     }
                 }
             }
+            return Redirect(Url.Action("photos", "admin"));
+        }
+
+        // Remove photo from wwwroot/images
+        [Route("/admin/photos/remove/{filename}")]
+        public IActionResult RemovePhoto(string filename)
+        {
+            if (filename == null)
+                return Redirect("/Error/404");
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    var role = user.Role;
+                    if (Functions.permissionLevel(role) < 3)
+                        return Forbid();
+                }
+            }
+
+            string filepath = @"wwwroot/images/" + filename;
+            if (System.IO.File.Exists(filepath))
+            {
+                System.IO.File.Delete(filepath);
+            }
+
             return Redirect(Url.Action("photos", "admin"));
         }
 
