@@ -24,6 +24,7 @@ namespace ShopWebApp
         public string Brand { get; set; }
         public string Code { get; set; }
         public int Price { get; set; }
+        public int OldPrice { get; set; }
         public string Tags { get; set; }
         public string About { get; set; }
         public string LongAbout { get; set; }
