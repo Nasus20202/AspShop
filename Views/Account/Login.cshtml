@@ -8,6 +8,7 @@
 <span class="text-danger">@Model.Message</span>
 <br />
 <form asp-controller="Account" asp-action="Login" method="post">
+    @Html.AntiForgeryToken()
     <div class="form-group">
         <label for="email" asp-for="@Model.Login">Adres email</label>
         <input type="email" class="form-control" id="email" asp-for="@Model.Login" name="Login"><!--aria-describedby="emailHelp"-->

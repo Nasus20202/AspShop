@@ -19,7 +19,9 @@
 <body onload="onStart()">
     <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
         <!-- Brand -->
-        <a class="navbar-brand" href="@Url.Action("index", "home")">Sklep</a>
+        <a class="navbar-brand" href="@Url.Action("index", "home")">
+            Sklep
+        </a>
 
         <!-- Toggler/collapsibe Button -->
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
@@ -63,8 +65,21 @@
             </ul>
             <ul class="navbar-nav justify-content-right">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-light" href="#" id="navbardrop" data-toggle="dropdown">
-                        Konto
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Szukaj  <i class="bi-search text-light"  style="margin-left:2px"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <form class="px-2 py-1" action="/search" method="get">
+                            <div class="form-group">
+                                <input type="search" class="form-control" name="name" placeholder="Szukaj..." required>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-block btn-outline-success">Szukaj <i class="bi-search"></i> </button>
+                        </form>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Konto  <i class="bi-person-circle text-light" style="margin-left:2px"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
                         @if (User.Identity.IsAuthenticated)
@@ -82,11 +97,12 @@
                     </div>
                 </li>
                 <li class="nav-item mr-1">
-                    <a class="nav-link text-light" href="#">Koszyk</a>
+                    <a class="nav-link" href="#">Koszyk  <i class="bi-cart  text-light"  style="margin-left:2px"></i></a>
                 </li>
             </ul>
         </div>
     </nav>
+    @RenderSection("top", false)
     <div class="container-fluid" style="padding-top:65px; padding-left: 5vw; padding-right: 5vw">
         <div class="row">
             <div class="col-md-2">
@@ -101,7 +117,7 @@
         </div>
     </div>
     <div style="margin-top:50px"></div>
-    <div class="navbar fixed-bottom bg-dark navbar-dark text-light" style="margin-top:15px">
+    <div class="navbar fixed-bottom bg-light navbar-light" style="margin-top:15px">
         Sklep &copy 2021
 
         <div class="float-left" id="cookieInfo">
@@ -111,7 +127,7 @@
         @if (User.Identity.IsAuthenticated)
         {
             var user = DbFunctions.FindUserByEmail(Model.User.Email);
-            if (Functions.permissionLevel(user.Role) >= 2)
+            if (Functions.PermissionLevel(user.Role) >= 2)
             {
                 @:<a class="btn btn-sm btn-outline-success float-left" href="@Url.Action("index", "admin")">Panel</a>
             }

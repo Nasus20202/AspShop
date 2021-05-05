@@ -7,14 +7,15 @@
 <h2 style="text-align:center">Obsługa klientów</h2>
 <br />
 
-@{ 
+@{
     string rootPath = Url.Action("table", "admin");
     string ordersPath = rootPath + "/orders/";
     string customOrdersPath = rootPath + "/customOrders/";
-    string usersPath =  rootPath + "/users/";
+    string usersPath = rootPath + "/users/";
     string productsPath = rootPath + "/products/";
     string subcategoriesPath = rootPath + "/subcategories/";
     string categoriesPath = rootPath + "/categories/";
+    string photosPath = "admin/photos/";
 }
 
 <ul class="list-group">
@@ -26,10 +27,11 @@
         <a href="@customOrdersPath" class="text-dark">Zamówienia niestandardowe</a>
         <span class="badge badge-success badge-pill">1</span>
     </li>
-    @if (Functions.permissionLevel(Model.User.Role) >= 3){ 
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        <a href="@usersPath" class="text-info">Użytkownicy</a>
-    </li>
+    @if (Functions.PermissionLevel(Model.User.Role) >= 3)
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="@usersPath" class="text-info">Użytkownicy</a>
+        </li>
     }
 </ul>
 <br />
@@ -44,5 +46,13 @@
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
         <a href="@categoriesPath" class="text-info">Kategorie</a>
+    </li>
+</ul>
+<br />
+<h2 style="text-align:center">Zasoby</h2>
+<br />
+<ul class="list-group">
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="@photosPath" class="text-info">Zdjęcia</a>
     </li>
 </ul>

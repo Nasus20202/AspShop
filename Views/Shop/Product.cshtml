@@ -1,0 +1,105 @@
+﻿@using ShopWebApp
+
+@{
+    Layout = "_Layout";
+    Product product = ViewBag.Product;
+    double price = product.Price / 100.0, oldPrice = product.OldPrice / 100.0, discount = oldPrice == 0 ? 0 :  Math.Round((oldPrice - price)/oldPrice, 2)*100;
+    double rate = -1;
+    int stars = 0, halfStars = 0;
+    if (product.RatingVotes > 0)
+    {
+        rate = Math.Round(product.RatingSum / (double)product.RatingVotes, 2);
+        halfStars = Convert.ToInt32(rate / 0.5);
+        double rest = rate - halfStars * 0.5;
+        if (rest >= 0.5)
+            halfStars++;
+        stars = halfStars / 2;
+        if (halfStars % 2 == 1)
+            halfStars = 1;
+        else
+            halfStars = 0;
+    }
+}
+@section top{
+    <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
+        <h1 class="text-center display-4 align-bottom">@product.Brand @product.Name</h1>
+    </div>
+}
+<div>
+    <div class="row d-flex">
+        <div class="col-md-5">
+            <img class="img-fluid" src="/images/@product.Photo" alt="@product.Code" />
+        </div>
+        <div class="col-md-7">
+            <table class="table h5">
+                <tbody>
+                    <tr>
+                        <td class="text-secondary">Produkt</td>
+                        <th>@product.Name</th>
+                    </tr>
+                    <tr>
+                        <td class="text-secondary">Producent</td>
+                        <th>@product.Brand</th>
+                    </tr>
+                    <tr>
+                        <td class="text-secondary">Cena</td>
+                        <th>@price zł
+                        @if (product.OldPrice > product.Price)
+                        {
+                            <span class="ml-2" style="color: orangered; text-decoration: line-through; text-decoration-color: darkred">@oldPrice zł</span><br /><span style="color: forestgreen">- @discount%</span>
+                        }
+                        </th>
+                    </tr>
+                    <tr>
+                        <td class="text-secondary">Dostępność</td>
+                        @if (product.Stock == 0)
+                        {
+                            <th class="text-danger">Niedostępny</th>
+                        }
+                        else if (product.Stock > 0)
+                        {
+                            <th>@product.Stock szt.</th>
+                        }
+                        else
+                        {
+                            <th>W magazynie</th>
+                        }
+                    </tr>
+                    <tr>
+                        <td class="text-secondary">Ocena</td>
+                        @if (rate == -1)
+                        {
+                            <td>Brak opinii</td>
+                        }
+                        else
+                        {
+                            <td class="text-warning">
+                                @for (int i = 0; i < stars; i++)
+                                {
+                                    @:<i class="bi-star-fill"></i>
+                                }
+                                @if (halfStars == 1)
+                                {
+                                    @:<i class="bi-star-half"></i>
+                                }
+                                @for (int i = stars + halfStars; i < 5; i++)
+                                {
+                                    @:<i class="bi-star"></i>
+                                }
+                                (@product.RatingVotes)
+                            </td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@if (product.Stock != 0)
+{
+    <a href="#" class="btn btn-success btn-lg btn-block h4">Dodaj do koszyka <i class="bi-cart-plus-fill"></i></a>
+}
+else
+{
+    <a href="" class="btn btn-warning btn-lg btn-block" style="pointer-events: none;">Produkt tymczasowo niedostępny <i class=" bi-exclamation-triangle"></i></a>
+}

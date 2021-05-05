@@ -1,0 +1,16 @@
+﻿@using ShopWebApp
+@{ 
+    Layout = "_AdminLayout";
+}
+<br />
+<h1>Edytuj @ViewData["Name"]</h1>
+<br />
+
+<form class="form-group" action="/admin/@ViewData["table"]/@ViewData["Id"]/edit" method="post">
+    @foreach (KeyValuePair<string, string> kvp in ViewBag.values)
+    {
+        <label for="@kvp.Key">@kvp.Key</label>
+        <input type="text" name="@kvp.Key" value="@kvp.Value" class="form-control" />
+    }
+    <button type="submit" class="btn btn-primary btn-lg btn-block" style="margin-top: 7px">Zapisz zmiany</button>
+</form>

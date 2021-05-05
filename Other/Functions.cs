@@ -7,7 +7,7 @@ namespace ShopWebApp
 {
     public class Functions
     {
-        public static int permissionLevel(string role)
+        public static int PermissionLevel(string role)
         {
             if (role == null)
                 return 0;
