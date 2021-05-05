@@ -58,7 +58,7 @@ namespace ShopWebApp
             model.Tablename = table; model.Name = name;
             if(table == "users")
             {
-                if (model.User.Role == null || Functions.permissionLevel(model.User.Role) < 3)
+                if (model.User.Role == null || Functions.PermissionLevel(model.User.Role) < 3)
                 {
                     return Forbid();
                 }
@@ -80,9 +80,12 @@ namespace ShopWebApp
                 model.Dict.Add("Telefon", user.Phone);
                 model.Dict.Add("Rola", user.Role);
                 model.Dict.Add("Ostatnia edycja", user.Modified.ToString());
-                model.Dict.Add("Hash hasła (SHA256)", user.Password);
+                if(Functions.PermissionLevel(model.User.Role)>=5)
+                    model.Dict.Add("Hash hasła (SHA256)", user.Password);
                 ViewData["Name"] = "Użytkownik";
                 ViewData["ObjectName"] = user.Email;
+                ViewBag.Id = user.UserId;
+                ViewBag.PermissionLevelToEdit = 5;
             } 
             else if(table == "categories")
             {
@@ -113,6 +116,8 @@ namespace ShopWebApp
                 model.Dict.Add("Nazwa", category.Name);
                 model.Dict.Add("Kod", category.Code);
                 model.Dict.Add("Opis", category.About);
+                ViewBag.Id = category.CategoryId;
+                ViewBag.PermissionLevelToEdit = 4;
 
                 using (var db = new ShopDatabase())
                 {
@@ -171,6 +176,8 @@ namespace ShopWebApp
                         ViewBag.ChildObjects = new List<Product>();
                     ViewBag.ChildObjects = products;
                 }
+                ViewBag.Id = subcategory.SubcategoryId;
+                ViewBag.PermissionLevelToEdit = 4;
                 ViewData["Name"] = "Podkategoria";
                 ViewData["ObjectName"] = subcategory.Name;
             }
@@ -196,6 +203,7 @@ namespace ShopWebApp
                 model.Dict.Add("Producent", product.Brand);
                 model.Dict.Add("Kod", product.Code);
                 model.Dict.Add("Cena", (product.Price / 100.0).ToString() + " zł");
+                model.Dict.Add("Cena przed promocją", (product.OldPrice / 100.0).ToString() + " zł");
                 model.Dict.Add("Ilość dostępnych", product.Stock.ToString());
                 model.Dict.Add("Zdjęcie główne", product.Photo);
                 model.Dict.Add("Dodatkowe zdjęcia", product.OtherPhotos);
@@ -204,6 +212,8 @@ namespace ShopWebApp
                 model.Dict.Add("Krótki opis", product.About);
                 model.Dict.Add("Długi opis", product.LongAbout);
                 model.Title = "Produkt: " + product.Brand + " " + product.Name;
+                ViewBag.Id = product.ProductId;
+                ViewBag.PermissionLevelToEdit = 4;
                 ViewData["Name"] = "Produkt";
                 ViewData["ObjectName"] = product.Brand + " " + product.Name;
             }
@@ -245,7 +255,7 @@ namespace ShopWebApp
             tablename = tablename.ToLower();
             if (tablename == "users")
             {
-                if (model.User.Role == null || Functions.permissionLevel(model.User.Role) < 3)
+                if (model.User.Role == null || Functions.PermissionLevel(model.User.Role) < 3)
                 {
                     return Forbid();
                 }
@@ -357,11 +367,12 @@ namespace ShopWebApp
         }
 
         // Edit object
-
+        [HttpGet]
         [Route("/admin/{table}/{name}/edit")]
         public IActionResult Edit(string table, string name)
         {
             var model = new BaseViewModel();
+            model.Title = "Edytuj " + name + " w " + table;
             if (User.Identity.IsAuthenticated)
             {
                 using (var db = new ShopDatabase())
@@ -377,20 +388,271 @@ namespace ShopWebApp
             }
             if (table == "categories")
             {
-
+                if (Functions.PermissionLevel(model.User.Role) < 4)
+                {
+                    return Forbid();
+                }
+                using(var db = new ShopDatabase())
+                {
+                    Category category = (from c in db.Categories
+                                         where c.CategoryId.ToString() == name || c.Name == name || c.Code == name
+                                         select c).FirstOrDefault();
+                    if (category == null)
+                        return Redirect("/Error/404");
+                    var values = new Dictionary<string, string>();
+                    values.Add("Code", category.Code);
+                    values.Add("Name", category.Name);
+                    values.Add("About", category.About);
+                    ViewBag.values = values;
+                    ViewData["Name"] = category.Name;
+                    ViewData["Id"] = category.CategoryId.ToString();
+                    ViewData["table"] = table;
+                }
             }
             else if (table == "subcategories")
             {
-
+                if (Functions.PermissionLevel(model.User.Role) < 4)
+                {
+                    return Forbid();
+                }
+                using (var db = new ShopDatabase())
+                {
+                    Subcategory subcategory = (from c in db.Subcategories
+                                         where c.SubcategoryId.ToString() == name || c.Name == name || c.Code == name
+                                         select c).FirstOrDefault();
+                    if (subcategory == null)
+                        return Redirect("/Error/404");
+                    var values = new Dictionary<string, string>();
+                    values.Add("Code", subcategory.Code);
+                    values.Add("Name", subcategory.Name);
+                    values.Add("About", subcategory.About);
+                    values.Add("Tags", subcategory.Tags);
+                    values.Add("CategoryId", subcategory.CategoryId.ToString());
+                    ViewBag.values = values;
+                    ViewData["Name"] = subcategory.Name;
+                    ViewData["Id"] = subcategory.SubcategoryId.ToString();
+                    ViewData["table"] = table;
+                }
             }
             else if (table == "products")
             {
+                if (Functions.PermissionLevel(model.User.Role) < 4)
+                {
+                    return Forbid();
+                }
+                using (var db = new ShopDatabase())
+                {
+                    Product product = (from c in db.Products
+                                         where c.ProductId.ToString() == name || c.Name == name || c.Code == name
+                                         select c).FirstOrDefault();
+                    if (product == null)
+                        return Redirect("/Error/404");
+                    var values = new Dictionary<string, string>();
+                    values.Add("Name", product.Name);
+                    values.Add("Brand", product.Brand);
+                    values.Add("Code", product.Code);
+                    values.Add("Price", product.Price.ToString());
+                    values.Add("OldPrice", product.OldPrice.ToString());
+                    values.Add("Tags", product.Tags);
+                    values.Add("About", product.About);
+                    values.Add("LongAbout", product.LongAbout);
+                    if (Functions.PermissionLevel(model.User.Role) >= 5)
+                    {
+                        values.Add("RatingSum", product.RatingSum.ToString());
+                        values.Add("RatingVotes", product.RatingVotes.ToString());
+                    }
+                    values.Add("Stock", product.Stock.ToString());
+                    values.Add("Photo", product.Photo);
+                    values.Add("OtherPhotos", product.OtherPhotos);
 
+                    values.Add("SubcategoryId", product.SubcategoryId.ToString());
+                    ViewBag.values = values;
+                    ViewData["Name"] = product.Name;
+                    ViewData["Id"] = product.ProductId.ToString();
+                    ViewData["table"] = table;
+                }
+            }
+            else if(table == "users")
+            {
+                if (Functions.PermissionLevel(model.User.Role) < 5)
+                {
+                    return Forbid();
+                }
+                using (var db = new ShopDatabase())
+                {
+                    User user = (from c in db.Users
+                                       where c.UserId.ToString() == name || c.Email == name
+                                       select c).FirstOrDefault();
+                    if (user == null)
+                        return Redirect("/Error/404");
+                    var values = new Dictionary<string, string>();
+                    values.Add("Email", user.Email);
+                    values.Add("Name", user.Name);
+                    values.Add("Surname", user.Surname);
+                    values.Add("Role", user.Role);
+                    values.Add("Password", user.Password);
+                    values.Add("Address", user.Address);
+                    values.Add("Phone", user.Phone);
+                    ViewBag.values = values;
+                    ViewData["Name"] = user.Email;
+                    ViewData["Id"] = user.UserId.ToString();
+                    ViewData["table"] = table;
+                }
             }
             else
                 return Redirect("/Error/404");
-            model.Title = "Edytuj " + name + " w " + table;
             return View(model);
+        }
+
+        [HttpPost]
+        [Route("/admin/{table}/{objectName}/edit")]
+        public IActionResult EditPost(string table, string objectName, Dictionary<string, string> values)
+        {
+            var user = new User();
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                }
+            }
+            if (table == "categories")
+            {
+                using (var db = new ShopDatabase())
+                {
+                    if (Functions.PermissionLevel(user.Role) < 4)
+                    {
+                        return Forbid();
+                    }
+                    string s = objectName;
+                    Category category = (from c in db.Categories
+                                         where c.CategoryId.ToString() == objectName || c.Code == objectName
+                                         select c).FirstOrDefault();
+                    if (category == null)
+                        return Redirect("/Error/404");
+                    if (values["Name"] != null) { category.Name = values["Name"]; }
+                    if (values["Code"] != null) { category.Code = values["Code"]; }
+                    if (values["About"] != null) { category.About = values["About"]; }
+                    DbFunctions.UpdateCategory(category);
+                    objectName = category.Code;
+                }
+            }
+            else if (table == "subcategories")
+            {
+                if (Functions.PermissionLevel(user.Role) < 4)
+                {
+                    return Forbid();
+                }
+                using (var db = new ShopDatabase())
+                {
+                    Subcategory subcategory = (from c in db.Subcategories
+                                               where c.SubcategoryId.ToString() == objectName || c.Code == objectName
+                                               select c).FirstOrDefault();
+                    if (subcategory == null)
+                        return Redirect("/Error/404");
+                    if (values["Name"] != null) { subcategory.Name = values["Name"]; }
+                    if (values["Code"] != null) { subcategory.Code = values["Code"]; }
+                    if (values["About"] != null) { subcategory.About = values["About"]; }
+                    if (values["Tags"] != null) { subcategory.Tags = values["Tags"]; }
+                    int categoryId;
+                    if (values["CategoryId"] != null)
+                        if (int.TryParse(values["CategoryId"], out categoryId))
+                        {
+                            if(db.Categories.Where(c => c.CategoryId == categoryId).FirstOrDefault() != null)
+                                subcategory.CategoryId = categoryId;
+                        }
+                    DbFunctions.UpdateSubategory(subcategory);
+                    objectName = subcategory.Code;
+                }
+            }
+            else if (table == "products")
+            {
+                if (Functions.PermissionLevel(user.Role) < 4)
+                {
+                    return Forbid();
+                }
+                using (var db = new ShopDatabase())
+                {
+                    Product product = (from c in db.Products
+                                       where c.ProductId.ToString() == objectName || c.Code == objectName
+                                       select c).FirstOrDefault();
+                    if (product == null)
+                        return Redirect("/Error/404");
+                    int number;
+                    if (values["Name"] != null) { product.Name = values["Name"]; }
+                    if (values["Brand"] != null) { product.Brand = values["Brand"]; }
+                    if (values["Code"] != null) { product.Code = values["Code"]; }
+                    if (Functions.PermissionLevel(user.Role) >= 5)
+                    {
+                        if (values["Price"] != null)
+                            if (int.TryParse(values["Price"], out number))
+                                product.Price = number;
+                        if (values["OldPrice"] != null)
+                            if (int.TryParse(values["OldPrice"], out number))
+                                product.OldPrice = number;
+                    }
+                    if (values["Tags"] != null) { product.Tags = values["Tags"]; }
+                    if (values["About"] != null) { product.About = values["About"]; }
+                    if (values["LongAbout"] != null) { product.LongAbout = values["LongAbout"]; }
+                    if (Functions.PermissionLevel(user.Role)>=5)
+                    {
+                        if (values["RatingSum"] != null)
+                            if (int.TryParse(values["RatingSum"], out number))
+                                product.RatingSum = number;
+                        if (values["RatingVotes"] != null)
+                            if (int.TryParse(values["RatingVotes"], out number))
+                                product.RatingVotes = number;
+                    }
+                    if (values["Photo"] != null) { product.Photo = values["Photo"]; }
+                    if (values["OtherPhotos"] != null) { product.OtherPhotos = values["OtherPhotos"]; }
+                    if (values["Stock"] != null)
+                        if (int.TryParse(values["Stock"], out number))
+                            product.Stock = number;
+
+                    if (values["SubcategoryId"] != null)
+                        if (int.TryParse(values["SubcategoryId"], out number))
+                        {
+                            if (db.Subcategories.Where(c => c.SubcategoryId == number).FirstOrDefault() != null)
+                                product.SubcategoryId = number;
+                        }
+                    DbFunctions.UpdateProduct(product);
+                    objectName = product.Code;
+                }
+            }
+            else if(table == "users")
+            {
+                if (Functions.PermissionLevel(user.Role) < 5)
+                {
+                    return Forbid();
+                }
+                using (var db = new ShopDatabase())
+                {
+                    User shopUser = (from c in db.Users
+                                       where c.UserId.ToString() == objectName || c.Email == objectName
+                                       select c).FirstOrDefault();
+                    if (shopUser == null)
+                        return Redirect("/Error/404");
+                    bool isCurrentUserBeingChanged = false;
+                    if (shopUser.Email == user.Email)
+                        isCurrentUserBeingChanged = true;
+                    if (values["Email"] != null) { shopUser.Email = values["Email"]; }
+                    if (values["Name"] != null) { shopUser.Name = values["Name"]; }
+                    if (values["Surname"] != null) { shopUser.Surname = values["Surname"]; }
+                    if (values["Role"] != null) { shopUser.Role = values["Role"]; }
+                    if (values["Password"] != null) { shopUser.Password = values["Password"]; }
+                    if (values["Address"] != null) { shopUser.Address = values["Address"]; }
+                    if (values["Phone"] != null) { shopUser.Surname = values["Phone"]; }
+                    DbFunctions.UpdateUser(shopUser);
+                    objectName = shopUser.UserId.ToString();
+                    if (user.Email != shopUser.Email && isCurrentUserBeingChanged)
+                        return Redirect(Url.Action("logout", "account"));
+                }
+            }
+            else
+                return Redirect("/Error/404");
+            return Redirect("/admin/" + table + "/" + objectName);
         }
 
         // Users and products search
@@ -440,7 +702,7 @@ namespace ShopWebApp
                 if (page < 0 || page > Math.Max(usersList.Count / objectsPerPage + (usersList.Count % objectsPerPage != 0 ? 1 : 0), productList.Count / objectsPerPage + (productList.Count % objectsPerPage != 0 ? 1 : 0)))
                     return Redirect("/Error/404");
                 ViewData["name"] = name;
-                if (User.Identity.IsAuthenticated && Functions.permissionLevel(model.User.Role) > 2)
+                if (User.Identity.IsAuthenticated && Functions.PermissionLevel(model.User.Role) > 2)
                     ViewBag.users = users;
                 else
                     ViewBag.users = new Dictionary<string, string>();
@@ -484,7 +746,7 @@ namespace ShopWebApp
                                 where c.Email == User.Identity.Name
                                 select c).FirstOrDefault();
                     var role = user.Role;
-                    if (Functions.permissionLevel(role) < 3)
+                    if (Functions.PermissionLevel(role) < 3)
                         return Forbid();
                 }
             }
@@ -522,7 +784,7 @@ namespace ShopWebApp
                                 where c.Email == User.Identity.Name
                                 select c).FirstOrDefault();
                     var role = user.Role;
-                    if (Functions.permissionLevel(role) < 3)
+                    if (Functions.PermissionLevel(role) < 3)
                         return Forbid();
                 }
             }

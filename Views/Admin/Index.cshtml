@@ -27,7 +27,7 @@
         <a href="@customOrdersPath" class="text-dark">Zamówienia niestandardowe</a>
         <span class="badge badge-success badge-pill">1</span>
     </li>
-    @if (Functions.permissionLevel(Model.User.Role) >= 3)
+    @if (Functions.PermissionLevel(Model.User.Role) >= 3)
     {
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <a href="@usersPath" class="text-info">Użytkownicy</a>

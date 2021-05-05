@@ -73,7 +73,7 @@
                             <div class="form-group">
                                 <input type="search" class="form-control" name="name" placeholder="Szukaj..." required>
                             </div>
-                            <button type="submit" class="btn btn-sm btn-block btn-outline-success">Szukaj</button>
+                            <button type="submit" class="btn btn-sm btn-block btn-outline-success">Szukaj <i class="bi-search"></i> </button>
                         </form>
                     </div>
                 </li>
@@ -127,7 +127,7 @@
         @if (User.Identity.IsAuthenticated)
         {
             var user = DbFunctions.FindUserByEmail(Model.User.Email);
-            if (Functions.permissionLevel(user.Role) >= 2)
+            if (Functions.PermissionLevel(user.Role) >= 2)
             {
                 @:<a class="btn btn-sm btn-outline-success float-left" href="@Url.Action("index", "admin")">Panel</a>
             }

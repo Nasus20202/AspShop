@@ -107,6 +107,7 @@ namespace ShopWebApp
                 subcategory.Code = updatedSubcategory.Code;
                 subcategory.About = updatedSubcategory.About;
                 subcategory.Tags = updatedSubcategory.Tags;
+                subcategory.CategoryId = updatedSubcategory.CategoryId;
 
 
                 subcategory.Modified = DateTime.UtcNow;
@@ -162,12 +163,19 @@ namespace ShopWebApp
                 if (product == null)
                     return;
                 product.Name = updatedProduct.Name;
+                product.Brand = updatedProduct.Brand;
                 product.Code = updatedProduct.Code;
                 product.About = updatedProduct.About;
+                product.LongAbout = updatedProduct.LongAbout;
                 product.Price = updatedProduct.Price;
+                product.OldPrice = updatedProduct.OldPrice;
                 product.RatingSum = updatedProduct.RatingSum;
-                product.RatingVotes = updatedProduct.RatingSum;
-                //Photo - no changes, file path is not static. May be changed in the future
+                product.RatingVotes = updatedProduct.RatingVotes;
+                product.Photo = updatedProduct.Photo;
+                product.OtherPhotos = updatedProduct.OtherPhotos;
+                product.Stock = updatedProduct.Stock;
+
+                product.SubcategoryId = updatedProduct.SubcategoryId;
 
                 product.Modified = DateTime.UtcNow;
                 try
@@ -233,9 +241,11 @@ namespace ShopWebApp
                 user.Name = updatedUser.Name;
                 user.Surname = updatedUser.Surname;
                 user.Email = updatedUser.Email;
+                user.Role = updatedUser.Role;
                 user.Phone = updatedUser.Phone;
                 user.Password = updatedUser.Password;
                 user.Address = updatedUser.Address;
+
                 user.Modified = DateTime.UtcNow;
                 try
                 {
