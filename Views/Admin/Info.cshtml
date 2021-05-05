@@ -51,6 +51,9 @@
 
 
 @{ 
-    string path = Url.Action("Table", "Admin")+"/" + Model.Tablename;
+    string path = Url.Action("Table", "Admin") + "/" + Model.Tablename;
+}
+@if(Functions.PermissionLevel(Model.User.Role)>= ViewBag.PermissionLevelToEdit){
+<a href="/admin/@Model.Tablename/@ViewBag.Id/edit" class="btn btn-primary btn-lg btn-block" style="margin-top: 7px">Edytuj @ViewData["ObjectName"]</a>
 }
 <a href="@path" class="btn btn-outline-primary btn-lg btn-block" style="margin-top: 7px">Lista rekordów tabeli @Model.Tablename</a>

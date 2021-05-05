@@ -1,7 +1,14 @@
 ﻿@using ShopWebApp
 @model BaseViewModel
 @{
-
+    string rootPath = Url.Action("table", "admin");
+    string ordersPath = rootPath + "/orders/";
+    string customOrdersPath = rootPath + "/customOrders/";
+    string usersPath = rootPath + "/users/";
+    string productsPath = rootPath + "/products/";
+    string subcategoriesPath = rootPath + "/subcategories/";
+    string categoriesPath = rootPath + "/categories/";
+    string photosPath = "/admin/photos/";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -31,26 +38,42 @@
         <!-- Navbar links -->
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Obsługa klientów
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="@ordersPath" class="dropdown-item">Zamówienia</a>
+                        <a href="@customOrdersPath" class="dropdown-item">Zamówienia niestandardowe</a>
+                        @if (Functions.PermissionLevel(Model.User.Role) >= 3)
+                        {
+                            <a href="@usersPath" class="dropdown-item">Użytkownicy</a>
+                        }
+                    </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Struktura sklepu
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="@productsPath" class="dropdown-item">Produkty</a>
+                        <a href="@subcategoriesPath" class="dropdown-item">Podkategorie</a>
+                        <a href="@categoriesPath" class="dropdown-item">Kategorie</a>
+                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                        Dropdown link
+                        Zasoby
                     </a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">Link 1</a>
-                        <a class="dropdown-item" href="#">Link 2</a>
-                        <a class="dropdown-item" href="#">Link 3</a>
+                        <a href="@photosPath" class="dropdown-item">Zdjęcia</a>
                     </div>
                 </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0" action="/admin/search" method="get">
-                <input class="form-control mr-sm-2 bg-dark text-white" type="search"  placeholder="Szukaj..." name="name" required>
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Szukaj</button>
+            <form class="form-inline my-2 my-lg-0 mr-1" action="/admin/search" method="get">
+                <input class="form-control mr-sm-2 bg-dark text-white" type="search" placeholder="Szukaj..." name="name" required>
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="bi-search"></i></button>
             </form>
             <ul class="navbar-nav justify-content-right">
                 <li class="nav-item mr-1">
