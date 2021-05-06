@@ -26,6 +26,7 @@ namespace ShopWebApp
         public int Price { get; set; }
         public int OldPrice { get; set; }
         public string Tags { get; set; }
+        public string Types { get; set; }
         public string About { get; set; }
         public string LongAbout { get; set; }
         public int RatingSum { get; set; }

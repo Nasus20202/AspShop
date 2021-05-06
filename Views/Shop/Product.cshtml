@@ -19,6 +19,9 @@
         else
             halfStars = 0;
     }
+    string[] photos = { };
+    if(product.OtherPhotos != "" && product.OtherPhotos != null)
+        photos = product.OtherPhotos.Split(';');
 }
 @section top{
     <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
@@ -26,11 +29,45 @@
     </div>
 }
 <div>
-    <div class="row d-flex">
-        <div class="col-md-5">
+    <div class="row d-flex fadein">
+        <div class="col-xl-5">
+            @if (photos.Length < 1)
+            {
             <img class="img-fluid" src="/images/@product.Photo" alt="@product.Code" />
+            }
+            else
+            {
+            <div id="carousel" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    <li data-target="#carousel" data-slide-to="0" class="active"></li>
+                    @for (int i = 1; i <= photos.Length; i++)
+                    {
+                        <li data-target="#carousel" data-slide-to="@i"></li>
+                    }
+                </ol>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img class="d-block w-100" src="/images/@product.Photo" alt="@product.Photo">
+                    </div>
+                    @foreach (string photo in photos)
+                    {
+                        <div class="carousel-item">
+                            <img class="d-block w-100" src="/images/@photo" alt="@photo">
+                        </div>
+                    }
+                </div>
+                <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Poprzedni</span>
+                </a>
+                <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Następny</span>
+                </a>
+            </div>
+            }
         </div>
-        <div class="col-md-7">
+        <div class="col-xl-7">
             <table class="table h5">
                 <tbody>
                     <tr>

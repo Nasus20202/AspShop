@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
     <link href="~/css/style.css" rel="stylesheet" />
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -46,7 +47,7 @@
                                     .Collection(c => c.Subcategories)
                                     .Load();
                                 var subcategories = cat.Subcategories.ToList();
-                                @:<div class="dropdown-menu">
+                                @:<div class="dropdown-menu fadein">
                                     @:<a class="dropdown-item font-weight-bold" href="/s/@cat.Code">Wszystkie</a>
                                     @:<div class="dropdown-divider"></div>
                                     foreach (Subcategory subcat in subcategories)
@@ -68,7 +69,7 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                         Szukaj  <i class="bi-search text-light"  style="margin-left:2px"></i>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right">
+                    <div class="dropdown-menu dropdown-menu-right fadein">
                         <form class="px-2 py-1" action="/search" method="get">
                             <div class="form-group">
                                 <input type="search" class="form-control" name="name" placeholder="Szukaj..." required>
@@ -81,7 +82,7 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                         Konto  <i class="bi-person-circle text-light" style="margin-left:2px"></i>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right">
+                    <div class="dropdown-menu dropdown-menu-right fadein">
                         @if (User.Identity.IsAuthenticated)
                         {
                             <a class="dropdown-item" href="@Url.Action("index", "account")">@Model.User.Name @Model.User.Surname</a>

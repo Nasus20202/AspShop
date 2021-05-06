@@ -7,34 +7,35 @@
     @Model.User.Name
 }
 <br />
-
-@{
-    using (var db = new ShopDatabase())
-    {
-        var categories = db.Categories.ToList();
-        foreach (Category category in categories)
+<div class="fadein">
+    @{
+        using (var db = new ShopDatabase())
         {
-            @:<p>@category.Name:</p>
-            var subcategories = db.Entry(category)
-                .Collection(c => c.Subcategories)
-                .Query()
-                .ToList();
-            foreach (Subcategory subcategory in subcategories)
+            var categories = db.Categories.ToList();
+            foreach (Category category in categories)
             {
-                @:<p style="margin-left: 20px">@subcategory.Name</p>
-                var products = db.Entry(subcategory)
-                    .Collection(s => s.Products)
+                @:<p>@category.Name:</p>
+                var subcategories = db.Entry(category)
+                    .Collection(c => c.Subcategories)
                     .Query()
                     .ToList();
-                foreach (Product product in products)
+                foreach (Subcategory subcategory in subcategories)
                 {
-                    @:<div class="row">                     
-                        @:<p class="col-8" style="margin-left: 40px">@product.Name</p><br />
-                        @:<img class="img-fluid float-right col-4" style="max-width:20%" src="/images/@product.Photo" alt="@product.Code" />
-                    @:</div>
+                    @:<p style="margin-left: 20px">@subcategory.Name</p>
+                    var products = db.Entry(subcategory)
+                        .Collection(s => s.Products)
+                        .Query()
+                        .ToList();
+                    foreach (Product product in products)
+                    {
+                        @:<div class="row">
+                            @:<p class="col-8" style="margin-left: 40px">@product.Name</p><br />
+                            @:<img class="img-fluid float-right col-4" style="max-width:20%" src="/images/@product.Photo" alt="@product.Code" />
+                        @:</div>
+                    }
                 }
+                @:<br /><br />
             }
-            @:<br /><br />
         }
     }
-}
+</div>
