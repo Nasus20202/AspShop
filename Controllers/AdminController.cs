@@ -209,6 +209,7 @@ namespace ShopWebApp
                 model.Dict.Add("Dodatkowe zdjęcia", product.OtherPhotos);
                 model.Dict.Add("Ocena produktu", product.RatingVotes > 0 ? Math.Round(product.RatingSum / (double)product.RatingVotes, 2).ToString() + " (" + product.RatingVotes + ")" : "Brak ocen");
                 model.Dict.Add("Tagi", product.Tags);
+                model.Dict.Add("Typy", product.Types);
                 model.Dict.Add("Krótki opis", product.About);
                 model.Dict.Add("Długi opis", product.LongAbout);
                 model.Title = "Produkt: " + product.Brand + " " + product.Name;
@@ -407,6 +408,7 @@ namespace ShopWebApp
                     ViewData["Name"] = category.Name;
                     ViewData["Id"] = category.CategoryId.ToString();
                     ViewData["table"] = table;
+                    model.Title = "Edytuj kategorię " + category.Name;
                 }
             }
             else if (table == "subcategories")
@@ -432,6 +434,7 @@ namespace ShopWebApp
                     ViewData["Name"] = subcategory.Name;
                     ViewData["Id"] = subcategory.SubcategoryId.ToString();
                     ViewData["table"] = table;
+                    model.Title = "Edytuj podkategorię " + subcategory.Name;
                 }
             }
             else if (table == "products")
@@ -454,6 +457,7 @@ namespace ShopWebApp
                     values.Add("Price", product.Price.ToString());
                     values.Add("OldPrice", product.OldPrice.ToString());
                     values.Add("Tags", product.Tags);
+                    values.Add("Types", product.Types);
                     values.Add("About", product.About);
                     values.Add("LongAbout", product.LongAbout);
                     if (Functions.PermissionLevel(model.User.Role) >= 5)
@@ -467,9 +471,10 @@ namespace ShopWebApp
 
                     values.Add("SubcategoryId", product.SubcategoryId.ToString());
                     ViewBag.values = values;
-                    ViewData["Name"] = product.Name;
+                    ViewData["Name"] = product.Brand + " " + product.Name;
                     ViewData["Id"] = product.ProductId.ToString();
                     ViewData["table"] = table;
+                    model.Title = "Edytuj produkt " + product.Brand + " " + product.Name;
                 }
             }
             else if(table == "users")
@@ -497,6 +502,7 @@ namespace ShopWebApp
                     ViewData["Name"] = user.Email;
                     ViewData["Id"] = user.UserId.ToString();
                     ViewData["table"] = table;
+                    model.Title = "Edytuj użytkownika " + user.Email;
                 }
             }
             else
@@ -594,6 +600,7 @@ namespace ShopWebApp
                                 product.OldPrice = number;
                     }
                     if (values["Tags"] != null) { product.Tags = values["Tags"]; }
+                    if (values["Types"] != null) { product.Types = values["Types"]; }
                     if (values["About"] != null) { product.About = values["About"]; }
                     if (values["LongAbout"] != null) { product.LongAbout = values["LongAbout"]; }
                     if (Functions.PermissionLevel(user.Role)>=5)
