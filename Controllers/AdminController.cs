@@ -254,6 +254,7 @@ namespace ShopWebApp
             }
 
             tablename = tablename.ToLower();
+            ViewData["Tablename"] = tablename;
             if (tablename == "users")
             {
                 if (model.User.Role == null || Functions.PermissionLevel(model.User.Role) < 3)
@@ -660,6 +661,67 @@ namespace ShopWebApp
             else
                 return Redirect("/Error/404");
             return Redirect("/admin/" + table + "/" + objectName);
+        }
+
+        [HttpGet]
+        [Route("/admin/{table}/add")]
+        public IActionResult Add(string table)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string role = "";
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    role = user.Role;
+                }
+            }
+            table = table.ToLower(); int id = 0;
+            if (table == "categories")
+            {
+                var category = new Category();
+                using (var db = new ShopDatabase()){
+                    db.Categories.Add(category);
+                    db.SaveChanges();
+                }
+                id = category.CategoryId;
+            }
+            else if (table == "subcategories")
+            {
+                var subcategory = new Subcategory();
+                using (var db = new ShopDatabase())
+                {
+                    Category cat = db.Categories.FirstOrDefault();
+                    if (cat != null)
+                    {
+                        subcategory.CategoryId = cat.CategoryId;
+                        db.Subcategories.Add(subcategory);
+                        db.SaveChanges();
+                    }
+                }
+                id = subcategory.SubcategoryId;
+            }
+            else if (table == "products")
+            {
+                var product = new Product();
+                using (var db = new ShopDatabase())
+                {
+                    Subcategory sub = db.Subcategories.FirstOrDefault();
+                    if (sub != null)
+                    {
+                        product.SubcategoryId = sub.SubcategoryId;
+                        db.Products.Add(product);
+                        db.SaveChanges();
+                    }
+                }
+                id = product.ProductId;
+            }
+            else
+                return Redirect("/Error/404");
+
+            return Redirect("/admin/" + table + "/" + id + "/edit");
         }
 
         // Users and products search
