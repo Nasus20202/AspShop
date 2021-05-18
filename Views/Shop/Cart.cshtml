@@ -3,9 +3,25 @@
 @{
     Layout = "_Layout";
 }
-<h1>Koszyk</h1>
-@foreach(KeyValuePair<string, int> kvp in ViewBag.Cart) 
-{ 
-    @kvp.Key<br />
-    @kvp.Value<br />
+@section fluid {
+    <br />
+    <h2 style="text-align:center">Koszyk</h2>
+    <br />
+    <div id="cartlist">
+        @await Html.PartialAsync("/Views/Shop/Partial/pv_cartlist.cshtml")
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <button type="button" class="btn btn-outline-danger btn-block btn-lg" @if(ViewBag.Cart.Count <= 0){
+                @:disabled
+            }>
+            Wyczyść koszyk</button>
+        </div>
+        <div class="col-sm-8">
+            <button type="button" class="btn btn-success btn-block btn-lg" @if(ViewBag.Cart.Count <= 0){
+                @:disabled
+            }>Zamów produkty</button>
+        </div>
+    </div>
+
 }

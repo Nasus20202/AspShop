@@ -211,11 +211,58 @@ namespace ShopWebApp.Controllers
             return View(model);
         }
 
-        /*[Route("/cart/add/{code}/{count:int}")]
-        public IActionResult AddToCart(string code, int count)
+        //[HttpPost]
+        [Route("/cart/add/{code}/{count:int?}")]
+        public IActionResult AddToCart(string code, int count = 1)
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
+            {
+                Dictionary<string, int> dict = new Dictionary<string, int>();
+                HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(dict));
+            }
+            Dictionary<string, int> cartDict = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
 
-        }*/
+            using(var db = new ShopDatabase())
+            {
+                var product = db.Products.Where(p => p.Code == code).FirstOrDefault();
+                if (product == null)
+                    throw new KeyNotFoundException("Code " + code + " was not found in products table.");
+            }
+            if (cartDict.ContainsKey(code))
+            {
+                cartDict[code] += count;
+            }
+            else
+            {
+                cartDict.Add(code, count);
+            }
+            if (cartDict[code] <= 0)
+                cartDict.Remove(code);
+            HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(cartDict));
+
+            return Ok();
+
+        }
+        //[HttpPost]
+        [Route("/cart/remove/{code?}")]
+        public IActionResult RemoveFromCart(string code)
+        {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
+            {
+                Dictionary<string, int> dict = new Dictionary<string, int>();
+                HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(dict));
+            }
+            Dictionary<string, int> cartDict = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
+
+            if (code == null)
+                cartDict = new Dictionary<string, int>();
+            else if (cartDict.ContainsKey(code))
+                cartDict.Remove(code);
+
+            HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(cartDict));
+
+            return Ok();
+        }
 
         [Route("/search")]
         public IActionResult Search([FromQuery] string name = " ", [FromQuery] int page = 1)
