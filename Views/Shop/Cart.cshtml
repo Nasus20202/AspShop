@@ -1,0 +1,11 @@
+﻿@using ShopWebApp
+@model BaseViewModel
+@{
+    Layout = "_Layout";
+}
+<h1>Koszyk</h1>
+@foreach(KeyValuePair<string, int> kvp in ViewBag.Cart) 
+{ 
+    @kvp.Key<br />
+    @kvp.Value<br />
+}

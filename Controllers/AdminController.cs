@@ -667,9 +667,9 @@ namespace ShopWebApp
         [Route("/admin/{table}/add")]
         public IActionResult Add(string table)
         {
+            string role = "";
             if (User.Identity.IsAuthenticated)
             {
-                string role = "";
                 using (var db = new ShopDatabase())
                 {
                     var user = (from c in db.Users
@@ -679,7 +679,7 @@ namespace ShopWebApp
                 }
             }
             table = table.ToLower(); int id = 0;
-            if (table == "categories")
+            if (table == "categories" && Functions.PermissionLevel(role) >= 4)
             {
                 var category = new Category();
                 using (var db = new ShopDatabase()){
@@ -688,7 +688,7 @@ namespace ShopWebApp
                 }
                 id = category.CategoryId;
             }
-            else if (table == "subcategories")
+            else if (table == "subcategories" && Functions.PermissionLevel(role) >= 4)
             {
                 var subcategory = new Subcategory();
                 using (var db = new ShopDatabase())
@@ -703,7 +703,7 @@ namespace ShopWebApp
                 }
                 id = subcategory.SubcategoryId;
             }
-            else if (table == "products")
+            else if (table == "products" && Functions.PermissionLevel(role) >= 4)
             {
                 var product = new Product();
                 using (var db = new ShopDatabase())

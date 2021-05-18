@@ -10,8 +10,6 @@
         <p class="text-center display-5 align-bottom">@Model.Category.About</p>
     </div>
 }
-
-<div class="fadein">
     <div class="row">
         @foreach (Product prod in Model.Products)
         {
@@ -86,7 +84,6 @@
             </div>
         }
     </div>
-</div>
 @{
     int prev = Model.Page - 1, next = Model.Page + 1;
 }

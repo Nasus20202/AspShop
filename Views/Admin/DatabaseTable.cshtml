@@ -5,7 +5,7 @@
 }
 <br />
 <h2 style="text-align:center">Tabela @ViewData["Name"] - strona @Model.Page 
-@if (ViewData["Tablename"].ToString() == "categories" || ViewData["Tablename"].ToString() == "subcategories" || ViewData["Tablename"].ToString() == "products")
+@if (Functions.PermissionLevel(Model.User.Role) >= 4 && (ViewData["Tablename"].ToString() == "categories" || ViewData["Tablename"].ToString() == "subcategories" || ViewData["Tablename"].ToString() == "products"))
 {
     <a class="btn btn-outline-primary" href="/admin/@ViewData["Tablename"].ToString()/add">Nowy <i class="bi-plus" style="font-size:large"></i></a>
 }

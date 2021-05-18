@@ -23,13 +23,36 @@
     if(product.OtherPhotos != "" && product.OtherPhotos != null)
         photos = product.OtherPhotos.Split(';');
 }
+
 @section top{
     <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
         <h1 class="text-center display-4 align-bottom">@product.Brand @product.Name</h1>
     </div>
 }
-<div>
-    <div class="row d-flex fadein">
+
+@section modal {
+    <div class="modal fade" id="staticBackdrop" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Koszyk</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4>Dodano nowy produkt do koszyka</h4>
+                    @product.Brand @product.Name
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-block btn-outline-success" data-dismiss="modal">Kontynuuj zakupy</button>
+                    <a href="" class="btn btn-block btn-success">Koszyk</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+    <div class="row d-flex">
         <div class="col-xl-5">
             @if (photos.Length < 1)
             {
@@ -131,10 +154,9 @@
             </table>
         </div>
     </div>
-</div>
 @if (product.Stock != 0)
 {
-    <a href="#" class="btn btn-success btn-lg btn-block h4">Dodaj do koszyka <i class="bi-cart-plus-fill"></i></a>
+    <a href="#" class="btn btn-success btn-lg btn-block h4" data-toggle="modal" data-target="#staticBackdrop">Dodaj do koszyka <i class="bi-cart-plus-fill"></i></a>
 }
 else
 {

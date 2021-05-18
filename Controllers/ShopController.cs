@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ShopWebApp.Controllers
 {
@@ -177,6 +180,43 @@ namespace ShopWebApp.Controllers
             model.Title = product.Brand + " " + product.Name;
             return View(model);
         }
+
+        [Route("/cart")]
+        public IActionResult Cart()
+        {
+            var model = new BaseViewModel();
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                }
+            }
+
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
+            {
+                Dictionary<string, int> cartDict = new Dictionary<string, int>();
+                cartDict.Add("gk61", 1);
+                cartDict.Add("gk61w", 5);
+                HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(cartDict));
+            }
+            ViewBag.Cart = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
+            
+            model.Title = "Koszyk";
+            return View(model);
+        }
+
+        /*[Route("/cart/add/{code}/{count:int}")]
+        public IActionResult AddToCart(string code, int count)
+        {
+
+        }*/
+
         [Route("/search")]
         public IActionResult Search([FromQuery] string name = " ", [FromQuery] int page = 1)
         {

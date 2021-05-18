@@ -3,22 +3,45 @@
 @using System.IO;
 @{
     Layout = "_AdminLayout";
-    int c = 0;
+    int c = 0; string name = "";
 }
 
+@section modal
+{
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Potwierdź usunięcie</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Czy na pewno chcesz usunąć ten plik?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Anuluj</button>
+                <a href="/admin/photos/remove/@name" class="btn btn-danger">Tak</a>
+            </div>
+        </div>
+    </div>
+</div>
+}
 @{
     DirectoryInfo di = new DirectoryInfo(@"wwwroot/images/");
     FileInfo[] fiArr = di.GetFiles();
     <p class="text-info text-center h5">Na serwerze @(fiArr.Count() <= 4 ? (fiArr.Count() == 1 ? "znajduje się 1 zdjęcie" : (fiArr.Count() == 0)? "znajduje się 0 zdjęć":  "znajdują się "+ fiArr.Count().ToString() + " zdjęcia"): "znajduje się " + fiArr.Count().ToString() + " zdjęć")</p><br />
     @if (Functions.PermissionLevel(Model.User.Role) >= 3)
     {
-        <form enctype="multipart/form-data" method="post" action="/admin/upload">
-            <div class="form-group row">
-                <input class="col-lg-4 form-control-file" type="file" name="files" multiple />
-                <p class="col-lg-4"><input class="btn btn-block btn-outline-primary" type="submit" value="Prześlij" accept=".webp,.png,.jpg,.jpeg,.gif,.bmp" /></p>
-                <p class="col-lg-4 text-muted" style="font-size: smaller">(.webp, .png, .jpg, .jpeg, .gif, .bmp)</p>
-            </div>
-        </form>
+    <form enctype="multipart/form-data" method="post" action="/admin/upload">
+        <input class="form-control-file" style="visibility:collapse" type="file" name="files" id="files" multiple />
+        <div class="form-group row">
+            <p class="col-lg-4"><span class="btn btn-block btn-outline-primary" onclick="clickById('files')">Wybierz pliki</span></p>
+            <p class="col-lg-4"><input class="btn btn-block btn-outline-primary" type="submit" value="Prześlij" accept=".webp,.png,.jpg,.jpeg,.gif,.bmp" /></p>
+            <p class="col-lg-4 text-muted" style="font-size: smaller">(.webp, .png, .jpg, .jpeg, .gif, .bmp)</p>
+        </div>
+    </form>
     }
     <br />
     @:<div class="row">
@@ -39,7 +62,12 @@
                         <h6 class="card-text mb-2 text-muted">@Math.Round((f.Length / 1024.0), 1) KB</h6>
                         @if (Functions.PermissionLevel(Model.User.Role) >= 3)
                         {
-                            <a href="/admin/photos/remove/@f.Name" class="card-link text-danger mt-auto">Usuń <i class="bi-dash-circle-fill"></i></a>
+                            name = f.Name;
+                            <!--<a href="/admin/photos/remove/@f.Name" class="card-link text-danger mt-auto">Usuń <i class="bi-dash-circle-fill"></i></a>-->
+                    <button type="button" class="btn card-link text-danger mt-auto" data-toggle="modal" data-target="#staticBackdrop">
+                        Usuń <i class="bi-dash-circle-fill"></i>
+                    </button>
+
                         }
                     </div>
                 </div>
