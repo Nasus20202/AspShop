@@ -24,7 +24,7 @@
                 </div>
                 <div class="modal-body">
                     <h4>Dodano nowy produkt do koszyka</h4>
-                    @productName
+                    <p id="productname"></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-block btn-outline-success" data-dismiss="modal">Kontynuuj zakupy</button>
@@ -38,6 +38,11 @@
 <script>
     function addToCart(code='') {
         $.post("/cart/add/"+code);
+    }
+    function changeItemName(name = '') {
+        var element = document.getElementById("productname");
+        element.innerHTML = name;
+        return false;
     }
 </script>
 
@@ -103,8 +108,8 @@
                     @if (prod.Stock != 0)
                     {
                         <div class="btn-group mt-auto">
-                            <a href="/p/@prod.Code" class="btn btn-outline-primary">@price zł</a>
-                            <a href="" class="btn btn-outline-success" data-toggle="modal" data-target="#staticBackdrop" onclick="addToCart('@prod.Code')"><i class="bi-cart-plus-fill"></i></a>
+                            <a href="/p/@prod.Code" class="btn btn-outline-primary">@price.ToString("C")</a>
+                            <a href="" class="btn btn-outline-success" data-toggle="modal" data-target="#staticBackdrop" onclick="changeItemName('@productName'); addToCart('@prod.Code')"><i class="bi-cart-plus-fill"></i></a>
                         </div>
                     }
                     else

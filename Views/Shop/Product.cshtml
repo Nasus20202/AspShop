@@ -103,10 +103,10 @@
                     </tr>
                     <tr>
                         <td class="text-secondary">Cena</td>
-                        <th>@price zł
+                        <th>@price.ToString("C")
                         @if (product.OldPrice > product.Price)
                         {
-                            <span class="ml-2" style="color: orangered; text-decoration: line-through; text-decoration-color: darkred">@oldPrice zł</span><br /><span style="color: forestgreen">- @discount%</span>
+                            <span class="ml-2" style="color: orangered; text-decoration: line-through; text-decoration-color: darkred">@oldPrice.ToString("C")</span><br /><span style="color: forestgreen">- @discount%</span>
                         }
                         </th>
                     </tr>

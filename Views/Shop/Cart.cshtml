@@ -5,7 +5,7 @@
 }
 @section modal
 {
-    <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="staticBackdrop" data-backdrop="modal" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -39,7 +39,7 @@
 
 @section fluid {
     <br />
-    <h2 style="text-align:center">Koszyk</h2>
+    <h2 style="text-align:center" class="display-4">Koszyk</h2>
     <br />
     <div id="cartlist">
         @await Html.PartialAsync("/Views/Shop/Partial/pv_cartlist.cshtml")
