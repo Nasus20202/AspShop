@@ -39,7 +39,7 @@ namespace ShopWebApp
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(15);
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.IsEssential = true;
                 options.Cookie.Name = ".Nasus.Session";
             });

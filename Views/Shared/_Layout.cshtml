@@ -1,4 +1,7 @@
 ﻿@using ShopWebApp
+@using Microsoft.AspNetCore.Http;
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Serialization;
 @model BaseViewModel
 
 <!DOCTYPE html>
@@ -58,6 +61,11 @@
                             @:</li>
                         }
                     }
+                    int itemsInCart = 0;
+                    if(!string.IsNullOrEmpty(Context.Session.GetString("_Cart")))
+                    {
+                        foreach(KeyValuePair<string, int> kvp in JsonConvert.DeserializeObject<Dictionary<string, int>>(Context.Session.GetString("_Cart"))){ itemsInCart += kvp.Value; };
+                    }
                 }
 
                 <li class="nav-item">
@@ -98,7 +106,9 @@
                     </div>
                 </li>
                 <li class="nav-item mr-1">
-                    <a class="nav-link" href="/cart">Koszyk  <i class="bi-cart  text-light" style="margin-left:2px"></i></a>
+                    <a class="nav-link" href="/cart" id="cartbutton">Koszyk @if (itemsInCart > 0) {
+                        @:(@itemsInCart.ToString()) 
+                    }  <i class="bi-cart  text-light" style="margin-left:2px"></i></a>
                 </li>
             </ul>
         </div>

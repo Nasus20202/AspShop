@@ -1,6 +1,17 @@
 ﻿@using ShopWebApp
 @model BaseViewModel
 
+<script>
+    function addProduct(code, count = 1) {
+        $.post("/cart/add/" + code + "/" + count);
+        setTimeout(updateCart, 10)
+    }
+    function removeProduct(code) {
+        $.post("/cart/remove/" + code);
+        setTimeout(updateCart, 10)
+    }
+</script>
+
 @if (ViewBag.Cart.Count > 0)
 {
 <table class="table table-hover">
@@ -34,8 +45,8 @@
                         <p style="color: forestgreen">Taniej o @((double)(product.OldPrice - product.Price) / 100) zł!</p>
                     }
                 </td>
-                <td><i class="bi-arrow-left"></i> @kvp.Value <i class="bi-arrow-right"></i></td>
-                <td><i class="bi-trash-fill"></i></td>
+                <td ><i class="bi-arrow-left" onclick="addProduct('@product.Code', -1)"></i> @kvp.Value <i class="bi-arrow-right" onclick="addProduct('@product.Code', 1)"></i></td>
+                <td><i class="bi-trash-fill" onclick="removeProduct('@product.Code')"></i></td>
             </tr>
         }
     </tbody>
