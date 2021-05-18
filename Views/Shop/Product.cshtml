@@ -46,7 +46,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-block btn-outline-success" data-dismiss="modal">Kontynuuj zakupy</button>
-                    <a href="" class="btn btn-block btn-success">Koszyk</a>
+                    <a href="/cart" class="btn btn-block btn-success">Koszyk</a>
                 </div>
             </div>
         </div>
@@ -154,9 +154,16 @@
             </table>
         </div>
     </div>
+
+<script>
+    function addToCart() {
+        $.post("/cart/add/@product.Code");
+    }
+</script>
+
 @if (product.Stock != 0)
 {
-    <a href="#" class="btn btn-success btn-lg btn-block h4" data-toggle="modal" data-target="#staticBackdrop">Dodaj do koszyka <i class="bi-cart-plus-fill"></i></a>
+    <a href="" class="btn btn-success btn-lg btn-block h4" data-toggle="modal" data-target="#staticBackdrop" onclick="addToCart()">Dodaj do koszyka <i class="bi-cart-plus-fill"></i></a>
 }
 else
 {

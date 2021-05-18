@@ -22,12 +22,21 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-warning" data-dismiss="modal">Anuluj</button>
-                <a href="/admin/photos/remove/@name" class="btn btn-danger">Tak</a>
+                <a href="" id="removelink" class="btn btn-danger">Tak</a>
             </div>
         </div>
     </div>
 </div>
 }
+
+<script>
+function changeLink(code = '') {
+      var link = document.getElementById("removelink");
+      link.setAttribute("href", '/admin/photos/remove/'+code);
+      return false;
+};
+</script>
+
 @{
     DirectoryInfo di = new DirectoryInfo(@"wwwroot/images/");
     FileInfo[] fiArr = di.GetFiles();
@@ -63,11 +72,9 @@
                         @if (Functions.PermissionLevel(Model.User.Role) >= 3)
                         {
                             name = f.Name;
-                            <!--<a href="/admin/photos/remove/@f.Name" class="card-link text-danger mt-auto">Usuń <i class="bi-dash-circle-fill"></i></a>-->
-                    <button type="button" class="btn card-link text-danger mt-auto" data-toggle="modal" data-target="#staticBackdrop">
-                        Usuń <i class="bi-dash-circle-fill"></i>
-                    </button>
-
+                            <a href="" id="removebutton" class="btn card-link text-danger mt-auto" onclick="changeLink('@f.Name')" data-toggle="modal" data-target="#staticBackdrop">
+                                Usuń <i class="bi-dash-circle-fill"></i>
+                            </a>
                         }
                     </div>
                 </div>
