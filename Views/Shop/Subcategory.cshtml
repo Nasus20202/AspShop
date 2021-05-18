@@ -4,6 +4,7 @@
 @{
     Layout = "_Layout";
     int c = 0;
+    string productName = "";
 }
 @section top{
     <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
@@ -11,6 +12,35 @@
         <p class="text-center display-5 align-bottom">@Model.Subcategory.About</p>
     </div>
 }
+
+    @section modal {
+    <div class="modal fade" id="staticBackdrop" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Koszyk</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4>Dodano nowy produkt do koszyka</h4>
+                    @productName
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-block btn-outline-success" data-dismiss="modal">Kontynuuj zakupy</button>
+                    <a href="/cart" class="btn btn-block btn-success">Koszyk</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    function addToCart(code='') {
+        $.post("/cart/add/"+code);
+    }
+</script>
 
     <div class="row">
         @foreach (Product prod in Model.Products)
@@ -43,6 +73,7 @@
                                 else
                                     halfStars = 0;
                             }
+                            productName = prod.Brand + " " + prod.Name;
                         }
                         <a href="/p/@prod.Code" class="text-dark nounderline"><h5 class="card-title">@prod.Brand @prod.Name</h5></a>
                         <p class="card-text">@prod.About</p>
@@ -74,7 +105,7 @@
                         {
                             <div class="btn-group mt-auto">
                                 <a href="/p/@prod.Code" class="btn btn-outline-primary">@price zł</a>
-                                <a href="#" class="btn btn-outline-success"><i class="bi-cart-plus-fill"></i></a>
+                                <a href="#" class="btn btn-outline-success" data-toggle="modal" data-target="#staticBackdrop" onclick="addToCart('@prod.Code')"><i class="bi-cart-plus-fill"></i></a>
                             </div>
                         }
                         else

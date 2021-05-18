@@ -3,6 +3,18 @@
 @{
     Layout = "_Layout";
 }
+<script>
+    function clearCart() {
+        $.post("/cart/remove");
+        setTimeout(updateCart, 10)
+    }
+    function updateCart() {
+        var cartTable = $.get("/cart/list", function (data) {
+            document.getElementById("cartlist").innerHTML = data;
+        });
+    }
+</script>
+
 @section fluid {
     <br />
     <h2 style="text-align:center">Koszyk</h2>
@@ -12,15 +24,16 @@
     </div>
     <div class="row">
         <div class="col-sm-4">
-            <button type="button" class="btn btn-outline-danger btn-block btn-lg" @if(ViewBag.Cart.Count <= 0){
-                @:disabled
-            }>
-            Wyczyść koszyk</button>
+            <button type="button" onclick="clearCart()" class="btn btn-outline-danger btn-block btn-lg" @if (ViewBag.Cart.Count <= 0) { @: disabled
+                    }>
+                Wyczyść koszyk
+            </button>
         </div>
         <div class="col-sm-8">
-            <button type="button" class="btn btn-success btn-block btn-lg" @if(ViewBag.Cart.Count <= 0){
-                @:disabled
-            }>Zamów produkty</button>
+            <button type="button" class="btn btn-success btn-block btn-lg" @if (ViewBag.Cart.Count <= 0) { @: disabled
+                    }>
+                Zamów produkty
+            </button>
         </div>
     </div>
 

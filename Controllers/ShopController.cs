@@ -201,8 +201,6 @@ namespace ShopWebApp.Controllers
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
             {
                 Dictionary<string, int> cartDict = new Dictionary<string, int>();
-                cartDict.Add("gk61", 1);
-                cartDict.Add("gk61w", 5);
                 HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(cartDict));
             }
             ViewBag.Cart = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
@@ -211,7 +209,7 @@ namespace ShopWebApp.Controllers
             return View(model);
         }
 
-        //[HttpPost]
+        [HttpPost]
         [Route("/cart/add/{code}/{count:int?}")]
         public IActionResult AddToCart(string code, int count = 1)
         {
@@ -243,7 +241,7 @@ namespace ShopWebApp.Controllers
             return Ok();
 
         }
-        //[HttpPost]
+        [HttpPost]
         [Route("/cart/remove/{code?}")]
         public IActionResult RemoveFromCart(string code)
         {
@@ -262,6 +260,22 @@ namespace ShopWebApp.Controllers
             HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(cartDict));
 
             return Ok();
+        }
+        [HttpGet]
+        [Route("/cart/list")]
+        public IActionResult GetCartList()
+        {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
+            {
+                Dictionary<string, int> dict = new Dictionary<string, int>();
+                HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(dict));
+            }
+            Dictionary<string, int> cartDict = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
+            ViewBag.Cart = cartDict;
+            if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                return PartialView("/Views/Shop/Partial/pv_cartlist.cshtml");
+            else
+                return Redirect("/Error/404");
         }
 
         [Route("/search")]
