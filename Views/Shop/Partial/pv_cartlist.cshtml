@@ -1,0 +1,47 @@
+﻿@using ShopWebApp
+@model BaseViewModel
+
+@if (ViewBag.Cart.Count > 0)
+{
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Produkt</th>
+            <th scope="col">Cena</th>
+            <th scope="col">Ilość</th>
+            <th scope="col">Usuń</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (KeyValuePair<string, int> kvp in ViewBag.Cart)
+        {
+
+            Product product = new Product();
+            using (var db = new ShopDatabase())
+            {
+                product = db.Products.Where(p => p.Code == kvp.Key).FirstOrDefault();
+                if (product == null)
+                    continue;
+            }
+            <tr>
+                <td style="width: 20%"><img class="img-fluid" src="/images/@product.Photo"></td>
+                <td>@product.Brand @product.Name</td>
+                <td>
+                    @((double)product.Price / 100) zł @if (product.OldPrice > product.Price)
+                    {
+                        <p style="text-decoration: line-through; color:red">@((double)product.OldPrice / 100) zł</p>
+                        <p style="color: forestgreen">Taniej o @((double)(product.OldPrice - product.Price) / 100) zł!</p>
+                    }
+                </td>
+                <td><i class="bi-arrow-left"></i> @kvp.Value <i class="bi-arrow-right"></i></td>
+                <td><i class="bi-trash-fill"></i></td>
+            </tr>
+        }
+    </tbody>
+</table>
+}
+else
+{
+    <h2 class="text-info" style="text-align:center; margin-top: 50px; margin-bottom: 70px">Koszyk jest pusty</h2>
+}
