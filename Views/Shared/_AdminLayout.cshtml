@@ -88,7 +88,7 @@
             <div class="col-sm-2">
                 @RenderSection("left", false)
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-8 fadein">
                 @RenderBody()
             </div>
             <div class="col-sm-2">
@@ -106,4 +106,5 @@
         </div>
     </div>
 </body>
+@RenderSection("modal", false);
 </html>

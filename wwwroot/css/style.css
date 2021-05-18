@@ -16,6 +16,7 @@
 .nounderline{
     text-decoration: none !important;
 }
+
 .fadein {
     animation: fadeInAnimation ease 0.3s;
     animation-iteration-count: 1;
