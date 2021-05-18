@@ -10,7 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace ShopWebApp.Controllers
+namespace ShopWebApp
 {
     public class AccountController : Controller
     {
@@ -270,7 +270,7 @@ namespace ShopWebApp.Controllers
                     return false;
             }
         }
-        private string Sha256Hash(string password)
+        public static string Sha256Hash(string password)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(password);
             byte[] hashed;

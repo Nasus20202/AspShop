@@ -1,8 +1,36 @@
 ﻿@using ShopWebApp
+@using Microsoft.AspNetCore.Http; 
 @model AdminModel
 @{
     Layout = "_AdminLayout";
 }
+
+@section modal
+{
+    <div class="modal fade" id="staticBackdrop" data-backdrop="modal" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Potwierdź usunięcie</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="@Context.Request.Path/remove" method="post" class="form-group">
+                    <div class="modal-body">
+                        Czy na pewno chcesz usunąć ten objekt, wraz z wszystkimi obiektami po nim dzidziczącymi?
+                        <input type="password" class="form-control" name="password" placeholder="Hasło" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">Anuluj</button>
+                        <button type="submit" class="btn btn-danger">Tak</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
 <br />
 <h2 style="text-align:center">@ViewData["Name"] - @ViewData["ObjectName"]</h2>
 <br />
@@ -14,46 +42,52 @@
                 @:<tr>
                     @:<th>
                         @kvp.Key
-                @:</th>
-                @:<td>
-                    @kvp.Value
-            @:</td>
-        @:</tr>
-    }
-        }
+                    @:</th>
+                    @:<td>
+                        @kvp.Value
+                    @:</td>
+                @:</tr>
+            }
+}
     </tbody>
 </table>
+@if (Functions.PermissionLevel(Model.User.Role) >= 4) { 
+<a href="" id="removebutton" class="btn btn-outline-danger btn-block" data-toggle="modal" data-target="#staticBackdrop">
+    Usuń obiekt <i class="bi-dash-circle-fill"></i>
+</a>
+}
 
 @if (ViewBag.ChildObjects != null && ViewBag.ChildObjects.Count > 0)
 {
     var childObjects = ViewBag.ChildObjects;
     @:<h4>Obiekty dziedziczące</h4>
-      <table class="table">
-          <tbody>
-              @{
-                  foreach (var child in childObjects)
-                  {
-                      string id = "", type = ViewData["type"].ToString();
-                      if (type == "users")
-                          id = child.UserId;
-                      else if (type == "categories" || type == "subcategories" || type == "products" || type == "orders")
-                          id = child.Code;
-                      @:<tr>
-                          @:<td>
-                              <a href="/admin/@type/@id">@child.Name</a>
-                          @:</td>
-                      @:</tr>
-                  }
-              }
-          </tbody>
-      </table>
+    <table class="table">
+        <tbody>
+            @{
+                foreach (var child in childObjects)
+                {
+                    string id = "", type = ViewData["type"].ToString();
+                    if (type == "users")
+                        id = child.UserId;
+                    else if (type == "categories" || type == "subcategories" || type == "products" || type == "orders")
+                        id = child.Code;
+                    @:<tr>
+                        @:<td>
+                            <a href="/admin/@type/@id">@child.Name</a>
+                        @:</td>
+                    @:</tr>
+                }
+            }
+        </tbody>
+    </table>
 }
 
 
-@{ 
+@{
     string path = Url.Action("Table", "Admin") + "/" + Model.Tablename;
 }
-@if(Functions.PermissionLevel(Model.User.Role)>= ViewBag.PermissionLevelToEdit){
-<a href="/admin/@Model.Tablename/@ViewBag.Id/edit" class="btn btn-primary btn-lg btn-block" style="margin-top: 7px">Edytuj @ViewData["ObjectName"]</a>
+@if (Functions.PermissionLevel(Model.User.Role) >= ViewBag.PermissionLevelToEdit)
+{
+    <a href="/admin/@Model.Tablename/@ViewBag.Id/edit" class="btn btn-primary btn-lg btn-block" style="margin-top: 7px">Edytuj @ViewData["ObjectName"]</a>
 }
 <a href="@path" class="btn btn-outline-primary btn-lg btn-block" style="margin-top: 7px">Lista rekordów tabeli @Model.Tablename</a>

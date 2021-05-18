@@ -296,7 +296,7 @@ namespace ShopWebApp
                     {
                         for (int i = start; i < end; i++)
                         {
-                            table.Names.Add(categoryList[i].Name);
+                            table.Names.Add(categoryList[i].Name == null ? "Kategoria bez nazwy" : categoryList[i].Name);
                             table.Codes.Add(categoryList[i].Code);
                         }
                     }
@@ -321,7 +321,7 @@ namespace ShopWebApp
                     {
                         for(int i = start; i < end; i++)
                         {
-                            table.Names.Add(subcategoryList[i].Name);
+                            table.Names.Add(subcategoryList[i].Name == null ? "Podkategoria bez nazwy" : subcategoryList[i].Name);
                             table.Codes.Add(subcategoryList[i].Code);
                         }
                     }
@@ -346,7 +346,7 @@ namespace ShopWebApp
                     {
                         for (int i = start; i < end; i++)
                         {
-                            table.Names.Add(productList[i].Brand + " " + productList[i].Name);
+                            table.Names.Add(productList[i].Brand + " " + productList[i].Name == null ? "Produkt bez nazwy" : productList[i].Brand + " " + productList[i].Name);
                             table.Codes.Add(productList[i].Code);
                         }
                     }
@@ -682,6 +682,7 @@ namespace ShopWebApp
             if (table == "categories" && Functions.PermissionLevel(role) >= 4)
             {
                 var category = new Category();
+                category.Code = "Kod";
                 using (var db = new ShopDatabase()){
                     db.Categories.Add(category);
                     db.SaveChanges();
@@ -691,6 +692,7 @@ namespace ShopWebApp
             else if (table == "subcategories" && Functions.PermissionLevel(role) >= 4)
             {
                 var subcategory = new Subcategory();
+                subcategory.Code = "Kod";
                 using (var db = new ShopDatabase())
                 {
                     Category cat = db.Categories.FirstOrDefault();
@@ -706,6 +708,7 @@ namespace ShopWebApp
             else if (table == "products" && Functions.PermissionLevel(role) >= 4)
             {
                 var product = new Product();
+                product.Code = "Kod";
                 using (var db = new ShopDatabase())
                 {
                     Subcategory sub = db.Subcategories.FirstOrDefault();
@@ -722,6 +725,75 @@ namespace ShopWebApp
                 return Redirect("/Error/404");
 
             return Redirect("/admin/" + table + "/" + id + "/edit");
+        }
+
+        [HttpPost]
+        [Route("/admin/{table}/{code}/remove")]
+        public IActionResult Remove(string table, string code, string password)
+        {
+            string role = "", passwordHash = AccountController.Sha256Hash(password), validHash = "";
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    role = user.Role;
+                    validHash = user.Password;
+                }
+            }
+            if (validHash != passwordHash)
+                return Redirect("/admin/"+table+"/"+code);
+            table = table.ToLower();
+            if (table == "products")
+            {
+                if (Functions.PermissionLevel(role) < 4)
+                    return Forbid();
+                Product product;
+                using(var db = new ShopDatabase())
+                {
+                    product = db.Products.Where(p => p.ProductId.ToString() == code || p.Code == code).FirstOrDefault();
+                    if (product == null)
+                        return Redirect("/Error/404");
+                    db.Products.Remove(product);
+                    db.SaveChanges();
+                }
+                return Redirect("/admin/table/products");
+            }
+            else if (table == "subcategories")
+            {
+                if (Functions.PermissionLevel(role) < 4)
+                    return Forbid();
+                Subcategory subcategory;
+                using (var db = new ShopDatabase())
+                {
+                    subcategory = db.Subcategories.Where(s => s.SubcategoryId.ToString() == code || s.Code == code).FirstOrDefault();
+                    if (subcategory == null)
+                        return Redirect("/Error/404");
+                    db.Subcategories.Remove(subcategory);
+                    db.SaveChanges();
+                }
+                return Redirect("/admin/table/subcategories");
+            }
+            else if (table == "categories")
+            {
+                if (Functions.PermissionLevel(role) < 4)
+                    return Forbid();
+                Category category;
+                using (var db = new ShopDatabase())
+                {
+                    category = db.Categories.Where(c => c.CategoryId.ToString() == code || c.Code == code).FirstOrDefault();
+                    if (category == null)
+                        return Redirect("/Error/404");
+                    db.Categories.Remove(category);
+                    db.SaveChanges();
+                }
+                return Redirect("/admin/table/categories");
+
+            }
+            else
+                return Redirect("/Error/404");
         }
 
         // Users and products search
