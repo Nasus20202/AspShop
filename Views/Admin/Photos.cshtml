@@ -38,7 +38,12 @@ function changeLink(code = '') {
 </script>
 
 @{
-    DirectoryInfo di = new DirectoryInfo(@"wwwroot/images/");
+    string path = @"wwwroot/images/";
+    DirectoryInfo di;
+    if (!Directory.Exists(path))
+        di = Directory.CreateDirectory(path);
+
+    di = new DirectoryInfo(path);
     FileInfo[] fiArr = di.GetFiles();
     <p class="text-info text-center h5">Na serwerze @(fiArr.Count() <= 4 ? (fiArr.Count() == 1 ? "znajduje się 1 zdjęcie" : (fiArr.Count() == 0)? "znajduje się 0 zdjęć":  "znajdują się "+ fiArr.Count().ToString() + " zdjęcia"): "znajduje się " + fiArr.Count().ToString() + " zdjęć")</p><br />
     @if (Functions.PermissionLevel(Model.User.Role) >= 3)
