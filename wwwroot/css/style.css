@@ -32,3 +32,9 @@
         opacity: 1;
     }
 }
+
+@media screen and (max-width: 575px) {
+    .margin-mobile {
+        margin-top: 10px;
+    }
+}

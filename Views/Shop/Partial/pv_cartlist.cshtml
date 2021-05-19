@@ -41,7 +41,7 @@
             int count = kvp.Value;
             totalCost += product.Price * count;
             <tr>
-                <td style="max-width: 7vw; max-height: 5vh"><a href="/p/@product.Code"><img class="img-fluid" src="/images/@product.Photo"></a></td>
+                <td style="max-width: 5vw; max-height: 5vh"><a href="/p/@product.Code"><img class="img-fluid" src="/images/@product.Photo"></a></td>
                 <td><a href="/p/@product.Code" class="nounderline text-dark">@product.Brand @product.Name</a></td>
                 <td>
                     @(((double)product.Price*count / 100).ToString("C")) @if (product.OldPrice > product.Price)
@@ -72,5 +72,5 @@
 }
 else
 {
-    <h2 class="text-info" style="text-align:center; margin-top: 50px; margin-bottom: 70px">Koszyk jest pusty</h2>
+    <h2 class="text-info" style="text-align:center; margin-top: 20vh; margin-bottom: 25vh">Koszyk jest pusty</h2>
 }

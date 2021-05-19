@@ -65,7 +65,7 @@ namespace ShopWebApp.Controllers
                     db.Entry(subcategory)
                         .Collection(s => s.Products)
                         .Load();
-                    foreach (Product product in subcategory.Products)
+                    foreach (Product product in subcategory.Products.Where(p => p.Enabled))
                         productList.Add(product);
                 }
                 var cutProductList = new List<Product>();
@@ -121,7 +121,7 @@ namespace ShopWebApp.Controllers
                 db.Entry(subcategory)
                     .Collection(s => s.Products)
                     .Load();
-                var productList = subcategory.Products.ToList();
+                var productList = subcategory.Products.Where(p => p.Enabled).ToList();
                 var cutProductList = new List<Product>();
                 if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0))
                     return Redirect("/Error/404");
@@ -299,7 +299,7 @@ namespace ShopWebApp.Controllers
             }
             using (var db = new ShopDatabase()) {
                 var products = db.Products
-                    .Where(p => p.Name.Contains(name) || p.Brand.Contains(name))
+                    .Where(p => (p.Name.Contains(name) || p.Brand.Contains(name)) && p.Enabled)
                     .ToList();
                 products = products.OrderByDescending(p => p.RatingVotes).ToList();
                 model.Count = products.Count;
@@ -307,7 +307,7 @@ namespace ShopWebApp.Controllers
                 if(products.Count == 0)
                 {
                     ViewData["message"] = "Brak wyników! Polecamy inne produkty dostępne w naszym sklepie";
-                    products = db.Products.OrderByDescending(p => p.RatingVotes).ToList();
+                    products = db.Products.Where(p => p.Enabled).OrderByDescending(p => p.RatingVotes).ToList();
                 }
                 else if (page <= 0 || page > products.Count / productsPerPage + (products.Count % productsPerPage != 0 ? 1 : 0))
                     return Redirect("/Error/404");
