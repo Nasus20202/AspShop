@@ -42,7 +42,7 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                         Obsługa klientów
                     </a>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu fadein">
                         <a href="@ordersPath" class="dropdown-item">Zamówienia</a>
                         <a href="@customOrdersPath" class="dropdown-item">Zamówienia niestandardowe</a>
                         @if (Functions.PermissionLevel(Model.User.Role) >= 3)
@@ -56,7 +56,7 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                         Struktura sklepu
                     </a>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu fadein">
                         <a href="@productsPath" class="dropdown-item">Produkty</a>
                         <a href="@subcategoriesPath" class="dropdown-item">Podkategorie</a>
                         <a href="@categoriesPath" class="dropdown-item">Kategorie</a>
@@ -66,7 +66,7 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                         Zasoby
                     </a>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu fadein">
                         <a href="@photosPath" class="dropdown-item">Zdjęcia</a>
                     </div>
                 </li>
@@ -88,7 +88,7 @@
             <div class="col-sm-2">
                 @RenderSection("left", false)
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-8 fadein">
                 @RenderBody()
             </div>
             <div class="col-sm-2">
@@ -106,4 +106,5 @@
         </div>
     </div>
 </body>
+@RenderSection("modal", false);
 </html>

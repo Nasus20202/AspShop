@@ -30,3 +30,8 @@ function showPasswordChange() {
     button.style.display = "none";
     seciton.style.display = "inline";
 }
+
+function clickById(id) {
+    var element = document.getElementById(id);
+    element.click();
+}
