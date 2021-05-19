@@ -36,6 +36,13 @@ namespace ShopWebApp
                 options.AccessDeniedPath = new PathString("/Account/Denied");
             });
             services.AddAuthorization();
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.IsEssential = true;
+                options.Cookie.Name = ".Nasus.Session";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,73 +55,12 @@ namespace ShopWebApp
                 app.UseDeveloperExceptionPage();
             }
 
-            // Populate PC Parts
-            using (var context = new ShopDatabase())
-            {
-                var category = new Category
-                {
-                    Name = "Podzespo³y Komputerowe",
-                    About = "PC Parts",
-                    Subcategories = new List<Subcategory>()
-                    {
-                        new Subcategory { Name = "Procesory", About="CPUs", Tags=""},
-                        new Subcategory { Name = "Karty graficzne", About="GPU", Tags=""},
-                        new Subcategory { Name = "P³yty g³ówne", About="MOBOs", Tags=""}
-                    }
-
-                };
-                context.Add(category);
-                //context.SaveChanges();
-            }
-            // Populate Keyboards
-            using (var context = new ShopDatabase())
-            {
-                var category = new Category
-                {
-                    Name = "Klawiatury",
-                    About = "Keyboards",
-                    Subcategories = new List<Subcategory>()
-                    {
-                        new Subcategory { Name = "Klawiatury 60%", About="60", Tags="",  Code="keyboard60"},
-                        new Subcategory { Name = "Klawiatury TKL", About="80", Tags="", Code="keyboard80"},
-                        new Subcategory { Name = "Klawiatury 100%", About="100", Tags="", Code="keyboard100"},
-                        new Subcategory { Name = "Prze³¹czniki", About="Switches", Tags="", Code="switch"}
-                    }
-
-                };
-                context.Add(category);
-                //context.SaveChanges();
-            }
-            // Move Subcategories between Categories
-            using (var context = new ShopDatabase())
-            {
-                var category = (from c in context.Categories
-                                where c.CategoryId == 2
-                                select c).FirstOrDefault();
-                var subcategory = (from c in context.Subcategories
-                                   where c.SubcategoryId == 6
-                                   select c).FirstOrDefault();
-                subcategory.Category = category;
-                //context.SaveChanges();
-            }
-            // Add products
-            using (var context = new ShopDatabase())
-            {
-                var subcategory = context.Subcategories
-                                .Single(s => s.SubcategoryId == 4);
-                context.Entry(subcategory)
-                    .Collection(s => s.Products)
-                    .Load();
-                var product = new Product { Name = "K87", Brand= "Womier", Code = "k87", Price = 37999, Tags="", About = "", Photo = "k87.webp", OtherPhotos = "", LongAbout ="" };
-                subcategory.Products.Add(product);
-                //context.SaveChanges();
-            }
-
             app.UseStaticFiles();
             app.UseRouting();
             
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSession();
             var db = new ShopDatabase();
             db.Database.EnsureCreated();
 

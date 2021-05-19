@@ -10,7 +10,14 @@
     @foreach (KeyValuePair<string, string> kvp in ViewBag.values)
     {
         <label for="@kvp.Key">@kvp.Key</label>
-        <input type="text" name="@kvp.Key" value="@kvp.Value" class="form-control" />
+        @if (!kvp.Key.ToLower().Contains("long"))
+        {
+            <input type="text" name="@kvp.Key" value="@kvp.Value" class="form-control" />
+        }
+        else
+        {
+            <textarea class="form-control" name="@kvp.Key" rows="5">@kvp.Value</textarea>
+        }
     }
     <button type="submit" class="btn btn-primary btn-lg btn-block" style="margin-top: 7px">Zapisz zmiany</button>
 </form>

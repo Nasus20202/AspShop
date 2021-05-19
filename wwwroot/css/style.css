@@ -1,1 +1,40 @@
-﻿
+﻿.card:hover {
+    box-shadow: 0 0 1em gray;
+    transform: scale(1.05);
+}
+.btn:hover {
+    box-shadow: 0 0 0.5em gray;
+    transform: scale(1.02);
+}
+.card {
+    transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
+}
+.btn {
+    transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
+}
+
+.nounderline{
+    text-decoration: none !important;
+}
+
+.fadein {
+    animation: fadeInAnimation ease 0.3s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@media screen and (max-width: 575px) {
+    .margin-mobile {
+        margin-top: 10px;
+    }
+}

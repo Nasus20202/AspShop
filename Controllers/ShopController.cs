@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ShopWebApp.Controllers
 {
@@ -62,7 +65,7 @@ namespace ShopWebApp.Controllers
                     db.Entry(subcategory)
                         .Collection(s => s.Products)
                         .Load();
-                    foreach (Product product in subcategory.Products)
+                    foreach (Product product in subcategory.Products.Where(p => p.Enabled))
                         productList.Add(product);
                 }
                 var cutProductList = new List<Product>();
@@ -118,7 +121,7 @@ namespace ShopWebApp.Controllers
                 db.Entry(subcategory)
                     .Collection(s => s.Products)
                     .Load();
-                var productList = subcategory.Products.ToList();
+                var productList = subcategory.Products.Where(p => p.Enabled).ToList();
                 var cutProductList = new List<Product>();
                 if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0))
                     return Redirect("/Error/404");
@@ -177,6 +180,104 @@ namespace ShopWebApp.Controllers
             model.Title = product.Brand + " " + product.Name;
             return View(model);
         }
+
+        [Route("/cart")]
+        public IActionResult Cart()
+        {
+            var model = new BaseViewModel();
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                }
+            }
+
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
+            {
+                Dictionary<string, int> cartDict = new Dictionary<string, int>();
+                HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(cartDict));
+            }
+            ViewBag.Cart = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
+            
+            model.Title = "Koszyk";
+            return View(model);
+        }
+
+        [HttpPost]
+        [Route("/cart/add/{code}/{count:int?}")]
+        public IActionResult AddToCart(string code, int count = 1)
+        {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
+            {
+                Dictionary<string, int> dict = new Dictionary<string, int>();
+                HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(dict));
+            }
+            Dictionary<string, int> cartDict = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
+
+            using(var db = new ShopDatabase())
+            {
+                var product = db.Products.Where(p => p.Code == code).FirstOrDefault();
+                if (product == null)
+                    throw new KeyNotFoundException("Code " + code + " was not found in products table.");
+            }
+            if (cartDict.ContainsKey(code))
+            {
+                cartDict[code] += count;
+            }
+            else
+            {
+                cartDict.Add(code, count);
+            }
+            if (cartDict[code] <= 0)
+                cartDict.Remove(code);
+            HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(cartDict));
+
+            return Ok();
+
+        }
+        [HttpPost]
+        [Route("/cart/remove/{code?}")]
+        public IActionResult RemoveFromCart(string code)
+        {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
+            {
+                Dictionary<string, int> dict = new Dictionary<string, int>();
+                HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(dict));
+            }
+            Dictionary<string, int> cartDict = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
+
+            if (code == null)
+                cartDict = new Dictionary<string, int>();
+            else if (cartDict.ContainsKey(code))
+                cartDict.Remove(code);
+
+            HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(cartDict));
+
+            return Ok();
+        }
+        [HttpGet]
+        [Route("/cart/list")]
+        public IActionResult GetCartList()
+        {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
+            {
+                Dictionary<string, int> dict = new Dictionary<string, int>();
+                HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(dict));
+            }
+            Dictionary<string, int> cartDict = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
+            ViewBag.Cart = cartDict;
+            if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                return PartialView("/Views/Shop/Partial/pv_cartlist.cshtml");
+            else
+                return Redirect("/Error/404");
+        }
+
         [Route("/search")]
         public IActionResult Search([FromQuery] string name = " ", [FromQuery] int page = 1)
         {
@@ -198,7 +299,7 @@ namespace ShopWebApp.Controllers
             }
             using (var db = new ShopDatabase()) {
                 var products = db.Products
-                    .Where(p => p.Name.Contains(name) || p.Brand.Contains(name))
+                    .Where(p => (p.Name.Contains(name) || p.Brand.Contains(name)) && p.Enabled)
                     .ToList();
                 products = products.OrderByDescending(p => p.RatingVotes).ToList();
                 model.Count = products.Count;
@@ -206,7 +307,7 @@ namespace ShopWebApp.Controllers
                 if(products.Count == 0)
                 {
                     ViewData["message"] = "Brak wyników! Polecamy inne produkty dostępne w naszym sklepie";
-                    products = db.Products.OrderByDescending(p => p.RatingVotes).ToList();
+                    products = db.Products.Where(p => p.Enabled).OrderByDescending(p => p.RatingVotes).ToList();
                 }
                 else if (page <= 0 || page > products.Count / productsPerPage + (products.Count % productsPerPage != 0 ? 1 : 0))
                     return Redirect("/Error/404");

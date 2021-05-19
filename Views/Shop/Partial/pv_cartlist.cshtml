@@ -1,0 +1,76 @@
+﻿@using ShopWebApp
+@model BaseViewModel
+
+<script>
+    function addProduct(code, count = 1) {
+        $.post("/cart/add/" + code + "/" + count);
+        setTimeout(updateCart, 10)
+    }
+    function removeProduct(code) {
+        $.post("/cart/remove/" + code);
+        setTimeout(updateCart, 10)
+    }
+</script>
+
+@if (ViewBag.Cart.Count > 0)
+{
+<table class="table table-hover" style="font-size: large">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Produkt</th>
+            <th scope="col">Cena</th>
+            <th scope="col">Ilość</th>
+            <th scope="col">Usuń</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int totalCost = 0, totalDiscount = 0;
+        }
+        @foreach (KeyValuePair<string, int> kvp in ViewBag.Cart)
+        {
+
+            Product product = new Product();
+            using (var db = new ShopDatabase())
+            {
+                product = db.Products.Where(p => p.Code == kvp.Key).FirstOrDefault();
+                if (product == null)
+                    continue;
+            }
+            int count = kvp.Value;
+            totalCost += product.Price * count;
+            <tr>
+                <td style="max-width: 5vw; max-height: 5vh"><a href="/p/@product.Code"><img class="img-fluid" src="/images/@product.Photo"></a></td>
+                <td><a href="/p/@product.Code" class="nounderline text-dark">@product.Brand @product.Name</a></td>
+                <td>
+                    @(((double)product.Price*count / 100).ToString("C")) @if (product.OldPrice > product.Price)
+                    {
+                        <p style="text-decoration: line-through; color:red">@(((double)product.OldPrice*count / 100).ToString("C"))</p>
+                        <p style="color: forestgreen">Taniej o @(((double)(product.OldPrice - product.Price)*count / 100).ToString("C"))!</p>
+                        totalDiscount += (product.OldPrice - product.Price)*count;
+                    }
+                </td>
+                <td><i class="bi-arrow-left" onclick="addProduct('@product.Code', -1)"></i> @kvp.Value <i class="bi-arrow-right" onclick="addProduct('@product.Code', 1)"></i></td>
+                <td><i class="bi-trash-fill" onclick="removeProduct('@product.Code')"></i></td>
+            </tr>
+        }
+    <tr>
+        <td></td>
+        <td>Suma:</td>
+        <td style="font-weight: bold">@(((double)totalCost / 100).ToString("C"))</td>
+        <td>
+            @if (totalDiscount > 0)
+            {
+                @:<p style="color: forestgreen; font-weight: bold">@(((double)totalDiscount / 100).ToString("C")) rabatu</p>
+            }
+        </td>
+        <td></td>
+    </tr>
+    </tbody>
+</table>
+}
+else
+{
+    <h2 class="text-info" style="text-align:center; margin-top: 20vh; margin-bottom: 25vh">Koszyk jest pusty</h2>
+}

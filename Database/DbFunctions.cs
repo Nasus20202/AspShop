@@ -49,6 +49,7 @@ namespace ShopWebApp
                 category.Name = updatedCategory.Name;
                 category.Code = updatedCategory.Code;
                 category.About = updatedCategory.About;
+                category.Enabled = updatedCategory.Enabled;
 
 
                 category.Modified = DateTime.UtcNow;
@@ -108,6 +109,7 @@ namespace ShopWebApp
                 subcategory.About = updatedSubcategory.About;
                 subcategory.Tags = updatedSubcategory.Tags;
                 subcategory.CategoryId = updatedSubcategory.CategoryId;
+                subcategory.Enabled = updatedSubcategory.Enabled;
 
 
                 subcategory.Modified = DateTime.UtcNow;
@@ -174,6 +176,7 @@ namespace ShopWebApp
                 product.Photo = updatedProduct.Photo;
                 product.OtherPhotos = updatedProduct.OtherPhotos;
                 product.Stock = updatedProduct.Stock;
+                product.Enabled = updatedProduct.Enabled;
 
                 product.SubcategoryId = updatedProduct.SubcategoryId;
 
@@ -245,6 +248,7 @@ namespace ShopWebApp
                 user.Phone = updatedUser.Phone;
                 user.Password = updatedUser.Password;
                 user.Address = updatedUser.Address;
+                user.Enabled = updatedUser.Enabled;
 
                 user.Modified = DateTime.UtcNow;
                 try
