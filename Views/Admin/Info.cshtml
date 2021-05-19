@@ -1,5 +1,5 @@
 ﻿@using ShopWebApp
-@using Microsoft.AspNetCore.Http; 
+@using Microsoft.AspNetCore.Http;
 @model AdminModel
 @{
     Layout = "_AdminLayout";
@@ -19,6 +19,7 @@
                 <form action="@Context.Request.Path/remove" method="post" class="form-group">
                     <div class="modal-body">
                         Czy na pewno chcesz usunąć ten objekt, wraz z wszystkimi obiektami po nim dzidziczącymi?
+                        <p class="text-muted" style="font-size: smaller">Potwierdź operację hasłem</p>
                         <input type="password" class="form-control" name="password" placeholder="Hasło" required>
                     </div>
                     <div class="modal-footer">
@@ -37,6 +38,7 @@
 <table class="table">
     <tbody>
         @{
+            string type = ViewData["type"].ToString();
             foreach (KeyValuePair<string, string> kvp in Model.Dict)
             {
                 @:<tr>
@@ -48,13 +50,14 @@
                     @:</td>
                 @:</tr>
             }
-}
+        }
     </tbody>
 </table>
-@if (Functions.PermissionLevel(Model.User.Role) >= 4) { 
-<a href="" id="removebutton" class="btn btn-outline-danger btn-block" data-toggle="modal" data-target="#staticBackdrop">
-    Usuń obiekt <i class="bi-dash-circle-fill"></i>
-</a>
+@if ((Functions.PermissionLevel(Model.User.Role) >= 4 && (type == "categories" || type == "subcategories" || type == "products") || (Functions.PermissionLevel(Model.User.Role) >= 5) && type == "users"))
+        {
+    <a href="" id="removebutton" class="btn btn-outline-danger btn-block" data-toggle="modal" data-target="#staticBackdrop">
+        Usuń obiekt <i class="bi-dash-circle-fill"></i>
+    </a>
 }
 
 @if (ViewBag.ChildObjects != null && ViewBag.ChildObjects.Count > 0)
@@ -66,17 +69,26 @@
             @{
                 foreach (var child in childObjects)
                 {
-                    string id = "", type = ViewData["type"].ToString();
+                    string id = "";
                     if (type == "users")
                         id = child.UserId;
                     else if (type == "categories" || type == "subcategories" || type == "products" || type == "orders")
                         id = child.Code;
                     @:<tr>
                         @:<td>
-                            <a href="/admin/@type/@id">@child.Name</a>
-                        @:</td>
-                    @:</tr>
-                }
+                            <a href="/admin/@type/@id">
+                                @if (child.Name != null)
+                                {
+                                    @child.Name
+                                }
+                                else
+                                {
+                                    @:Obiekt bez nazwy
+                                }
+                        </a>
+                    @:</td>
+                @:</tr>
+            }
             }
         </tbody>
     </table>

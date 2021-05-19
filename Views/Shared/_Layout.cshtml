@@ -39,6 +39,7 @@
                     using (var db = new ShopDatabase())
                     {
                         List<Category> categories = (from c in db.Categories
+                                                     where c.Enabled
                                                      select c).ToList();
                         foreach (Category cat in categories)
                         {
@@ -49,7 +50,7 @@
                                 db.Entry(cat)
                                     .Collection(c => c.Subcategories)
                                     .Load();
-                                var subcategories = cat.Subcategories.ToList();
+                                var subcategories = cat.Subcategories.Where(s => s.Enabled).ToList();
                                 @:<div class="dropdown-menu fadein">
                                     @:<a class="dropdown-item font-weight-bold" href="/s/@cat.Code">Wszystkie</a>
                                     @:<div class="dropdown-divider"></div>

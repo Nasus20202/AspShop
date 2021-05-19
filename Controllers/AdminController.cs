@@ -116,6 +116,8 @@ namespace ShopWebApp
                 model.Dict.Add("Nazwa", category.Name);
                 model.Dict.Add("Kod", category.Code);
                 model.Dict.Add("Opis", category.About);
+                model.Dict.Add("Ostatnia edycja", category.Modified.ToString());
+                model.Dict.Add("Aktywny", category.Enabled.ToString());
                 ViewBag.Id = category.CategoryId;
                 ViewBag.PermissionLevelToEdit = 4;
 
@@ -164,6 +166,8 @@ namespace ShopWebApp
                 model.Dict.Add("Kod", subcategory.Code);
                 model.Dict.Add("Tagi", subcategory.Tags);
                 model.Dict.Add("Opis", subcategory.About);
+                model.Dict.Add("Ostatnia edycja", subcategory.Modified.ToString());
+                model.Dict.Add("Aktywny", subcategory.Enabled.ToString());
                 using (var db = new ShopDatabase())
                 {
                     var loadedSubcategory = db.Subcategories.Single(s => s.SubcategoryId == subcategory.SubcategoryId);
@@ -212,6 +216,8 @@ namespace ShopWebApp
                 model.Dict.Add("Typy", product.Types);
                 model.Dict.Add("Krótki opis", product.About);
                 model.Dict.Add("Długi opis", product.LongAbout);
+                model.Dict.Add("Ostatnia edycja", product.Modified.ToString());
+                model.Dict.Add("Aktywny", product.Enabled.ToString());
                 model.Title = "Produkt: " + product.Brand + " " + product.Name;
                 ViewBag.Id = product.ProductId;
                 ViewBag.PermissionLevelToEdit = 4;
@@ -222,7 +228,7 @@ namespace ShopWebApp
             { 
                 return Redirect("/Error/404"); 
             }
-
+            ViewData["type"] = table;
             return View(model);
         }
 
@@ -346,7 +352,7 @@ namespace ShopWebApp
                     {
                         for (int i = start; i < end; i++)
                         {
-                            table.Names.Add(productList[i].Brand + " " + productList[i].Name == null ? "Produkt bez nazwy" : productList[i].Brand + " " + productList[i].Name);
+                            table.Names.Add(productList[i].Name == null ? "Produkt bez nazwy" : productList[i].Brand + " " + productList[i].Name);
                             table.Codes.Add(productList[i].Code);
                         }
                     }
@@ -405,6 +411,7 @@ namespace ShopWebApp
                     values.Add("Code", category.Code);
                     values.Add("Name", category.Name);
                     values.Add("About", category.About);
+                    values.Add("Enabled", category.Enabled.ToString());
                     ViewBag.values = values;
                     ViewData["Name"] = category.Name;
                     ViewData["Id"] = category.CategoryId.ToString();
@@ -431,6 +438,7 @@ namespace ShopWebApp
                     values.Add("About", subcategory.About);
                     values.Add("Tags", subcategory.Tags);
                     values.Add("CategoryId", subcategory.CategoryId.ToString());
+                    values.Add("Enabled", subcategory.Enabled.ToString());
                     ViewBag.values = values;
                     ViewData["Name"] = subcategory.Name;
                     ViewData["Id"] = subcategory.SubcategoryId.ToString();
@@ -461,6 +469,7 @@ namespace ShopWebApp
                     values.Add("Types", product.Types);
                     values.Add("About", product.About);
                     values.Add("LongAbout", product.LongAbout);
+                    values.Add("Enabled", product.Enabled.ToString());
                     if (Functions.PermissionLevel(model.User.Role) >= 5)
                     {
                         values.Add("RatingSum", product.RatingSum.ToString());
@@ -542,6 +551,10 @@ namespace ShopWebApp
                     if (values["Name"] != null) { category.Name = values["Name"]; }
                     if (values["Code"] != null) { category.Code = values["Code"]; }
                     if (values["About"] != null) { category.About = values["About"]; }
+                    if (values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
+                        category.Enabled = true;
+                    else if (values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0"))
+                        category.Enabled = false;
                     DbFunctions.UpdateCategory(category);
                     objectName = category.Code;
                 }
@@ -563,6 +576,10 @@ namespace ShopWebApp
                     if (values["Code"] != null) { subcategory.Code = values["Code"]; }
                     if (values["About"] != null) { subcategory.About = values["About"]; }
                     if (values["Tags"] != null) { subcategory.Tags = values["Tags"]; }
+                    if (values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
+                        subcategory.Enabled = true;
+                    else if (values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0"))
+                        subcategory.Enabled = false;
                     int categoryId;
                     if (values["CategoryId"] != null)
                         if (int.TryParse(values["CategoryId"], out categoryId))
@@ -625,6 +642,10 @@ namespace ShopWebApp
                             if (db.Subcategories.Where(c => c.SubcategoryId == number).FirstOrDefault() != null)
                                 product.SubcategoryId = number;
                         }
+                    if (values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
+                        product.Enabled = true;
+                    else if (values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0"))
+                        product.Enabled = false;
                     DbFunctions.UpdateProduct(product);
                     objectName = product.Code;
                 }
@@ -731,7 +752,9 @@ namespace ShopWebApp
         [Route("/admin/{table}/{code}/remove")]
         public IActionResult Remove(string table, string code, string password)
         {
-            string role = "", passwordHash = AccountController.Sha256Hash(password), validHash = "";
+            if(password == null)
+                return Redirect("/admin/" + table + "/" + code);
+            string role = "", email = "", passwordHash = AccountController.Sha256Hash(password), validHash = "";
             if (User.Identity.IsAuthenticated)
             {
                 using (var db = new ShopDatabase())
@@ -740,13 +763,33 @@ namespace ShopWebApp
                                 where c.Email == User.Identity.Name
                                 select c).FirstOrDefault();
                     role = user.Role;
+                    email = user.Email;
                     validHash = user.Password;
                 }
             }
             if (validHash != passwordHash)
                 return Redirect("/admin/"+table+"/"+code);
             table = table.ToLower();
-            if (table == "products")
+            if(table == "users")
+            {
+                if (Functions.PermissionLevel(role) < 5)
+                    return Forbid();
+                User user; bool needToRelog = false;
+                using (var db = new ShopDatabase())
+                {
+                    user = db.Users.Where(u => u.UserId.ToString() == code || u.Email == code).FirstOrDefault();
+                    if (user == null)
+                        return Redirect("/Error/404");
+                    if (user.Email == email)
+                        needToRelog = true;
+                    db.Users.Remove(user);
+                    db.SaveChanges();
+                }
+                if (needToRelog)
+                    return Redirect(Url.Action("logout", "account"));
+                return Redirect("/admin/table/users");
+            }
+            else if (table == "products")
             {
                 if (Functions.PermissionLevel(role) < 4)
                     return Forbid();
