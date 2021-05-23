@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopWebApp;
 
 namespace ShopWebApp.Migrations
 {
     [DbContext(typeof(ShopDatabase))]
-    partial class ShopDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20210522082311_Orderupdate")]
+    partial class Orderupdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,14 +63,14 @@ namespace ShopWebApp.Migrations
                     b.Property<string>("ClientName")
                         .HasColumnType("text");
 
-                    b.Property<string>("ClientPhone")
-                        .HasColumnType("text");
-
                     b.Property<string>("Code")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("DateOfOrder")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("EmailPhone")
+                        .HasColumnType("text");
 
                     b.Property<bool>("Enabled")
                         .HasColumnType("tinyint(1)");
@@ -77,12 +79,6 @@ namespace ShopWebApp.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ShippingInfo")
-                        .HasColumnType("text");
-
-                    b.Property<int>("ShippingType")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
