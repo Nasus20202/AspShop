@@ -213,6 +213,8 @@ namespace ShopWebApp.Controllers
         [Route("/cart/add/{code}/{count:int?}")]
         public IActionResult AddToCart(string code, int count = 1)
         {
+            if (HttpContext.Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+                return Redirect("/Error/404");
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
             {
                 Dictionary<string, int> dict = new Dictionary<string, int>();
@@ -245,6 +247,8 @@ namespace ShopWebApp.Controllers
         [Route("/cart/remove/{code?}")]
         public IActionResult RemoveFromCart(string code)
         {
+            if (HttpContext.Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+                return Redirect("/Error/404");
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
             {
                 Dictionary<string, int> dict = new Dictionary<string, int>();
@@ -323,6 +327,41 @@ namespace ShopWebApp.Controllers
             }
             model.Title = "Szukaj: " + name;
             return View(model);
+        }
+
+        [Route("/review/{code}/{vote:int}")]
+        public IActionResult Review(string  code, int vote)
+        {
+            if (HttpContext.Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+                return Redirect("/Error/404");
+            int? isReviewed = HttpContext.Session.GetInt32(code);
+            if (isReviewed == null)
+                isReviewed = 0;
+            Product product;
+            using(var db = new ShopDatabase())
+            {
+                product = db.Products.Where(p => p.Code == code || p.ProductId.ToString() == code).FirstOrDefault();
+                if (product == null)
+                    return Redirect("/Error/404");
+                if (vote <= 5 && vote >= 1)
+                {
+                    if (isReviewed == 0)
+                    {
+                        product.RatingVotes++;
+                        product.RatingSum += vote;
+                        HttpContext.Session.SetInt32(code, vote);
+                    }
+                    else
+                    {
+                        product.RatingSum -= (int)isReviewed;
+                        product.RatingSum += vote;
+                        HttpContext.Session.SetInt32(code, vote);
+                    }
+                }
+                db.SaveChanges();
+            }
+
+            return Ok();
         }
     }
 }

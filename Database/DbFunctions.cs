@@ -174,6 +174,7 @@ namespace ShopWebApp
                 product.RatingSum = updatedProduct.RatingSum;
                 product.RatingVotes = updatedProduct.RatingVotes;
                 product.Photo = updatedProduct.Photo;
+                product.Types = updatedProduct.Types;
                 product.OtherPhotos = updatedProduct.OtherPhotos;
                 product.Stock = updatedProduct.Stock;
                 product.Enabled = updatedProduct.Enabled;
@@ -251,6 +252,80 @@ namespace ShopWebApp
                 user.Enabled = updatedUser.Enabled;
 
                 user.Modified = DateTime.UtcNow;
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+
+        // Orders
+
+        public static Order FindOrderById(int id)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var order = (from o in db.Orders
+                            where o.OrderId == id
+                            select o).FirstOrDefault();
+                return order;
+            }
+        }
+        public static Order FindOrderByCode(string code)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var order = (from o in db.Orders
+                            where o.Code == code
+                            select o).FirstOrDefault();
+                return order;
+            }
+        }
+        public static void AddOrder(Order order)
+        {
+            if (order == null)
+                return;
+            order.DateOfOrder = DateTime.UtcNow;
+            using (var db = new ShopDatabase())
+            {
+                db.Orders.Add(order);
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch
+                {
+                    return;
+                }
+            }
+        }
+        public static void UpdateOrder(Order updatedOrder)
+        {
+            using (var db = new ShopDatabase())
+            {
+                var order = (from o in db.Orders
+                            where o.OrderId == updatedOrder.OrderId
+                            select o).FirstOrDefault();
+                if (order == null)
+                    return;
+                order.Code = updatedOrder.Code;
+                order.Amount = updatedOrder.Amount;
+                order.Address = updatedOrder.Address;
+                order.PaymentMethod = updatedOrder.PaymentMethod;
+                order.Status = updatedOrder.Status;
+                order.ClientName = updatedOrder.ClientName;
+                order.ClientEmail = updatedOrder.ClientEmail;
+                order.ClientPhone = updatedOrder.ClientPhone;
+
+                order.UserId = updatedOrder.UserId;
+                order.ProductOrders = updatedOrder.ProductOrders;
+
+                order.Modified = DateTime.UtcNow;
                 try
                 {
                     db.SaveChanges();
