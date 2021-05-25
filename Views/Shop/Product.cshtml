@@ -1,9 +1,10 @@
 ﻿@using ShopWebApp
+@using Microsoft.AspNetCore.Http
 
 @{
     Layout = "_Layout";
     Product product = ViewBag.Product;
-    double price = product.Price / 100.0, oldPrice = product.OldPrice / 100.0, discount = oldPrice == 0 ? 0 :  Math.Round((oldPrice - price)/oldPrice, 2)*100;
+    double price = product.Price / 100.0, oldPrice = product.OldPrice / 100.0, discount = oldPrice == 0 ? 0 : Math.Round((oldPrice - price) / oldPrice, 2) * 100;
     double rate = -1;
     int stars = 0, halfStars = 0;
     if (product.RatingVotes > 0)
@@ -20,8 +21,11 @@
             halfStars = 0;
     }
     string[] photos = { };
-    if(product.OtherPhotos != "" && product.OtherPhotos != null)
+    string[] types = { };
+    if (product.OtherPhotos != "" && product.OtherPhotos != null)
         photos = product.OtherPhotos.Split(';');
+    if (product.Types != "" && product.Types != null)
+        types = product.Types.Split(';');
 }
 
 @section top{
@@ -52,14 +56,70 @@
         </div>
     </div>
 }
-    <div class="row d-flex">
-        <div class="col-xl-5">
-            @if (photos.Length < 1)
-            {
+<style>
+    .ratings {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        direction: rtl;
+        text-align: left;
+    }
+
+    .star {
+        position: relative;
+        line-height: 60px;
+        display: inline-block;
+        transition: color 0.2s ease;
+        color: #ebebeb;
+    }
+
+        .star:before {
+            content: '\2605';
+            width: 60px;
+            height: 60px;
+            font-size: 60px;
+        }
+
+        .star:hover,
+        .star.selected,
+        .star:hover ~ .star,
+        .star.selected ~ .star {
+            transition: color 0.8s ease;
+            color: #ffcc00;
+        }
+</style>
+<script>
+    function addToCart() {
+        $.post("/cart/add/@product.Code");
+    }
+    function vote(stars) {
+        document.getElementById("thanks").innerHTML = "<p class=\"fadein\">Dziękujemy</p>";
+        $.post("/review/@product.Code/" + stars);
+    }
+
+    $(function () {
+        var star = '.star',
+            selected = '.selected';
+
+        $(star).on('click', function () {
+            $(selected).each(function () {
+                $(this).removeClass('selected');
+            });
+            $(this).addClass('selected');
+        });
+
+    });
+</script>
+
+<div class="row d-flex">
+    <div class="col-xl-5">
+        @if (photos.Length < 1)
+        {
             <img class="img-fluid" src="/images/@product.Photo" alt="@product.Code" />
-            }
-            else
-            {
+        }
+        else
+        {
             <div id="carousel" class="carousel slide" data-ride="carousel">
                 <ol class="carousel-indicators">
                     <li data-target="#carousel" data-slide-to="0" class="active"></li>
@@ -88,78 +148,74 @@
                     <span class="sr-only">Następny</span>
                 </a>
             </div>
-            }
-        </div>
-        <div class="col-xl-7">
-            <table class="table h5">
-                <tbody>
-                    <tr>
-                        <td class="text-secondary">Produkt</td>
-                        <th>@product.Name</th>
-                    </tr>
-                    <tr>
-                        <td class="text-secondary">Producent</td>
-                        <th>@product.Brand</th>
-                    </tr>
-                    <tr>
-                        <td class="text-secondary">Cena</td>
-                        <th>@price.ToString("C")
+        }
+    </div>
+    <div class="col-xl-7">
+        <table class="table h5">
+            <tbody>
+                <tr>
+                    <td class="text-secondary">Produkt</td>
+                    <th>@product.Name</th>
+                </tr>
+                <tr>
+                    <td class="text-secondary">Producent</td>
+                    <th>@product.Brand</th>
+                </tr>
+                <tr>
+                    <td class="text-secondary">Cena</td>
+                    <th>
+                        @price.ToString("C")
                         @if (product.OldPrice > product.Price)
                         {
                             <span class="ml-2" style="color: orangered; text-decoration: line-through; text-decoration-color: darkred">@oldPrice.ToString("C")</span><br /><span style="color: forestgreen">- @discount%</span>
                         }
-                        </th>
-                    </tr>
-                    <tr>
-                        <td class="text-secondary">Dostępność</td>
-                        @if (product.Stock == 0)
-                        {
-                            <th class="text-danger">Niedostępny</th>
-                        }
-                        else if (product.Stock > 0)
-                        {
-                            <th>@product.Stock szt.</th>
-                        }
-                        else
-                        {
-                            <th>W magazynie</th>
-                        }
-                    </tr>
-                    <tr>
-                        <td class="text-secondary">Ocena</td>
-                        @if (rate == -1)
-                        {
-                            <td>Brak opinii</td>
-                        }
-                        else
-                        {
-                            <td class="text-warning">
-                                @for (int i = 0; i < stars; i++)
-                                {
-                                    @:<i class="bi-star-fill"></i>
-                                }
-                                @if (halfStars == 1)
-                                {
-                                    @:<i class="bi-star-half"></i>
-                                }
-                                @for (int i = stars + halfStars; i < 5; i++)
-                                {
-                                    @:<i class="bi-star"></i>
-                                }
-                                (@product.RatingVotes)
-                            </td>
-                        }
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <td class="text-secondary">Dostępność</td>
+                    @if (product.Stock == 0)
+                    {
+                        <th class="text-danger">Niedostępny</th>
+                    }
+                    else if (product.Stock > 0)
+                    {
+                        <th>@product.Stock szt.</th>
+                    }
+                    else
+                    {
+                        <th>W magazynie</th>
+                    }
+                </tr>
+                <tr>
+                    <td class="text-secondary">Ocena</td>
+                    @if (rate == -1)
+                    {
+                        <td>Brak opinii</td>
+                    }
+                    else
+                    {
+                        <td class="text-warning">
+                            @for (int i = 0; i < stars; i++)
+                            {
+                                @:<i class="bi-star-fill"></i>
+                            }
+                            @if (halfStars == 1)
+                            {
+                                @:<i class="bi-star-half"></i>
+                            }
+                            @for (int i = stars + halfStars; i < 5; i++)
+                            {
+                                @:<i class="bi-star"></i>
+                            }
+                            (@product.RatingVotes)
+                        </td>
+                    }
+                </tr>
+            </tbody>
+        </table>
     </div>
+</div>
 
-<script>
-    function addToCart() {
-        $.post("/cart/add/@product.Code");
-    }
-</script>
 
 @if (product.Stock != 0)
 {
@@ -169,7 +225,56 @@ else
 {
     <a href="" class="btn btn-warning btn-lg btn-block" style="pointer-events: none;">Produkt tymczasowo niedostępny <i class=" bi-exclamation-triangle"></i></a>
 }
+@if (types.Length > 0)
+{
+    <div class="row">
+        @using (var db = new ShopDatabase())
+        {
+            foreach (string code in types)
+            {
+                Product prod;
+
+                prod = db.Products.Where(p => p.Code == code || p.ProductId.ToString() == code).FirstOrDefault();
+                if (prod == null)
+                    continue;
+                <div class="col-2">
+                    <a class="text-muted" href="/p/@code">@prod.Name</a>
+                    <a href="/p/@code"><span class="badge badge-primary badge-pill" style="background-color: green; align-content: center">@(((double)prod.Price / 100).ToString("C"))</span></a>
+                </div>
+            }
+        }
+    </div>
+}
+
 <br />
 <div>
+    <hr />
     @Html.Raw(product.LongAbout)
+    <hr />
+</div>
+
+
+@{ 
+    int? isReviewed = Context.Request.HttpContext.Session.GetInt32(product.Code);
+    if (isReviewed == null)
+        isReviewed = 0;
+}
+
+<div  class="row">
+    <p id="thanks" class="h4 text-info col-4 align-middle" style="line-height: 60px;">
+        @if (isReviewed != 0)
+        {
+            @:Dziękujemy
+        }
+        else {
+            @:Oceń produkt
+        }
+    </p>
+    <ul class="ratings col-8">
+        <li class="star" onclick="vote(5)"></li>
+        <li class="star" onclick="vote(4)"></li>
+        <li class="star" onclick="vote(3)"></li>
+        <li class="star" onclick="vote(2)"></li>
+        <li class="star" onclick="vote(1)"></li>
+    </ul>
 </div>

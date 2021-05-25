@@ -174,6 +174,7 @@ namespace ShopWebApp
                 product.RatingSum = updatedProduct.RatingSum;
                 product.RatingVotes = updatedProduct.RatingVotes;
                 product.Photo = updatedProduct.Photo;
+                product.Types = updatedProduct.Types;
                 product.OtherPhotos = updatedProduct.OtherPhotos;
                 product.Stock = updatedProduct.Stock;
                 product.Enabled = updatedProduct.Enabled;
