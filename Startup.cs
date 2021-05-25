@@ -64,6 +64,41 @@ namespace ShopWebApp
             var db = new ShopDatabase();
             db.Database.EnsureCreated();
 
+            // populate db
+
+            Order order = db.Orders.Where(o => o.OrderId == 1).FirstOrDefault();
+            /*Product product1 = db.Products.Where(p => p.ProductId == 1).FirstOrDefault();
+            Product product2 = db.Products.Where(p => p.ProductId == 2).FirstOrDefault();
+            ProductOrder po1 = new ProductOrder();
+            ProductOrder po2 = new ProductOrder();
+
+
+            db.Entry(product1)
+                .Collection(o => o.ProductOrders)
+                .Load();
+            db.Entry(product2)
+                .Collection(o => o.ProductOrders)
+                .Load();
+
+            po1.OrderId = order.OrderId;
+            po1.ProductId = product1.ProductId;
+            po2.OrderId = order.OrderId;
+            po2.ProductId = product2.ProductId;
+            order.ProductOrders.Add(po1);
+            order.ProductOrders.Add(po2);
+            product1.ProductOrders.Add(po1);
+            product2.ProductOrders.Add(po2);*/
+            //db.SaveChanges();
+            db.Entry(order)
+                .Collection(o => o.ProductOrders)
+                .Load();
+
+            foreach (ProductOrder po in order.ProductOrders)
+            {
+                Product p = db.Products.Where(p => p.ProductId == po.ProductId).FirstOrDefault();
+                Console.WriteLine(p.Name);
+            }
+
             app.UseStatusCodePagesWithRedirects("/Error/{0}");
             app.UseEndpoints(endpoints =>
             {

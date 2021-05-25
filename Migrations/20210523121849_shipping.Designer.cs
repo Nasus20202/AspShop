@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopWebApp;
 
 namespace ShopWebApp.Migrations
 {
     [DbContext(typeof(ShopDatabase))]
-    partial class ShopDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20210523121849_shipping")]
+    partial class shipping
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,9 +172,14 @@ namespace ShopWebApp.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ProductId1")
+                        .HasColumnType("int");
+
                     b.HasKey("OrderId", "ProductId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("ProductId1");
 
                     b.ToTable("ProductOrders");
                 });
@@ -271,13 +278,13 @@ namespace ShopWebApp.Migrations
                 {
                     b.HasOne("ShopWebApp.Order", "Order")
                         .WithMany("ProductOrders")
-                        .HasForeignKey("OrderId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ShopWebApp.Product", "Product")
                         .WithMany("ProductOrders")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("ProductId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

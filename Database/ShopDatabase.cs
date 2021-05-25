@@ -18,7 +18,7 @@ namespace ShopWebApp
         public DbSet<User> Users { get; set; }
         public DbSet<Order> Orders { get; set; }
 
-
+        // Many  to many  relationships
         public DbSet<ProductOrder> ProductOrders { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -30,11 +30,11 @@ namespace ShopWebApp
             modelBuilder.Entity<ProductOrder>()
                 .HasKey(po => new { po.OrderId, po.ProductId });
             modelBuilder.Entity<ProductOrder>()
-                .HasOne(po => po.Order)
-                .WithMany(o => o.ProductOrders)
+                .HasOne(o => o.Order)
+                .WithMany(po => po.ProductOrders)
                 .HasForeignKey(po => po.OrderId);
             modelBuilder.Entity<ProductOrder>()
-                .HasOne(po => po.Order)
+                .HasOne(po => po.Product)
                 .WithMany(p => p.ProductOrders)
                 .HasForeignKey(po => po.ProductId);
         }
