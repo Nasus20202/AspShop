@@ -551,6 +551,7 @@ namespace ShopWebApp
                     if (values["Name"] != null) { category.Name = values["Name"]; }
                     if (values["Code"] != null) { category.Code = values["Code"]; }
                     if (values["About"] != null) { category.About = values["About"]; }
+                    else { category.About = ""; }
                     if (values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
                         category.Enabled = true;
                     else if (values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0"))
@@ -575,7 +576,9 @@ namespace ShopWebApp
                     if (values["Name"] != null) { subcategory.Name = values["Name"]; }
                     if (values["Code"] != null) { subcategory.Code = values["Code"]; }
                     if (values["About"] != null) { subcategory.About = values["About"]; }
+                    else { subcategory.About = ""; }
                     if (values["Tags"] != null) { subcategory.Tags = values["Tags"]; }
+                    else { subcategory.Tags = ""; }
                     if (values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
                         subcategory.Enabled = true;
                     else if (values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0"))
@@ -618,9 +621,13 @@ namespace ShopWebApp
                                 product.OldPrice = number;
                     }
                     if (values["Tags"] != null) { product.Tags = values["Tags"]; }
+                    else { product.Tags = ""; }
                     if (values["Types"] != null) { product.Types = values["Types"]; }
+                    else { product.Types = ""; }
                     if (values["About"] != null) { product.About = values["About"]; }
+                    else { product.About = ""; }
                     if (values["LongAbout"] != null) { product.LongAbout = values["LongAbout"]; }
+                    else { product.LongAbout = ""; }
                     if (Functions.PermissionLevel(user.Role)>=5)
                     {
                         if (values["RatingSum"] != null)
@@ -632,6 +639,7 @@ namespace ShopWebApp
                     }
                     if (values["Photo"] != null) { product.Photo = values["Photo"]; }
                     if (values["OtherPhotos"] != null) { product.OtherPhotos = values["OtherPhotos"]; }
+                    else { product.OtherPhotos = ""; }
                     if (values["Stock"] != null)
                         if (int.TryParse(values["Stock"], out number))
                             product.Stock = number;
@@ -672,7 +680,9 @@ namespace ShopWebApp
                     if (values["Role"] != null) { shopUser.Role = values["Role"]; }
                     if (values["Password"] != null) { shopUser.Password = values["Password"]; }
                     if (values["Address"] != null) { shopUser.Address = values["Address"]; }
+                    else { shopUser.Address = ""; }
                     if (values["Phone"] != null) { shopUser.Surname = values["Phone"]; }
+                    else { shopUser.Phone = ""; }
                     DbFunctions.UpdateUser(shopUser);
                     objectName = shopUser.UserId.ToString();
                     if (user.Email != shopUser.Email && isCurrentUserBeingChanged)
