@@ -86,15 +86,16 @@
     <div class="container-fluid" style="padding-top:65px">
         @RenderSection("fluid", false)
         <div class="row">
-            <div class="col-sm-2">
+            <div class="col-sm-2 order-md-1">
                 @RenderSection("left", false)
             </div>
-            <div class="col-sm-8 fadein">
-                @RenderBody()
-            </div>
-            <div class="col-sm-2">
+            <div class="col-sm-2 order-md-12">
                 @RenderSection("right", false)
             </div>
+            <div class="col-sm-8 fadein order-md-6">
+                @RenderBody()
+            </div>
+
         </div>
     </div>
     <div style="margin-top:50px"></div>
