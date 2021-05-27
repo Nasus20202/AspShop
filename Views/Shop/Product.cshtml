@@ -22,10 +22,19 @@
     }
     string[] photos = { };
     string[] types = { };
+    Dictionary<string, string> tags = new Dictionary<string, string>();
     if (product.OtherPhotos != "" && product.OtherPhotos != null)
         photos = product.OtherPhotos.Split(';');
     if (product.Types != "" && product.Types != null)
         types = product.Types.Split(';');
+    if(product.Tags != "" && product.Tags != null) {
+        string[] tagsTab = product.Tags.Split(';');
+        foreach(string s in tagsTab) {
+            string[] oneTagTab = s.Split(':');
+            if (oneTagTab.Length >= 2)
+                tags.Add(oneTagTab[0], oneTagTab[1]);
+        }
+    }
 }
 
 @section top{
@@ -216,7 +225,6 @@
     </div>
 </div>
 
-
 @if (product.Stock != 0)
 {
     <a href="" class="btn btn-success btn-lg btn-block h4" data-toggle="modal" data-target="#staticBackdrop" onclick="addToCart()">Dodaj do koszyka <i class="bi-cart-plus-fill"></i></a>
@@ -247,7 +255,7 @@ else
 }
 
 <br />
-<div>
+<div id="about">
     <hr />
     @Html.Raw(product.LongAbout)
     <hr />
@@ -260,7 +268,7 @@ else
         isReviewed = 0;
 }
 
-<div  class="row">
+<div class="row" id="rating">
     <p id="thanks" class="h4 text-info col-4 align-middle" style="line-height: 60px;">
         @if (isReviewed != 0)
         {
@@ -277,4 +285,16 @@ else
         <li class="star" onclick="vote(2)"></li>
         <li class="star" onclick="vote(1)"></li>
     </ul>
+</div>
+<div id="specs">
+    <h4>Specyfikacja</h4>
+    <table class="table table-hover">
+        @foreach (KeyValuePair<string, string> tag in tags)
+        {
+            <tr>
+                <td class="text-muted">@tag.Key</td>
+                <td>@tag.Value</td>
+            </tr>
+        }
+    </table>
 </div>

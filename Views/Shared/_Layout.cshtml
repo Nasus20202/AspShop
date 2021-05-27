@@ -118,14 +118,14 @@
     <div class="container-fluid fadein" style="padding-top:65px; padding-left: 5vw; padding-right: 5vw">
         @RenderSection("fluid", false)
         <div class="row">
-            <div class="col-md-2">
+            <div class="col-md-2 order-md-1">
                 @RenderSection("left", false)
             </div>
-            <div class="col-md-8">
-                @RenderBody()
-            </div>
-            <div class="col-md-2">
+            <div class="col-md-2 order-md-12">
                 @RenderSection("right", false)
+            </div>
+            <div class="col-md-8 order-md-6">
+                @RenderBody()
             </div>
         </div>
     </div>

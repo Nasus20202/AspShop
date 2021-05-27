@@ -1,51 +1,70 @@
 ﻿<div>
     @using ShopWebApp
-@model SubcategoryModel
-@{
-    Layout = "_Layout";
-    int c = 0;
-    string productName = "";
-}
-@section top{
-    <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
-        <h1 class="text-center display-4 align-bottom">@Model.Subcategory.Name</h1>
-        <p class="text-center display-5 align-bottom">@Model.Subcategory.About</p>
-    </div>
-}
+    @model SubcategoryModel
+    @{
+        Layout = "_Layout";
+        int c = 0;
+        string productName = "";
+    }
+    @section top{
+        <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
+            <h1 class="text-center display-4 align-bottom">@Model.Subcategory.Name</h1>
+            <p class="text-center display-5 align-bottom">@Model.Subcategory.About</p>
+        </div>
+    }
 
     @section modal {
-    <div class="modal fade" id="staticBackdrop" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Koszyk</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h4>Dodano nowy produkt do koszyka</h4>
-                    <p id="productname"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-block btn-outline-success" data-dismiss="modal">Kontynuuj zakupy</button>
-                    <a href="/cart" class="btn btn-block btn-success">Koszyk</a>
+        <div class="modal fade" id="staticBackdrop" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Koszyk</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Dodano nowy produkt do koszyka</h4>
+                        <p id="productname"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-block btn-outline-success" data-dismiss="modal">Kontynuuj zakupy</button>
+                        <a href="/cart" class="btn btn-block btn-success">Koszyk</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-}
+    }
+    @section left{
+        <div class="btn-group  d-md-none btn-block" role="group" aria-label="filer/sort">
+            <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#filter" aria-expanded="false" aria-controls="filter">
+                Filtrowanie
+            </button>
+            <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#sort" aria-expanded="false" aria-controls="sort">
+                Sortowanie
+            </button>
+        </div>
+        <div class="collapse dont-collapse-sm list-group" id="filter">
+            <span class="list-group-item font-weight-bold text-muted">Filtrowanie</span>
+        </div>
+    }
+    @section right{
+        <div class="collapse dont-collapse-sm list-group" id="sort">
+            <span class="list-group-item font-weight-bold text-muted">Sortowanie</span>
+            <a href="?page=@Model.Page&sort=name" class="list-group-item list-group-item-action">Nazwa od A do Z</a>
+        </div>
+    }
 
-<script>
-    function addToCart(code='') {
-        $.post("/cart/add/"+code);
-    }
-    function changeItemName(name = '') {
-        var element = document.getElementById("productname");
-        element.innerHTML = name;
-        return false;
-    }
-</script>
+    <script>
+        function addToCart(code = '') {
+            $.post("/cart/add/" + code);
+        }
+        function changeItemName(name = '') {
+            var element = document.getElementById("productname");
+            element.innerHTML = name;
+            return false;
+        }
+    </script>
 
     <div class="row">
         @foreach (Product prod in Model.Products)
@@ -129,9 +148,9 @@
 <br />
 @if (Model.Page > 1)
 {
-    @:<a class="float-left text-dark" href="?page=@prev"><i class="bi-arrow-left"></i> Poprzednia</a>
+    @:<a class="float-left text-dark nounderline" href="?page=@prev&sort=@ViewData["sort"]&filter=@ViewData["filter"]"><i class="bi-arrow-left"></i> Poprzednia</a>
 }
 @if (Model.Page < Model.LastPage)
 {
-    @:<a class="float-right text-dark" href="?page=@next">Następna <i class="bi-arrow-right"></i></a>
+    @:<a class="float-right text-dark nounderline" href="?page=@next&sort=@ViewData["sort"]&filter=@ViewData["filter"]">Następna <i class="bi-arrow-right"></i></a>
 }

@@ -18,7 +18,7 @@ namespace ShopWebApp.Controllers
             return Redirect(Url.Action("index", "home"));
         }
         [Route("s/{categoryName}/")]
-        public IActionResult Category(string categoryName, [FromQuery] int page = 1)
+        public IActionResult Category(string categoryName, [FromQuery] int page = 1, [FromQuery] string sort = "popularity")
         {
             var model = new CategoryModel();
             if (User.Identity.IsAuthenticated)
@@ -36,8 +36,8 @@ namespace ShopWebApp.Controllers
             using (var db = new ShopDatabase())
             {
                 var category = (from c in db.Categories
-                                   where c.Code == categoryName
-                                   select c).FirstOrDefault();
+                                where c.Code == categoryName
+                                select c).FirstOrDefault();
                 if (category == null)
                     category = (from c in db.Categories
                                 where c.Name == categoryName
@@ -60,13 +60,26 @@ namespace ShopWebApp.Controllers
                     .Collection(s => s.Subcategories)
                     .Load();
                 var productList = new List<Product>();
-                foreach(Subcategory subcategory in category.Subcategories)
+                foreach (Subcategory subcategory in category.Subcategories)
                 {
                     db.Entry(subcategory)
                         .Collection(s => s.Products)
                         .Load();
                     foreach (Product product in subcategory.Products.Where(p => p.Enabled))
                         productList.Add(product);
+                }
+                switch (sort) {
+                    case "name":
+                        productList = productList.OrderBy(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "-name":
+                        productList = productList.OrderByDescending(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "price":
+                        productList = productList.OrderBy(p => p.Price).ToList(); break;
+                    case "-price":
+                        productList = productList.OrderByDescending(p => p.Price).ToList(); break;
+                    case "rating":
+                        productList = productList.OrderByDescending(p => (p.RatingVotes == 0 ? 0 : (double)p.RatingSum / (double)p.RatingVotes)).ToList(); break;
+                    default: productList = productList.OrderByDescending(p => p.RatingVotes).ToList(); break;
                 }
                 var cutProductList = new List<Product>();
                 if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0))
@@ -79,6 +92,7 @@ namespace ShopWebApp.Controllers
                 if (productList.Count % productsPerPage != 0)
                     model.LastPage++;
                 model.Page = page;
+                ViewData["sort"] = sort;
                 model.Products = cutProductList;
                 model.Title = category.Name;
             }
@@ -86,7 +100,7 @@ namespace ShopWebApp.Controllers
             return View(model);
         }
         [Route("/s/{categoryName}/{subcategoryName}/")]
-        public IActionResult Subcategory(string categoryName, string subcategoryName, [FromQuery] int page = 1)
+        public IActionResult Subcategory(string categoryName, string subcategoryName, [FromQuery] int page = 1, [FromQuery] string sort = "popularity", [FromQuery] string filter = "")
         {
             var model = new SubcategoryModel();
             if (User.Identity.IsAuthenticated)
@@ -122,6 +136,20 @@ namespace ShopWebApp.Controllers
                     .Collection(s => s.Products)
                     .Load();
                 var productList = subcategory.Products.Where(p => p.Enabled).ToList();
+                switch (sort)
+                {
+                    case "name":
+                        productList = productList.OrderBy(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "-name":
+                        productList = productList.OrderByDescending(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "price":
+                        productList = productList.OrderBy(p => p.Price).ToList(); break;
+                    case "-price":
+                        productList = productList.OrderByDescending(p => p.Price).ToList(); break;
+                    case "rating":
+                        productList = productList.OrderByDescending(p => (p.RatingVotes == 0 ? 0 : (double)p.RatingSum / (double)p.RatingVotes)).ToList(); break;
+                    default: productList = productList.OrderByDescending(p => p.RatingVotes).ToList(); break;
+                }
                 var cutProductList = new List<Product>();
                 if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0))
                     return Redirect("/Error/404");
@@ -133,6 +161,8 @@ namespace ShopWebApp.Controllers
                 if (productList.Count % productsPerPage != 0)
                     model.LastPage++;
                 model.Page = page;
+                ViewData["sort"] = sort;
+                ViewData["filter"] = filter;
                 model.Products = cutProductList;
                 model.Subcategory = subcategory;
                 model.SubcategoryId = subcategory.SubcategoryId;
