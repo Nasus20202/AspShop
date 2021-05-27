@@ -44,14 +44,40 @@
                 Sortowanie
             </button>
         </div>
-        <div class="collapse dont-collapse-sm list-group" id="filter">
-            <span class="list-group-item font-weight-bold text-muted">Filtrowanie</span>
+        @{
+            Dictionary<string, string> tags = new Dictionary<string, string>();
+            string[] tagsTab = Model.Subcategory.Tags.Split(';');
+            foreach (string tagString in tagsTab)
+            {
+                string[] tag = tagString.Split(':');
+                if (tag.Length >= 2)
+                {
+                    tags.Add(tag[0], tag[1]);
+                }
+            }
+        }
+        <div class="sticky-top flex-column" style="top: 65px">
+            <div class="collapse dont-collapse-sm list-group" id="filter">
+                <span class="list-group-item font-weight-bold text-muted">Filtrowanie</span>
+                @foreach (KeyValuePair<string, string> tag in tags)
+                {
+                    <a href="" class="list-group-item list-group-item-action">@tag.Key (@tag.Value)</a>
+                }
+            </div>
         </div>
     }
     @section right{
-        <div class="collapse dont-collapse-sm list-group" id="sort">
-            <span class="list-group-item font-weight-bold text-muted">Sortowanie</span>
-            <a href="?page=@Model.Page&sort=name" class="list-group-item list-group-item-action">Nazwa od A do Z</a>
+        <div  class="sticky-top flex-column" style="top: 65px">
+            <div class="collapse dont-collapse-sm list-group" id="sort">
+                <span class="list-group-item font-weight-bold text-muted">Sortowanie</span>
+
+                <a href="?page=@Model.Page&sort=name&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Nazwa od A do Z</a>
+                <a href="?page=@Model.Page&sort=-name&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Nazwa od Z do A</a>
+                <a href="?page=@Model.Page&sort=price&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Cena od najniższej</a>
+                <a href="?page=@Model.Page&sort=-price&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Cena od najwyższej</a>
+                <a href="?page=@Model.Page&sort=rating&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Po ocenie użytkowników</a>
+                <a href="?page=@Model.Page&sort=popularity&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Po popularności</a>
+            </div>
         </div>
     }
 

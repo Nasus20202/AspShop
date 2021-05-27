@@ -35,8 +35,7 @@
     </div>
 }
 @section left{
-    
-    <div class="btn-group  d-md-none btn-block" role="group" aria-label="subcategories/sort">
+    <div class="btn-group d-md-none btn-block" role="group" aria-label="subcategories/sort">
         <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#subcategories" aria-expanded="false" aria-controls="subcategories">
             Podkategorie
         </button>
@@ -44,19 +43,29 @@
             Sortowanie
         </button>
     </div>
-    <div class="collapse dont-collapse-sm list-group" id="subcategories">
-        <span class="list-group-item font-weight-bold text-muted">@Model.Category.Name</span>
-        @foreach (Subcategory subcategory in Model.Category.Subcategories)
-        {
-            <a href="/s/@Model.Category.Code/@subcategory.Code" class="list-group-item list-group-item-action">@subcategory.Name</a>
-        }
+
+    <div class="sticky-top flex-column" style="top: 65px">
+        <div class="collapse dont-collapse-sm list-group" id="subcategories">
+            <span class="list-group-item font-weight-bold text-muted">@Model.Category.Name</span>
+            @foreach (Subcategory subcategory in Model.Category.Subcategories)
+            {
+                <a href="/s/@Model.Category.Code/@subcategory.Code" class="list-group-item list-group-item-action">@subcategory.Name</a>
+            }
+        </div>
     </div>
 }
 @section right{
-    
-    <div class="collapse dont-collapse-sm list-group" id="sort">
-        <span class="list-group-item font-weight-bold text-muted">Sortowanie</span>
-        <a href="?page=@Model.Page&sort=name" class="list-group-item list-group-item-action">Nazwa od A do Z</a>
+
+    <div class="sticky-top flex-column" style="top: 65px">
+        <div class="collapse dont-collapse-sm list-group" id="sort">
+            <span class="list-group-item font-weight-bold text-muted">Sortowanie</span>
+            <a href="?page=@Model.Page&sort=name" class="list-group-item list-group-item-action">Nazwa od A do Z</a>
+            <a href="?page=@Model.Page&sort=-name" class="list-group-item list-group-item-action">Nazwa od Z do A</a>
+            <a href="?page=@Model.Page&sort=price" class="list-group-item list-group-item-action">Cena od najniższej</a>
+            <a href="?page=@Model.Page&sort=-price" class="list-group-item list-group-item-action">Cena od najniższej</a>
+            <a href="?page=@Model.Page&sort=rating" class="list-group-item list-group-item-action">Po ocenie użytkowników</a>
+            <a href="?page=@Model.Page&sort=popularity" class="list-group-item list-group-item-action">Po popularności</a>
+        </div>
     </div>
 }
 
@@ -70,7 +79,6 @@
         return false;
     }
 </script>
-
 <div class="row">
     @foreach (Product prod in Model.Products)
     {

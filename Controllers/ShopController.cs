@@ -313,7 +313,7 @@ namespace ShopWebApp.Controllers
         }
 
         [Route("/search")]
-        public IActionResult Search([FromQuery] string name = " ", [FromQuery] int page = 1)
+        public IActionResult Search([FromQuery] string name = " ", [FromQuery] int page = 1, [FromQuery] string sort = "popularity")
         {
             if (name == null)
                 return Redirect("/Error/404");
@@ -335,16 +335,30 @@ namespace ShopWebApp.Controllers
                 var products = db.Products
                     .Where(p => (p.Name.Contains(name) || p.Brand.Contains(name)) && p.Enabled)
                     .ToList();
-                products = products.OrderByDescending(p => p.RatingVotes).ToList();
+                products = products.Where(p => p.Enabled).ToList();
                 model.Count = products.Count;
                 var cutProductList = new List<Product>();
                 if(products.Count == 0)
                 {
                     ViewData["message"] = "Brak wyników! Polecamy inne produkty dostępne w naszym sklepie";
-                    products = db.Products.Where(p => p.Enabled).OrderByDescending(p => p.RatingVotes).ToList();
+                    products = db.Products.Where(p => p.Enabled).ToList();
                 }
                 else if (page <= 0 || page > products.Count / productsPerPage + (products.Count % productsPerPage != 0 ? 1 : 0))
                     return Redirect("/Error/404");
+                switch (sort)
+                {
+                    case "name":
+                        products = products.OrderBy(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "-name":
+                        products = products.OrderByDescending(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "price":
+                        products = products.OrderBy(p => p.Price).ToList(); break;
+                    case "-price":
+                        products = products.OrderByDescending(p => p.Price).ToList(); break;
+                    case "rating":
+                        products = products.OrderByDescending(p => (p.RatingVotes == 0 ? 0 : (double)p.RatingSum / (double)p.RatingVotes)).ToList(); break;
+                    default: products = products.OrderByDescending(p => p.RatingVotes).ToList(); break;
+                }
                 for (int i = (page - 1) * productsPerPage; i < Math.Min(page * productsPerPage, products.Count); i++)
                 {
                     cutProductList.Add(products[i]);
@@ -353,6 +367,7 @@ namespace ShopWebApp.Controllers
                 if (products.Count % productsPerPage != 0)
                     model.LastPage++;
                 model.Page = page;
+                ViewData["sort"] = sort;
                 model.Products = cutProductList;
             }
             model.Title = "Szukaj: " + name;
