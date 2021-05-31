@@ -1,4 +1,12 @@
-﻿@{
+﻿@using ShopWebApp
+@model BaseViewModel
+@{
 }
-
-Logenz
+<title>@Model.Title</title>
+<form>
+    <input type="text" name="switchType" asp-for="@ViewBag.filters["switchType"]" />
+    <input type="text" name="color" asp-for="@ViewBag.filters["color"]" />
+    <button>Prześlij</button>
+    @ViewData["switchType"]
+    @ViewData["color"]
+</form>

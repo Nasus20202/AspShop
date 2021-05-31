@@ -67,16 +67,15 @@
         </div>
     }
     @section right{
-        <div  class="sticky-top flex-column" style="top: 65px">
+        <div class="sticky-top flex-column" style="top: 65px">
             <div class="collapse dont-collapse-sm list-group" id="sort">
                 <span class="list-group-item font-weight-bold text-muted">Sortowanie</span>
-
-                <a href="?page=@Model.Page&sort=name&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Nazwa od A do Z</a>
-                <a href="?page=@Model.Page&sort=-name&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Nazwa od Z do A</a>
-                <a href="?page=@Model.Page&sort=price&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Cena od najniższej</a>
-                <a href="?page=@Model.Page&sort=-price&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Cena od najwyższej</a>
-                <a href="?page=@Model.Page&sort=rating&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Po ocenie użytkowników</a>
-                <a href="?page=@Model.Page&sort=popularity&filter=@ViewData["filter"]" class="list-group-item list-group-item-action">Po popularności</a>
+                <button type="button" onclick="changeQuery('sort', 'name')" class="list-group-item list-group-item-action">Nazwa od A do Z</button>
+                <button type="button" onclick="changeQuery('sort', '-name')" class="list-group-item list-group-item-action">Nazwa od Z do A</button>
+                <button type="button" onclick="changeQuery('sort', 'price')" class="list-group-item list-group-item-action">Cena od najniższej</button>
+                <button type="button" onclick="changeQuery('sort', '-price')" class="list-group-item list-group-item-action">Cena od najwyższej</button>
+                <button type="button" onclick="changeQuery('sort', 'rating')" class="list-group-item list-group-item-action">Po ocenie użytkowników</button>
+                <button type="button" onclick="changeQuery('sort', 'popularity')" class="list-group-item list-group-item-action">Po popularności</button>
             </div>
         </div>
     }
@@ -174,9 +173,9 @@
 <br />
 @if (Model.Page > 1)
 {
-    @:<a class="float-left text-dark nounderline" href="?page=@prev&sort=@ViewData["sort"]&filter=@ViewData["filter"]"><i class="bi-arrow-left"></i> Poprzednia</a>
+      <p class="float-left text-dark nounderline pointer" onclick="changeQuery('page', '@prev')"><i class="bi-arrow-left"></i> Poprzednia</p>
 }
 @if (Model.Page < Model.LastPage)
 {
-    @:<a class="float-right text-dark nounderline" href="?page=@next&sort=@ViewData["sort"]&filter=@ViewData["filter"]">Następna <i class="bi-arrow-right"></i></a>
+    <p class="float-right text-dark nounderline pointer" onclick="changeQuery('page', '@next')">Następna <i class="bi-arrow-right"></i></p>
 }
