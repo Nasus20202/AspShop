@@ -53,3 +53,6 @@ hr {
         visibility: visible;
     }
 }
+.pointer {
+    cursor: pointer;
+}

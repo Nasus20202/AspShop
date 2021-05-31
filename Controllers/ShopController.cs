@@ -11,7 +11,7 @@ namespace ShopWebApp.Controllers
 {
     public class ShopController : Controller
     {
-        private static int productsPerPage = 30;
+        private static int productsPerPage = 3;
         [Route("/s")]
         public IActionResult Index()
         {
@@ -120,22 +120,30 @@ namespace ShopWebApp.Controllers
                 var subcategory = (from c in db.Subcategories
                                    where c.Code == subcategoryName
                                    select c).FirstOrDefault();
+
                 if (subcategory == null)
                     subcategory = (from c in db.Subcategories
                                    where c.Name == subcategoryName
                                    select c).FirstOrDefault();
+
                 if(subcategory == null)
                 {
                     int id;
                     if (int.TryParse(subcategoryName, out id))
                         subcategory = DbFunctions.FindSubcategoryById(id);
                 }
+
                 if(subcategory == null)
                     return Redirect("/Error/404");
                 db.Entry(subcategory)
                     .Collection(s => s.Products)
                     .Load();
+
                 var productList = subcategory.Products.Where(p => p.Enabled).ToList();
+
+
+
+
                 switch (sort)
                 {
                     case "name":
@@ -150,6 +158,7 @@ namespace ShopWebApp.Controllers
                         productList = productList.OrderByDescending(p => (p.RatingVotes == 0 ? 0 : (double)p.RatingSum / (double)p.RatingVotes)).ToList(); break;
                     default: productList = productList.OrderByDescending(p => p.RatingVotes).ToList(); break;
                 }
+
                 var cutProductList = new List<Product>();
                 if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0))
                     return Redirect("/Error/404");
@@ -157,9 +166,11 @@ namespace ShopWebApp.Controllers
                 {
                     cutProductList.Add(productList[i]);
                 }
+
                 model.LastPage = productList.Count / productsPerPage;
                 if (productList.Count % productsPerPage != 0)
                     model.LastPage++;
+
                 model.Page = page;
                 ViewData["sort"] = sort;
                 ViewData["filter"] = filter;
