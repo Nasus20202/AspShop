@@ -8,7 +8,7 @@ namespace ShopWebApp.Controllers
 {
     public class OrderController : Controller
     {
-        public IActionResult Index([FromQuery] Dictionary<string, string> filters)
+        public IActionResult Index()
         {
             var model = new BaseViewModel();
             if (User.Identity.IsAuthenticated)
@@ -23,14 +23,7 @@ namespace ShopWebApp.Controllers
                     model.User.Email = user.Email;
                 }
             }
-            if (filters == null)
-                filters = new Dictionary<string, string>();
             model.Title = "Twoje zamówienie";
-            ViewData["switchType"] = filters.ContainsKey("switchType") ? filters["switchType"] : "";
-            ViewData["color"] = filters.ContainsKey("color") ? filters["color"] : "";
-            filters["switchType"] = "";
-            filters["color"] = "";
-            ViewBag.filters = filters;
             return View(model);
         }
     }

@@ -11,7 +11,7 @@ namespace ShopWebApp.Controllers
 {
     public class ShopController : Controller
     {
-        private static int productsPerPage = 3;
+        private static int productsPerPage = 30;
         [Route("/s")]
         public IActionResult Index()
         {
@@ -100,7 +100,7 @@ namespace ShopWebApp.Controllers
             return View(model);
         }
         [Route("/s/{categoryName}/{subcategoryName}/")]
-        public IActionResult Subcategory(string categoryName, string subcategoryName, [FromQuery] int page = 1, [FromQuery] string sort = "popularity", [FromQuery] string filter = "")
+        public IActionResult Subcategory(string categoryName, string subcategoryName, [FromQuery] Dictionary<string, string> filters, [FromQuery] int page = 1, [FromQuery] string sort = "popularity")
         {
             var model = new SubcategoryModel();
             if (User.Identity.IsAuthenticated)
@@ -141,8 +141,55 @@ namespace ShopWebApp.Controllers
 
                 var productList = subcategory.Products.Where(p => p.Enabled).ToList();
 
+                Dictionary<string, string> tags = new Dictionary<string, string>();
+                string[] tagsTab = subcategory.Tags.Split(';');
+                foreach (string tagString in tagsTab)
+                {
+                    string[] tag = tagString.Split(':');
+                    if (tag.Length >= 2)
+                    {
+                        tags.Add(tag[0], tag[1]);
+                        filters[tag[0]] = filters.ContainsKey(tag[0]) ? filters[tag[0]] : "";
+                        if(tag[1] == "int")
+                        {
+                            filters[tag[0] + "from"] = filters.ContainsKey(tag[0]+ "from") && filters[tag[0]] + "from" != null ? filters[tag[0]+"from"] : "";
+                            filters[tag[0] + "to"] = filters.ContainsKey(tag[0] + "to") && filters[tag[0]] + "to" != null ? filters[tag[0] + "to"] : "";
+                        }
+                    }
+                }
+                double priceFrom = -1, priceTo = -1;
+
+                filters["pricefrom"] = filters.ContainsKey("pricefrom") && filters["pricefrom"]!=null ? filters["pricefrom"] : "";
+                filters["priceto"] = filters.ContainsKey("priceto") && filters["priceto"] != null ? filters["priceto"] : "";
+
+                // Change ',' to '.' because double format with dot bugs the parse function
+                filters["pricefrom"] = filters["pricefrom"].Replace('.', ',');
+                filters["priceto"] = filters["priceto"].Replace('.', ',');
+
+                if (filters.ContainsKey("pricefrom")) { double.TryParse(filters["pricefrom"], out priceFrom); };
+                if (filters.ContainsKey("priceto")) { double.TryParse(filters["priceto"], out priceTo); };
 
 
+                if(priceFrom > 0)
+                {
+                    productList = productList.Where(p => p.Price >= priceFrom*100).ToList();
+                }
+                if(priceTo > 0)
+                {
+                    productList = productList.Where(p => p.Price <= priceTo*100).ToList();
+                }
+
+
+
+                foreach(KeyValuePair<string, string> tag in tags)
+                {
+                    if(tag.Value == "int")
+                    {
+                        int from = -1, to = -1;
+                        if (filters.ContainsKey(tag.Key + "from")){ int.TryParse(filters[tag.Key + "from"], out from); };
+                        if (filters.ContainsKey(tag.Key + "to")) { int.TryParse(filters[tag.Key + "to"], out to); };
+                    }
+                }
 
                 switch (sort)
                 {
@@ -160,7 +207,7 @@ namespace ShopWebApp.Controllers
                 }
 
                 var cutProductList = new List<Product>();
-                if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0))
+                if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0) && productList.Count != 0)
                     return Redirect("/Error/404");
                 for(int i = (page-1)*productsPerPage; i < Math.Min(page*productsPerPage, productList.Count); i++)
                 {
@@ -173,7 +220,8 @@ namespace ShopWebApp.Controllers
 
                 model.Page = page;
                 ViewData["sort"] = sort;
-                ViewData["filter"] = filter;
+                ViewBag.filters = filters;
+                ViewBag.tags = tags;
                 model.Products = cutProductList;
                 model.Subcategory = subcategory;
                 model.SubcategoryId = subcategory.SubcategoryId;
