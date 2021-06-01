@@ -3,10 +3,10 @@
 @{
 }
 <title>@Model.Title</title>
-<form>
-    <input type="text" name="switchType" asp-for="@ViewBag.filters["switchType"]" />
-    <input type="text" name="color" asp-for="@ViewBag.filters["color"]" />
-    <button>Prześlij</button>
-    @ViewData["switchType"]
-    @ViewData["color"]
-</form>
+@{ 
+    string s = "249";
+    s = s.Replace('.', ',');
+    double d = -1.0;
+    double.TryParse(s, out d);
+}
+@d
