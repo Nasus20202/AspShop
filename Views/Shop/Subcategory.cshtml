@@ -67,7 +67,7 @@
                     @foreach (KeyValuePair<string, string> tag in tags)
                     {
                         <div class="list-group-item">
-                            <p class="font-weight-bold text-muted">@tag.Key (@tag.Value)</p>
+                            <p class="font-weight-bold text-muted">@tag.Key</p>
                             @if (tag.Value == "int")
                             {
                                 <div class="row mr-xl-1 ml-xl-1">
@@ -75,9 +75,25 @@
                                     <input type="number" class="form-control col-6" name="@(tag.Key + "to")" asp-for="@ViewBag.filters[tag.Key + "to"]" placeholder="Do" value="@ViewBag.filters[tag.Key + "to"]" />
                                 </div>
                             }
-                            else
+                            else if(ViewBag.tagTypes.ContainsKey(tag.Key))
                             {
+                                <div class="form-group">
+                                    @foreach(KeyValuePair<string, int> tagOption in ViewBag.tagTypes[tag.Key]) 
+                                    { 
 
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="true" id="@tag.Key:@tagOption.Key" name="@tag.Key:@tagOption.Key" asp-for="@ViewBag.filters[tag.Key+":"+tagOption.Key]"
+                                               @if(ViewBag.filters.ContainsKey(tag.Key+":"+tagOption.Key) && ViewBag.filters[tag.Key+":"+tagOption.Key] == "true") 
+                                               { 
+                                                   @:checked
+                                               }
+                                               >
+                                        <label class="form-check-label" for="@tag.Key:@tagOption.Key">
+                                            @tagOption.Key (@tagOption.Value)
+                                        </label>
+                                    </div>
+                                    }
+                                </div>
                             }
                         </div>
                     }

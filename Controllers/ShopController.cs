@@ -142,6 +142,35 @@ namespace ShopWebApp.Controllers
                 var productList = subcategory.Products.Where(p => p.Enabled).ToList();
 
                 Dictionary<string, string> tags = new Dictionary<string, string>();
+
+                Dictionary<string, Dictionary<string, string>> productTags = new Dictionary<string, Dictionary<string, string>>();
+                Dictionary<string, Dictionary<string, int>> tagTypes = new Dictionary<string, Dictionary<string, int>>();
+                foreach (Product product in productList)
+                {
+                    string[] productsTagStrings = product.Tags.Split(';');
+                    Dictionary<string, string> oneProductTags = new Dictionary<string, string>();
+                    foreach (string tagString in productsTagStrings)
+                    {
+                        string[] tag = tagString.Split(':');
+                        if (tag.Count() >= 2)
+                        {
+                            oneProductTags.Add(tag[0], tag[1]);
+                            if (tagTypes.ContainsKey(tag[0]))
+                            {
+                                if (tagTypes[tag[0]].ContainsKey(tag[1]))
+                                    tagTypes[tag[0]][tag[1]]++;
+                                else
+                                    tagTypes[tag[0]].Add(tag[1], 1);
+                            }
+                            else
+                            {
+                                tagTypes.Add(tag[0], new Dictionary<string, int>() { { tag[1], 1 } });
+                            }
+                        }
+                    }
+                    productTags.Add(product.Code, oneProductTags);
+                }
+
                 string[] tagsTab = subcategory.Tags.Split(';');
                 foreach (string tagString in tagsTab)
                 {
@@ -154,6 +183,13 @@ namespace ShopWebApp.Controllers
                         {
                             filters[tag[0] + "from"] = filters.ContainsKey(tag[0]+ "from") && filters[tag[0]] + "from" != null ? filters[tag[0]+"from"] : "";
                             filters[tag[0] + "to"] = filters.ContainsKey(tag[0] + "to") && filters[tag[0]] + "to" != null ? filters[tag[0] + "to"] : "";
+                        }
+                        else if(tagTypes.ContainsKey(tag[0]))
+                        {
+                            foreach(KeyValuePair<string, int> kvp in tagTypes[tag[0]])
+                            {
+                                filters[tag[0] + ":" + kvp.Key] = filters.ContainsKey(tag[0] + ":" + kvp.Key) && filters[tag[0] + ":" + kvp.Key] != null ? filters[tag[0] + ":" + kvp.Key] : "";
+                            }
                         }
                     }
                 }
@@ -179,8 +215,6 @@ namespace ShopWebApp.Controllers
                     productList = productList.Where(p => p.Price <= priceTo*100).ToList();
                 }
 
-
-
                 foreach(KeyValuePair<string, string> tag in tags)
                 {
                     if(tag.Value == "int")
@@ -190,6 +224,7 @@ namespace ShopWebApp.Controllers
                         if (filters.ContainsKey(tag.Key + "to")) { int.TryParse(filters[tag.Key + "to"], out to); };
                     }
                 }
+
 
                 switch (sort)
                 {
@@ -222,6 +257,7 @@ namespace ShopWebApp.Controllers
                 ViewData["sort"] = sort;
                 ViewBag.filters = filters;
                 ViewBag.tags = tags;
+                ViewBag.tagTypes = tagTypes;
                 model.Products = cutProductList;
                 model.Subcategory = subcategory;
                 model.SubcategoryId = subcategory.SubcategoryId;

@@ -26,13 +26,12 @@
         <div class="sticky-top flex-column" style="top: 65px">
             <div class="collapse dont-collapse-sm list-group" id="sort">
                 <span class="list-group-item font-weight-bold text-muted">Sortowanie</span>
-
-                <a href="?name=@Model.SearchFor&page=@Model.Page&sort=name" class="list-group-item list-group-item-action">Nazwa od A do Z</a>
-                <a href="?name=@Model.SearchFor&page=@Model.Page&sort=-name" class="list-group-item list-group-item-action">Nazwa od Z do A</a>
-                <a href="?name=@Model.SearchFor&page=@Model.Page&sort=price" class="list-group-item list-group-item-action">Cena od najniższej</a>
-                <a href="?name=@Model.SearchFor&page=@Model.Page&sort=-price" class="list-group-item list-group-item-action">Cena od najwyższej</a>
-                <a href="?name=@Model.SearchFor&page=@Model.Page&sort=rating" class="list-group-item list-group-item-action">Po ocenie użytkowników</a>
-                <a href="?name=@Model.SearchFor&page=@Model.Page&sort=popularity" class="list-group-item list-group-item-action">Po popularności</a>
+                <button type="button" onclick="changeQuery('sort', 'name')" class="list-group-item list-group-item-action">Nazwa od A do Z</button>
+                <button type="button" onclick="changeQuery('sort', '-name')" class="list-group-item list-group-item-action">Nazwa od Z do A</button>
+                <button type="button" onclick="changeQuery('sort', 'price')" class="list-group-item list-group-item-action">Cena od najniższej</button>
+                <button type="button" onclick="changeQuery('sort', '-price')" class="list-group-item list-group-item-action">Cena od najwyższej</button>
+                <button type="button" onclick="changeQuery('sort', 'rating')" class="list-group-item list-group-item-action">Po ocenie użytkowników</button>
+                <button type="button" onclick="changeQuery('sort', 'popularity')" class="list-group-item list-group-item-action">Po popularności</button>
             </div>
         </div>
     }
