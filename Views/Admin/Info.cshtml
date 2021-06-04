@@ -54,12 +54,19 @@
     </tbody>
 </table>
 @if ((Functions.PermissionLevel(Model.User.Role) >= 4 && (type == "categories" || type == "subcategories" || type == "products") || (Functions.PermissionLevel(Model.User.Role) >= 5) && type == "users"))
-        {
+{
     <a href="" id="removebutton" class="btn btn-outline-danger btn-block" data-toggle="modal" data-target="#staticBackdrop">
         Usuń obiekt <i class="bi-dash-circle-fill"></i>
     </a>
 }
-
+@if (Functions.PermissionLevel(Model.User.Role) >= ViewBag.PermissionLevelToEdit)
+{
+    <a href="/admin/@Model.Tablename/@ViewBag.Id/edit" class="btn btn-primary btn-lg btn-block" style="margin-top: 7px">Edytuj @ViewData["ObjectName"]</a>
+}
+@{ 
+    string path = Url.Action("Table", "Admin") + "/" + Model.Tablename;
+}
+<a href="@path" class="btn btn-outline-primary btn-lg btn-block" style="margin-top: 7px">Lista rekordów tabeli @Model.Tablename</a>
 @if (ViewBag.ChildObjects != null && ViewBag.ChildObjects.Count > 0)
 {
     var childObjects = ViewBag.ChildObjects;
@@ -85,21 +92,11 @@
                                 {
                                     @:Obiekt bez nazwy
                                 }
-                        </a>
-                    @:</td>
-                @:</tr>
-            }
+                            </a>
+                        @:</td>
+                    @:</tr>
+                }
             }
         </tbody>
     </table>
 }
-
-
-@{
-    string path = Url.Action("Table", "Admin") + "/" + Model.Tablename;
-}
-@if (Functions.PermissionLevel(Model.User.Role) >= ViewBag.PermissionLevelToEdit)
-{
-    <a href="/admin/@Model.Tablename/@ViewBag.Id/edit" class="btn btn-primary btn-lg btn-block" style="margin-top: 7px">Edytuj @ViewData["ObjectName"]</a>
-}
-<a href="@path" class="btn btn-outline-primary btn-lg btn-block" style="margin-top: 7px">Lista rekordów tabeli @Model.Tablename</a>
