@@ -140,6 +140,7 @@ namespace ShopWebApp.Controllers
                     .Load();
 
                 var productList = subcategory.Products.Where(p => p.Enabled).ToList();
+                List<Product> newProductList = new List<Product>();
 
                 Dictionary<string, string> tags = new Dictionary<string, string>();
 
@@ -193,7 +194,7 @@ namespace ShopWebApp.Controllers
                         }
                     }
                 }
-                double priceFrom = -1, priceTo = -1;
+                double priceFrom = -1, priceTo = -1; bool filtered = false;
 
                 filters["pricefrom"] = filters.ContainsKey("pricefrom") && filters["pricefrom"]!=null ? filters["pricefrom"] : "";
                 filters["priceto"] = filters.ContainsKey("priceto") && filters["priceto"] != null ? filters["priceto"] : "";
@@ -222,10 +223,50 @@ namespace ShopWebApp.Controllers
                         int from = -1, to = -1;
                         if (filters.ContainsKey(tag.Key + "from")){ int.TryParse(filters[tag.Key + "from"], out from); };
                         if (filters.ContainsKey(tag.Key + "to")) { int.TryParse(filters[tag.Key + "to"], out to); };
+                        foreach(Product product in productList)
+                        {
+                            if (newProductList.Where(p => p.Code == product.Code).FirstOrDefault() != null)
+                                continue;
+                            if (!productTags.ContainsKey(product.Code) || !productTags[product.Code].ContainsKey(tag.Key))
+                            {
+                                continue;
+                            }
+                            int value;
+                            int.TryParse(productTags[product.Code][tag.Key], out value);
+                            if((value >= from || from <= 0) && (value <= to || to <= 0) && (from > 0 || to > 0))
+                            {
+                                newProductList.Add(product);
+                                filtered = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach(Product product in productList)
+                        {
+
+                            if (!productTags.ContainsKey(product.Code) || !productTags[product.Code].ContainsKey(tag.Key))
+                            {
+                                continue;
+                            }
+                            List<Product> compatible = new List<Product>();
+                            foreach(KeyValuePair<string, int> kvp in tagTypes[tag.Key])
+                            {
+                                string tagName = tag.Key + ":" + kvp.Key;
+                                if (filters[tagName] == "true" && productTags[product.Code][tag.Key] == kvp.Key)
+                                {
+                                    if (newProductList.Where(p => p.Code == product.Code).FirstOrDefault() == null)
+                                        newProductList.Add(product);
+                                    filtered = true;
+                                }
+
+                            }
+                        }
                     }
                 }
-
-
+                if(filtered)
+                    productList = newProductList;
+                
                 switch (sort)
                 {
                     case "name":
