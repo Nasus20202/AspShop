@@ -148,6 +148,7 @@ namespace ShopWebApp.Controllers
 
                 Dictionary<string, Dictionary<string, string>> productTags = new Dictionary<string, Dictionary<string, string>>();
                 Dictionary<string, Dictionary<string, int>> tagTypes = new Dictionary<string, Dictionary<string, int>>();
+                Dictionary<string, bool> isStringFiltered = new Dictionary<string, bool>();
                 foreach (Product product in productList)
                 {
                     string[] productsTagStrings = product.Tags.Split(';');
@@ -189,9 +190,12 @@ namespace ShopWebApp.Controllers
                         }
                         else if(tagTypes.ContainsKey(tag[0]))
                         {
+                            isStringFiltered.Add(tag[0], false);
                             foreach(KeyValuePair<string, int> kvp in tagTypes[tag[0]])
                             {
                                 filters[tag[0] + ":" + kvp.Key] = filters.ContainsKey(tag[0] + ":" + kvp.Key) && filters[tag[0] + ":" + kvp.Key] != null ? filters[tag[0] + ":" + kvp.Key] : "";
+                                if (filters[tag[0] + ":" + kvp.Key] != "")
+                                    isStringFiltered[tag[0]] = true;
                             }
                         }
                     }
@@ -245,6 +249,7 @@ namespace ShopWebApp.Controllers
                             {
                                 if (!intIncompatible.Contains(product))
                                     intIncompatible.Add(product);
+                                filtered = true;
                             }
                         }
                     }
@@ -255,10 +260,13 @@ namespace ShopWebApp.Controllers
 
                             if (!productTags.ContainsKey(product.Code) || !productTags[product.Code].ContainsKey(tag.Key))
                             {
-
+                                if(isStringFiltered[tag.Key])
+                                    if (!incompatible.Contains(product))
+                                        incompatible.Add(product);
                                 continue;
                             }
                             List<Product> compatible = new List<Product>();
+                            List<Product> localIncompatible = new List<Product>();
                             foreach(KeyValuePair<string, int> kvp in tagTypes[tag.Key])
                             {
                                 string tagName = tag.Key + ":" + kvp.Key;
@@ -272,12 +280,15 @@ namespace ShopWebApp.Controllers
                                 }
                                 else if(filters[tagName] == "true")
                                 {
-                                    if (!incompatible.Contains(product))
-                                        incompatible.Add(product);
+                                    if (!localIncompatible.Contains(product))
+                                        localIncompatible.Add(product);
                                 }
                             }
                             foreach (Product prod in compatible)
-                                incompatible.Remove(prod);
+                                localIncompatible.Remove(prod);
+                            foreach (Product prod in localIncompatible)
+                                if (!incompatible.Contains(prod))
+                                    incompatible.Add(prod);
                         }
                     }
                 }
