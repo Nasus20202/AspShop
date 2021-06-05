@@ -35,3 +35,10 @@ function clickById(id) {
     var element = document.getElementById(id);
     element.click();
 }
+
+function changeQuery(query = '', value = '') {
+    var url = window.location.search;
+    var params = new URLSearchParams(url);
+    params.set(query, value);
+    window.location.search = params.toString();
+}

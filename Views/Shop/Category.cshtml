@@ -34,10 +34,44 @@
         </div>
     </div>
 }
+@section left{
+    <div class="btn-group d-md-none btn-block" role="group" aria-label="subcategories/sort">
+        <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#subcategories" aria-expanded="false" aria-controls="subcategories">
+            Podkategorie
+        </button>
+        <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#sort" aria-expanded="false" aria-controls="sort">
+            Sortowanie
+        </button>
+    </div>
+
+    <div class="sticky-top flex-column" style="top: 65px">
+        <div class="collapse dont-collapse-sm list-group" id="subcategories">
+            <span class="list-group-item font-weight-bold text-muted">@Model.Category.Name</span>
+            @foreach (Subcategory subcategory in Model.Category.Subcategories)
+            {
+                <a href="/s/@Model.Category.Code/@subcategory.Code" class="list-group-item list-group-item-action">@subcategory.Name</a>
+            }
+        </div>
+    </div>
+}
+@section right{
+
+    <div class="sticky-top flex-column" style="top: 65px">
+        <div class="collapse dont-collapse-sm list-group" id="sort">
+            <span class="list-group-item font-weight-bold text-muted">Sortowanie</span>
+            <button type="button" onclick="changeQuery('sort', 'name')" class="list-group-item list-group-item-action">Nazwa od A do Z</button>
+            <button type="button" onclick="changeQuery('sort', '-name')" class="list-group-item list-group-item-action">Nazwa od Z do A</button>
+            <button type="button" onclick="changeQuery('sort', 'price')" class="list-group-item list-group-item-action">Cena od najniższej</button>
+            <button type="button" onclick="changeQuery('sort', '-price')" class="list-group-item list-group-item-action">Cena od najwyższej</button>
+            <button type="button" onclick="changeQuery('sort', 'rating')" class="list-group-item list-group-item-action">Po ocenie użytkowników</button>
+            <button type="button" onclick="changeQuery('sort', 'popularity')" class="list-group-item list-group-item-action">Po popularności</button>
+        </div>
+    </div>
+}
 
 <script>
-    function addToCart(code='') {
-        $.post("/cart/add/"+code);
+    function addToCart(code = '') {
+        $.post("/cart/add/" + code);
     }
     function changeItemName(name = '') {
         var element = document.getElementById("productname");
@@ -45,7 +79,6 @@
         return false;
     }
 </script>
-
 <div class="row">
     @foreach (Product prod in Model.Products)
     {
@@ -127,9 +160,9 @@
 <br />
 @if (Model.Page > 1)
 {
-    @:<a class="float-left text-dark" href="?page=@prev"><i class="bi-arrow-left"></i> Poprzednia</a>
+    <p class="float-left text-dark nounderline pointer" onclick="changeQuery('page', '@prev')"><i class="bi-arrow-left"></i> Poprzednia</p>
 }
 @if (Model.Page < Model.LastPage)
 {
-    @:<a class="float-right text-dark" href="?page=@next">Następna <i class="bi-arrow-right"></i></a>
+    <p class="float-right text-dark nounderline pointer" onclick="changeQuery('page', '@next')">Następna <i class="bi-arrow-right"></i></p>
 }

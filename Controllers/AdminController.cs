@@ -128,7 +128,7 @@ namespace ShopWebApp
                                .Collection(c => c.Subcategories)
                                 .Query()
                                 .ToList();
-                    ViewData["type"] = "subcategories";
+                    ViewData["childtype"] = "subcategories";
                     if (subcategories == null)
                         ViewBag.ChildObjects = new List<Subcategory>();
                     ViewBag.ChildObjects = subcategories;
@@ -175,7 +175,7 @@ namespace ShopWebApp
                                .Collection(c => c.Products)
                                 .Query()
                                 .ToList();
-                    ViewData["type"] = "products";
+                    ViewData["childtype"] = "products";
                     if (products == null)
                         ViewBag.ChildObjects = new List<Product>();
                     ViewBag.ChildObjects = products;

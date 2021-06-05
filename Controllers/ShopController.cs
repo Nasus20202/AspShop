@@ -18,7 +18,7 @@ namespace ShopWebApp.Controllers
             return Redirect(Url.Action("index", "home"));
         }
         [Route("s/{categoryName}/")]
-        public IActionResult Category(string categoryName, [FromQuery] int page = 1)
+        public IActionResult Category(string categoryName, [FromQuery] int page = 1, [FromQuery] string sort = "popularity")
         {
             var model = new CategoryModel();
             if (User.Identity.IsAuthenticated)
@@ -36,8 +36,8 @@ namespace ShopWebApp.Controllers
             using (var db = new ShopDatabase())
             {
                 var category = (from c in db.Categories
-                                   where c.Code == categoryName
-                                   select c).FirstOrDefault();
+                                where c.Code == categoryName
+                                select c).FirstOrDefault();
                 if (category == null)
                     category = (from c in db.Categories
                                 where c.Name == categoryName
@@ -60,13 +60,26 @@ namespace ShopWebApp.Controllers
                     .Collection(s => s.Subcategories)
                     .Load();
                 var productList = new List<Product>();
-                foreach(Subcategory subcategory in category.Subcategories)
+                foreach (Subcategory subcategory in category.Subcategories)
                 {
                     db.Entry(subcategory)
                         .Collection(s => s.Products)
                         .Load();
                     foreach (Product product in subcategory.Products.Where(p => p.Enabled))
                         productList.Add(product);
+                }
+                switch (sort) {
+                    case "name":
+                        productList = productList.OrderBy(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "-name":
+                        productList = productList.OrderByDescending(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "price":
+                        productList = productList.OrderBy(p => p.Price).ToList(); break;
+                    case "-price":
+                        productList = productList.OrderByDescending(p => p.Price).ToList(); break;
+                    case "rating":
+                        productList = productList.OrderByDescending(p => (p.RatingVotes == 0 ? 0 : (double)p.RatingSum / (double)p.RatingVotes)).ToList(); break;
+                    default: productList = productList.OrderByDescending(p => p.RatingVotes).ToList(); break;
                 }
                 var cutProductList = new List<Product>();
                 if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0))
@@ -79,6 +92,7 @@ namespace ShopWebApp.Controllers
                 if (productList.Count % productsPerPage != 0)
                     model.LastPage++;
                 model.Page = page;
+                ViewData["sort"] = sort;
                 model.Products = cutProductList;
                 model.Title = category.Name;
             }
@@ -86,7 +100,7 @@ namespace ShopWebApp.Controllers
             return View(model);
         }
         [Route("/s/{categoryName}/{subcategoryName}/")]
-        public IActionResult Subcategory(string categoryName, string subcategoryName, [FromQuery] int page = 1)
+        public IActionResult Subcategory(string categoryName, string subcategoryName, [FromQuery] Dictionary<string, string> filters, [FromQuery] int page = 1, [FromQuery] string sort = "popularity")
         {
             var model = new SubcategoryModel();
             if (User.Identity.IsAuthenticated)
@@ -106,33 +120,218 @@ namespace ShopWebApp.Controllers
                 var subcategory = (from c in db.Subcategories
                                    where c.Code == subcategoryName
                                    select c).FirstOrDefault();
+
                 if (subcategory == null)
                     subcategory = (from c in db.Subcategories
                                    where c.Name == subcategoryName
                                    select c).FirstOrDefault();
+
                 if(subcategory == null)
                 {
                     int id;
                     if (int.TryParse(subcategoryName, out id))
                         subcategory = DbFunctions.FindSubcategoryById(id);
                 }
+
                 if(subcategory == null)
                     return Redirect("/Error/404");
                 db.Entry(subcategory)
                     .Collection(s => s.Products)
                     .Load();
+
                 var productList = subcategory.Products.Where(p => p.Enabled).ToList();
+                List<Product> newProductList = new List<Product>();
+                List<Product> incompatible = new List<Product>();
+                List<Product> intIncompatible = new List<Product>();
+
+                Dictionary<string, string> tags = new Dictionary<string, string>();
+
+                Dictionary<string, Dictionary<string, string>> productTags = new Dictionary<string, Dictionary<string, string>>();
+                Dictionary<string, Dictionary<string, int>> tagTypes = new Dictionary<string, Dictionary<string, int>>();
+                Dictionary<string, bool> isStringFiltered = new Dictionary<string, bool>();
+                foreach (Product product in productList)
+                {
+                    string[] productsTagStrings = product.Tags.Split(';');
+                    Dictionary<string, string> oneProductTags = new Dictionary<string, string>();
+                    foreach (string tagString in productsTagStrings)
+                    {
+                        string[] tag = tagString.Split(':');
+                        if (tag.Count() >= 2)
+                        {
+                            oneProductTags.Add(tag[0], tag[1]);
+                            if (tagTypes.ContainsKey(tag[0]))
+                            {
+                                if (tagTypes[tag[0]].ContainsKey(tag[1]))
+                                    tagTypes[tag[0]][tag[1]]++;
+                                else
+                                    tagTypes[tag[0]].Add(tag[1], 1);
+                            }
+                            else
+                            {
+                                tagTypes.Add(tag[0], new Dictionary<string, int>() { { tag[1], 1 } });
+                            }
+                        }
+                    }
+                    productTags.Add(product.Code, oneProductTags);
+                }
+
+                string[] tagsTab = subcategory.Tags.Split(';');
+                foreach (string tagString in tagsTab)
+                {
+                    string[] tag = tagString.Split(':');
+                    if (tag.Length >= 2)
+                    {
+                        tags.Add(tag[0], tag[1]);
+                        filters[tag[0]] = filters.ContainsKey(tag[0]) ? filters[tag[0]] : "";
+                        if(tag[1] == "int")
+                        {
+                            filters[tag[0] + "from"] = filters.ContainsKey(tag[0]+ "from") && filters[tag[0]] + "from" != null ? filters[tag[0]+"from"] : "";
+                            filters[tag[0] + "to"] = filters.ContainsKey(tag[0] + "to") && filters[tag[0]] + "to" != null ? filters[tag[0] + "to"] : "";
+                        }
+                        else if(tagTypes.ContainsKey(tag[0]))
+                        {
+                            isStringFiltered.Add(tag[0], false);
+                            foreach(KeyValuePair<string, int> kvp in tagTypes[tag[0]])
+                            {
+                                filters[tag[0] + ":" + kvp.Key] = filters.ContainsKey(tag[0] + ":" + kvp.Key) && filters[tag[0] + ":" + kvp.Key] != null ? filters[tag[0] + ":" + kvp.Key] : "";
+                                if (filters[tag[0] + ":" + kvp.Key] != "")
+                                    isStringFiltered[tag[0]] = true;
+                            }
+                        }
+                    }
+                }
+                double priceFrom = -1, priceTo = -1; bool filtered = false;
+
+                filters["pricefrom"] = filters.ContainsKey("pricefrom") && filters["pricefrom"]!=null ? filters["pricefrom"] : "";
+                filters["priceto"] = filters.ContainsKey("priceto") && filters["priceto"] != null ? filters["priceto"] : "";
+
+                // Change ',' to '.' because double format with dot bugs the parse function
+                filters["pricefrom"] = filters["pricefrom"].Replace('.', ',');
+                filters["priceto"] = filters["priceto"].Replace('.', ',');
+
+                if (filters.ContainsKey("pricefrom")) { double.TryParse(filters["pricefrom"], out priceFrom); };
+                if (filters.ContainsKey("priceto")) { double.TryParse(filters["priceto"], out priceTo); };
+
+
+                if(priceFrom > 0)
+                {
+                    productList = productList.Where(p => p.Price >= priceFrom*100).ToList();
+                }
+                if(priceTo > 0)
+                {
+                    productList = productList.Where(p => p.Price <= priceTo*100).ToList();
+                }
+
+                foreach(KeyValuePair<string, string> tag in tags)
+                {
+                    if(tag.Value == "int")
+                    {
+                        int from = -1, to = -1;
+                        if (filters.ContainsKey(tag.Key + "from")){ int.TryParse(filters[tag.Key + "from"], out from); };
+                        if (filters.ContainsKey(tag.Key + "to")) { int.TryParse(filters[tag.Key + "to"], out to); };
+                        foreach(Product product in productList)
+                        {
+                            /*if (newProductList.Where(p => p.Code == product.Code).FirstOrDefault() != null)
+                                continue;*/
+                            if (!productTags.ContainsKey(product.Code) || !productTags[product.Code].ContainsKey(tag.Key))
+                            {
+                                continue;
+                            }
+                            int value;
+                            int.TryParse(productTags[product.Code][tag.Key], out value);
+                            if((value >= from || from <= 0) && (value <= to || to <= 0) && (from > 0 || to > 0))
+                            {
+                                if(!newProductList.Contains(product))
+                                    newProductList.Add(product);
+                                filtered = true;
+                            }
+                            else if((from > 0 || to > 0))
+                            {
+                                if (!intIncompatible.Contains(product))
+                                    intIncompatible.Add(product);
+                                filtered = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach(Product product in productList)
+                        {
+
+                            if (!productTags.ContainsKey(product.Code) || !productTags[product.Code].ContainsKey(tag.Key))
+                            {
+                                if(isStringFiltered[tag.Key])
+                                    if (!incompatible.Contains(product))
+                                        incompatible.Add(product);
+                                continue;
+                            }
+                            List<Product> compatible = new List<Product>();
+                            List<Product> localIncompatible = new List<Product>();
+                            foreach(KeyValuePair<string, int> kvp in tagTypes[tag.Key])
+                            {
+                                string tagName = tag.Key + ":" + kvp.Key;
+                                if (filters[tagName] == "true" && productTags[product.Code][tag.Key] == kvp.Key)
+                                {
+                                    if (newProductList.Where(p => p.Code == product.Code).FirstOrDefault() == null)
+                                        newProductList.Add(product);
+                                    if (!compatible.Contains(product))
+                                        compatible.Add(product);
+                                    filtered = true;
+                                }
+                                else if(filters[tagName] == "true")
+                                {
+                                    if (!localIncompatible.Contains(product))
+                                        localIncompatible.Add(product);
+                                }
+                            }
+                            foreach (Product prod in compatible)
+                                localIncompatible.Remove(prod);
+                            foreach (Product prod in localIncompatible)
+                                if (!incompatible.Contains(prod))
+                                    incompatible.Add(prod);
+                        }
+                    }
+                }
+                foreach (Product prod in incompatible)
+                    newProductList.Remove(prod);
+                foreach (Product prod in intIncompatible)
+                    if (newProductList.Contains(prod))
+                        newProductList.Remove(prod);
+                if (filtered)
+                    productList = newProductList;
+                
+                switch (sort)
+                {
+                    case "name":
+                        productList = productList.OrderBy(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "-name":
+                        productList = productList.OrderByDescending(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "price":
+                        productList = productList.OrderBy(p => p.Price).ToList(); break;
+                    case "-price":
+                        productList = productList.OrderByDescending(p => p.Price).ToList(); break;
+                    case "rating":
+                        productList = productList.OrderByDescending(p => (p.RatingVotes == 0 ? 0 : (double)p.RatingSum / (double)p.RatingVotes)).ToList(); break;
+                    default: productList = productList.OrderByDescending(p => p.RatingVotes).ToList(); break;
+                }
+
                 var cutProductList = new List<Product>();
-                if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0))
+                if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0) && productList.Count != 0)
                     return Redirect("/Error/404");
                 for(int i = (page-1)*productsPerPage; i < Math.Min(page*productsPerPage, productList.Count); i++)
                 {
                     cutProductList.Add(productList[i]);
                 }
+
                 model.LastPage = productList.Count / productsPerPage;
                 if (productList.Count % productsPerPage != 0)
                     model.LastPage++;
+
                 model.Page = page;
+                ViewData["sort"] = sort;
+                ViewBag.filters = filters;
+                ViewBag.tags = tags;
+                ViewBag.tagTypes = tagTypes;
                 model.Products = cutProductList;
                 model.Subcategory = subcategory;
                 model.SubcategoryId = subcategory.SubcategoryId;
@@ -283,7 +482,7 @@ namespace ShopWebApp.Controllers
         }
 
         [Route("/search")]
-        public IActionResult Search([FromQuery] string name = " ", [FromQuery] int page = 1)
+        public IActionResult Search([FromQuery] string name = " ", [FromQuery] int page = 1, [FromQuery] string sort = "popularity")
         {
             if (name == null)
                 return Redirect("/Error/404");
@@ -305,16 +504,30 @@ namespace ShopWebApp.Controllers
                 var products = db.Products
                     .Where(p => (p.Name.Contains(name) || p.Brand.Contains(name)) && p.Enabled)
                     .ToList();
-                products = products.OrderByDescending(p => p.RatingVotes).ToList();
+                products = products.Where(p => p.Enabled).ToList();
                 model.Count = products.Count;
                 var cutProductList = new List<Product>();
                 if(products.Count == 0)
                 {
                     ViewData["message"] = "Brak wyników! Polecamy inne produkty dostępne w naszym sklepie";
-                    products = db.Products.Where(p => p.Enabled).OrderByDescending(p => p.RatingVotes).ToList();
+                    products = db.Products.Where(p => p.Enabled).ToList();
                 }
                 else if (page <= 0 || page > products.Count / productsPerPage + (products.Count % productsPerPage != 0 ? 1 : 0))
                     return Redirect("/Error/404");
+                switch (sort)
+                {
+                    case "name":
+                        products = products.OrderBy(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "-name":
+                        products = products.OrderByDescending(p => (p.Brand + " " + p.Name)).ToList(); break;
+                    case "price":
+                        products = products.OrderBy(p => p.Price).ToList(); break;
+                    case "-price":
+                        products = products.OrderByDescending(p => p.Price).ToList(); break;
+                    case "rating":
+                        products = products.OrderByDescending(p => (p.RatingVotes == 0 ? 0 : (double)p.RatingSum / (double)p.RatingVotes)).ToList(); break;
+                    default: products = products.OrderByDescending(p => p.RatingVotes).ToList(); break;
+                }
                 for (int i = (page - 1) * productsPerPage; i < Math.Min(page * productsPerPage, products.Count); i++)
                 {
                     cutProductList.Add(products[i]);
@@ -323,6 +536,7 @@ namespace ShopWebApp.Controllers
                 if (products.Count % productsPerPage != 0)
                     model.LastPage++;
                 model.Page = page;
+                ViewData["sort"] = sort;
                 model.Products = cutProductList;
             }
             model.Title = "Szukaj: " + name;
