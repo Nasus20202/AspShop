@@ -141,6 +141,8 @@ namespace ShopWebApp.Controllers
 
                 var productList = subcategory.Products.Where(p => p.Enabled).ToList();
                 List<Product> newProductList = new List<Product>();
+                List<Product> incompatible = new List<Product>();
+                List<Product> intIncompatible = new List<Product>();
 
                 Dictionary<string, string> tags = new Dictionary<string, string>();
 
@@ -225,8 +227,8 @@ namespace ShopWebApp.Controllers
                         if (filters.ContainsKey(tag.Key + "to")) { int.TryParse(filters[tag.Key + "to"], out to); };
                         foreach(Product product in productList)
                         {
-                            if (newProductList.Where(p => p.Code == product.Code).FirstOrDefault() != null)
-                                continue;
+                            /*if (newProductList.Where(p => p.Code == product.Code).FirstOrDefault() != null)
+                                continue;*/
                             if (!productTags.ContainsKey(product.Code) || !productTags[product.Code].ContainsKey(tag.Key))
                             {
                                 continue;
@@ -235,8 +237,14 @@ namespace ShopWebApp.Controllers
                             int.TryParse(productTags[product.Code][tag.Key], out value);
                             if((value >= from || from <= 0) && (value <= to || to <= 0) && (from > 0 || to > 0))
                             {
-                                newProductList.Add(product);
+                                if(!newProductList.Contains(product))
+                                    newProductList.Add(product);
                                 filtered = true;
+                            }
+                            else if((from > 0 || to > 0))
+                            {
+                                if (!intIncompatible.Contains(product))
+                                    intIncompatible.Add(product);
                             }
                         }
                     }
@@ -247,6 +255,7 @@ namespace ShopWebApp.Controllers
 
                             if (!productTags.ContainsKey(product.Code) || !productTags[product.Code].ContainsKey(tag.Key))
                             {
+
                                 continue;
                             }
                             List<Product> compatible = new List<Product>();
@@ -257,14 +266,27 @@ namespace ShopWebApp.Controllers
                                 {
                                     if (newProductList.Where(p => p.Code == product.Code).FirstOrDefault() == null)
                                         newProductList.Add(product);
+                                    if (!compatible.Contains(product))
+                                        compatible.Add(product);
                                     filtered = true;
                                 }
-
+                                else if(filters[tagName] == "true")
+                                {
+                                    if (!incompatible.Contains(product))
+                                        incompatible.Add(product);
+                                }
                             }
+                            foreach (Product prod in compatible)
+                                incompatible.Remove(prod);
                         }
                     }
                 }
-                if(filtered)
+                foreach (Product prod in incompatible)
+                    newProductList.Remove(prod);
+                foreach (Product prod in intIncompatible)
+                    if (newProductList.Contains(prod))
+                        newProductList.Remove(prod);
+                if (filtered)
                     productList = newProductList;
                 
                 switch (sort)
