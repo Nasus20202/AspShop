@@ -1,4 +1,12 @@
-﻿@{
+﻿@using ShopWebApp
+@model BaseViewModel
+@{
 }
-
-Logenz
+<title>@Model.Title</title>
+@{ 
+    string s = "249";
+    s = s.Replace('.', ',');
+    double d = -1.0;
+    double.TryParse(s, out d);
+}
+@d

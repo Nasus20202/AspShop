@@ -1,53 +1,145 @@
 ﻿<div>
     @using ShopWebApp
-@model SubcategoryModel
-@{
-    Layout = "_Layout";
-    int c = 0;
-    string productName = "";
-}
-@section top{
-    <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
-        <h1 class="text-center display-4 align-bottom">@Model.Subcategory.Name</h1>
-        <p class="text-center display-5 align-bottom">@Model.Subcategory.About</p>
-    </div>
-}
+    @model SubcategoryModel
+    @{
+        Layout = "_Layout";
+        int c = 0;
+        string productName = "";
+    }
+    @section top{
+        <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
+            <h1 class="text-center display-4 align-bottom">@Model.Subcategory.Name</h1>
+            <p class="text-center display-5 align-bottom">@Model.Subcategory.About</p>
+        </div>
+    }
 
     @section modal {
-    <div class="modal fade" id="staticBackdrop" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Koszyk</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h4>Dodano nowy produkt do koszyka</h4>
-                    <p id="productname"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-block btn-outline-success" data-dismiss="modal">Kontynuuj zakupy</button>
-                    <a href="/cart" class="btn btn-block btn-success">Koszyk</a>
+        <div class="modal fade" id="staticBackdrop" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Koszyk</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Dodano nowy produkt do koszyka</h4>
+                        <p id="productname"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-block btn-outline-success" data-dismiss="modal">Kontynuuj zakupy</button>
+                        <a href="/cart" class="btn btn-block btn-success">Koszyk</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-}
-
-<script>
-    function addToCart(code='') {
-        $.post("/cart/add/"+code);
     }
-    function changeItemName(name = '') {
-        var element = document.getElementById("productname");
-        element.innerHTML = name;
-        return false;
-    }
-</script>
+    @section left{
+        <div class="btn-group  d-md-none btn-block" role="group" aria-label="filer/sort">
+            <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#filter" aria-expanded="false" aria-controls="filter">
+                Filtrowanie
+            </button>
+            <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#sort" aria-expanded="false" aria-controls="sort">
+                Sortowanie
+            </button>
+        </div>
+        @{
+            Dictionary<string, string> tags = ViewBag.tags;
+        }
+        <div class="sticky-top flex-column" style="top: 65px">
+            <div class="collapse dont-collapse-sm list-group" id="filter">
+                <span class="list-group-item font-weight-bold text-muted">Filtrowanie</span>
+                <form id="filterform">
+                    <div class="list-group-item">
+                        <p class="font-weight-bold text-muted">Cena</p>
+                        <div class="row" style="margin-top: 10px; text-align: center">
+                            <div class="col-sm-2">Od</div>
+                            <input type="number" class="form-control col-sm-8" name="pricefrom" asp-for="@ViewBag.filters["pricefrom"]" placeholder="Od" value="@ViewBag.filters["pricefrom"]" step="0.01" />
+                            <div class="col-sm-2">zł</div>
+                        </div>
+                        <div class="row" style="margin-top: 10px; text-align: center">
+                            <div class="col-sm-2">Do</div>
+                            <input type="number" class="form-control col-sm-8" name="priceto" asp-for="@ViewBag.filters["priceto"]" placeholder="Do" value="@ViewBag.filters["priceto"]" step="0.01" />
+                            <div class="col-sm-2">zł</div>
+                        </div>
+                    </div>
+                    @foreach (KeyValuePair<string, string> tag in tags)
+                    {
+                        <div class="list-group-item">
+                            <p class="font-weight-bold text-muted">@tag.Key</p>
+                            @if (tag.Value == "int")
+                            {
+                                <div class="row mr-xl-1 ml-xl-1">
+                                    <input type="number" class="form-control col-6" name="@(tag.Key + "from")" asp-for="@ViewBag.filters[tag.Key + "from"]" placeholder="Od" value="@ViewBag.filters[tag.Key + "from"]" />
+                                    <input type="number" class="form-control col-6" name="@(tag.Key + "to")" asp-for="@ViewBag.filters[tag.Key + "to"]" placeholder="Do" value="@ViewBag.filters[tag.Key + "to"]" />
+                                </div>
+                            }
+                            else if(ViewBag.tagTypes.ContainsKey(tag.Key))
+                            {
+                                <div class="form-group">
+                                    @foreach(KeyValuePair<string, int> tagOption in ViewBag.tagTypes[tag.Key]) 
+                                    { 
 
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="true" id="@tag.Key:@tagOption.Key" name="@tag.Key:@tagOption.Key" asp-for="@ViewBag.filters[tag.Key+":"+tagOption.Key]"
+                                               @if(ViewBag.filters.ContainsKey(tag.Key+":"+tagOption.Key) && ViewBag.filters[tag.Key+":"+tagOption.Key] == "true") 
+                                               { 
+                                                   @:checked
+                                               }
+                                               >
+                                        <label class="form-check-label" for="@tag.Key:@tagOption.Key">
+                                            @tagOption.Key (@tagOption.Value)
+                                        </label>
+                                    </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </form>
+                <div class="btn-group btn-block" role="group">
+                    <button onclick="document.getElementById('filterform').submit()" class="btn btn-outline-primary">Filtruj</button>
+                    <button onclick="window.location.search = ''" class="btn btn-outline-danger">Wyczyść</button>
+                </div>
+
+            </div>
+        </div>
+        @foreach (KeyValuePair<string, string> tag in tags)
+        {
+            @ViewBag.filters[tag.Key]
+        }
+    }
+    @section right{
+        <div class="sticky-top flex-column" style="top: 65px">
+            <div class="collapse dont-collapse-sm list-group" id="sort">
+                <span class="list-group-item font-weight-bold text-muted">Sortowanie</span>
+                <button type="button" onclick="changeQuery('sort', 'name')" class="list-group-item list-group-item-action">Nazwa od A do Z</button>
+                <button type="button" onclick="changeQuery('sort', '-name')" class="list-group-item list-group-item-action">Nazwa od Z do A</button>
+                <button type="button" onclick="changeQuery('sort', 'price')" class="list-group-item list-group-item-action">Cena od najniższej</button>
+                <button type="button" onclick="changeQuery('sort', '-price')" class="list-group-item list-group-item-action">Cena od najwyższej</button>
+                <button type="button" onclick="changeQuery('sort', 'rating')" class="list-group-item list-group-item-action">Po ocenie użytkowników</button>
+                <button type="button" onclick="changeQuery('sort', 'popularity')" class="list-group-item list-group-item-action">Po popularności</button>
+            </div>
+        </div>
+    }
+
+    <script>
+        function addToCart(code = '') {
+            $.post("/cart/add/" + code);
+        }
+        function changeItemName(name = '') {
+            var element = document.getElementById("productname");
+            element.innerHTML = name;
+            return false;
+        }
+    </script>
+    @if (Model.Products.Count == 0)
+    {
+        <div class="text-info h3 text-center">Brak produktów spełniających kryteria</div>
+    }
     <div class="row">
+
         @foreach (Product prod in Model.Products)
         {
             if (c == 3)
@@ -129,9 +221,9 @@
 <br />
 @if (Model.Page > 1)
 {
-    @:<a class="float-left text-dark" href="?page=@prev"><i class="bi-arrow-left"></i> Poprzednia</a>
+      <p class="float-left text-dark nounderline pointer" onclick="changeQuery('page', '@prev')"><i class="bi-arrow-left"></i> Poprzednia</p>
 }
 @if (Model.Page < Model.LastPage)
 {
-    @:<a class="float-right text-dark" href="?page=@next">Następna <i class="bi-arrow-right"></i></a>
+    <p class="float-right text-dark nounderline pointer" onclick="changeQuery('page', '@next')">Następna <i class="bi-arrow-right"></i></p>
 }

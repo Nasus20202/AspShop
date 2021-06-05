@@ -10,7 +10,21 @@ namespace ShopWebApp.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            var model = new BaseViewModel();
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var db = new ShopDatabase())
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                }
+            }
+            model.Title = "Twoje zamówienie";
+            return View(model);
         }
     }
 }

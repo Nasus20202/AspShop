@@ -45,3 +45,14 @@ hr {
         margin-top: 10px;
     }
 }
+
+@media (min-width: 768px) {
+    .collapse.dont-collapse-sm {
+        display: block;
+        height: auto !important;
+        visibility: visible;
+    }
+}
+.pointer {
+    cursor: pointer;
+}
