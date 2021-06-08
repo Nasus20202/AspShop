@@ -19,6 +19,7 @@ namespace ShopWebApp
         public int Status { get; set; }
         public DateTime DateOfOrder { get; set; }
         public string ClientName { get; set; }
+        public string ClientSurname { get; set; }
         public string ClientEmail { get; set; }
         public string ClientPhone { get; set; }
 

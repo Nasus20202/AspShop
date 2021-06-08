@@ -24,13 +24,6 @@ function onStart() {
     }
 }
 
-function showPasswordChange() {
-    var button = document.getElementById("passwordShow");
-    var seciton = document.getElementById("changePassword");
-    button.style.display = "none";
-    seciton.style.display = "inline";
-}
-
 function clickById(id) {
     var element = document.getElementById(id);
     element.click();
