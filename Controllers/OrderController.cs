@@ -8,7 +8,7 @@ namespace ShopWebApp.Controllers
 {
     public class OrderController : Controller
     {
-        public IActionResult Index()
+        public IActionResult Index(OrderModel input)
         {
             var model = new OrderModel();
             if (User.Identity.IsAuthenticated)
@@ -27,8 +27,17 @@ namespace ShopWebApp.Controllers
             }
             if (model.Order == null)
                 model.Order = new Order();
+            if (input.Message != null && input.Message != string.Empty)
+                model.Message = input.Message;
             model.Title = "Twoje zamówienie";
             return View(model);
+        }
+        [HttpPost]
+        [ActionName("Index")]
+        public IActionResult SubmitOrder(OrderModel input)
+        {
+            input.Message = input.Order.ClientName;
+            return Index(input);
         }
     }
 }

@@ -13,51 +13,71 @@
 
 @if (Context.User.Identity.IsAuthenticated)
 {
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-    Jesteś zalogowany! Twoje zamówienie zostanie zapisane na twoim koncie.
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Jesteś zalogowany! Twoje zamówienie zostanie zapisane na twoim koncie.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
 }
 else
 {
 
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <a href="@Url.Action("login", "account")?ReturnUrl=/order" class="nounderline text-dark">
-        Zaloguj się, aby zapisać zamówienie na swoim koncie.
-    </a>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
-
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <a href="@Url.Action("login", "account")?ReturnUrl=/order" class="nounderline text-dark">
+            Zaloguj się, aby zapisać zamówienie na swoim koncie.
+        </a>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
 }
-
-<form method="post">
+@if (Model.Message != null && Model.Message != string.Empty)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Model.Message
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+<form method="post" id="orderForm" style="margin-bottom: 30px">
     <div class="form-row">
         <div class="form-group col-md-6">
             <label for="ClientName">Imię</label>
-            <input type="text" class="form-control" id="ClientName" asp-for="@Model.Order.ClientName" value="@Model.User.Name" required>
+            <input type="text" class="form-control" name="Order.ClientName" id="ClientName" asp-for="@Model.Order.ClientName" value="@Model.User.Name" required>
         </div>
         <div class="form-group col-md-6">
             <label for="ClientSurname">Nazwisko</label>
-            <input type="text" class="form-control" id="ClientSurname" asp-for="@Model.Order.ClientSurname" value="@Model.User.Surname" required>
+            <input type="text" class="form-control" name="Order.ClientSurname" id="ClientSurname" asp-for="@Model.Order.ClientSurname" value="@Model.User.Surname" required>
         </div>
     </div>
     <div class="form-row">
         <div class="form-group col-md-6">
             <label for="Email">Kontaktowy adres email</label>
-            <input type="text" class="form-control" id="Email" asp-for="@Model.Order.ClientEmail" value="@Model.User.Email" required>
+            <input type="text" class="form-control" name="Order.Email" id="Email" asp-for="@Model.Order.ClientEmail" value="@Model.User.Email" required>
         </div>
         <div class="form-group col-md-6">
             <label for="Phone">Numer telefonu</label>
-            <input type="text" class="form-control" id="Phone" asp-for="@Model.Order.ClientPhone" value="@Model.User.Phone" required>
+            <input type="text" class="form-control" name="Order.Phone" id-"Phone" asp-for="@Model.Order.ClientPhone" value="@Model.User.Phone" required>
         </div>
     </div>
     <div class="form-group">
         <label for="Address">Adres</label>
-        <input type="text" class="form-control" id="Address" asp-for="@Model.Order.Address" value="@Model.User.Address">
+        <input type="text" class="form-control" name="Order.Address" id="Address" asp-for="@Model.Order.Address" value="@Model.User.Address" required>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <select class="custom-select" name="Order.ShippingType" id="ShippingType" asp-for="@Model.Order.ShippingType">
+                <option selected>Dostawa</option>
+                <option value="1">Kurier (+20 zł)</option>
+                <option value="2">Paczkomat (+8,99 zł)</option>
+                <option value="3">Odbiór osobisty</option>
+            </select>
+        </div>
+        <div class="col-8">
+            <input type="text" class="form-control" name="Order.ShippingInfo" id="ShippingInfo" asp-for="@Model.Order.ShippingInfo" placeholder="Uwagi do zamówienia" />
+        </div>
     </div>
 </form>
 
@@ -67,6 +87,6 @@ else
         <a href="@Url.Action("cart", "shop")" class="btn btn-outline-primary btn-block btn-lg margin-mobile">Powrót do sklepu</a>
     </div>
     <div class="col-sm-8">
-        <a href="" class="btn btn-success btn-block btn-lg margin-mobile">Przejdź do podsumowania</a>
+        <p onclick="document.getElementById('orderForm').submit()" class="btn btn-success btn-block btn-lg margin-mobile">Przejdź do podsumowania</p>
     </div>
 </div>
