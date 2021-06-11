@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ShopWebApp.Controllers
 {
@@ -10,7 +13,14 @@ namespace ShopWebApp.Controllers
     {
         public IActionResult Index(OrderModel input)
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
+            {
+                Dictionary<string, int> dict = new Dictionary<string, int>();
+                HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(dict));
+            }
+            Dictionary<string, int> cartDict = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
             var model = new OrderModel();
+            model.Cart = cartDict;
             if (User.Identity.IsAuthenticated)
             {
                 using (var db = new ShopDatabase())
@@ -52,7 +62,29 @@ namespace ShopWebApp.Controllers
                 input.Message += "Niepoprawna metoda dostawy\n"; isValid = false; }
             if (input.Order.PaymentMethod < 1 || input.Order.PaymentMethod > 3) {
                 input.Message += "Niepoprawna metoda płatności\n"; isValid = false; }
-            return Index(input);
+            if(input.Order.ClientName.Length < 3 || input.Order.ClientName.Length > 64){
+                input.Message += "Niepoprawne imię\n"; isValid = false; }
+            if(input.Order.ClientSurname.Length < 3 || input.Order.ClientSurname.Length > 64){
+                input.Message += "Niepoprawne nazwisko\n"; isValid = false; }
+            if(input.Order.ClientEmail.Length < 5 || input.Order.ClientEmail.Length > 128 || !input.Order.ClientEmail.Contains('@')){
+                input.Message += "Niepoprawny adres email\n"; isValid = false; }
+            if(input.Order.ClientPhone.Length < 9 || input.Order.ClientPhone.Length > 16){
+                input.Message += "Niepoprawny numer telefonu\n"; isValid = false; }
+            if(input.Order.Address.Length < 5 || input.Order.Address.Length > 256){
+                input.Message += "Niepoprawny adres\n"; isValid = false; }
+            if (isValid)
+            {
+                return Ok("Good");
+            }
+            else
+                return Index(input);
+        }
+        [Route("/order/{code}")]
+        public IActionResult Status(string code)
+        {
+            OrderModel model = new OrderModel();
+            model.Title = "Zamówienie " + code; 
+            return View(model);
         }
     }
 }

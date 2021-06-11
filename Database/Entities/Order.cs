@@ -22,6 +22,7 @@ namespace ShopWebApp
         public string ClientSurname { get; set; }
         public string ClientEmail { get; set; }
         public string ClientPhone { get; set; }
+        public string Comments { get; set; }
 
         public int ShippingType { get; set; }
         public string ShippingInfo { get; set; }
