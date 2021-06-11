@@ -37,7 +37,7 @@
     </div>
     <div class="form-group">
         <label for="User.Phone" asp-for="@Model.User.Phone">Numer telefonu</label>
-        <input type="text" class="form-control" name="User.Phone" asp-for="@Model.User.Phone" pattern=".{9,16}">
+        <input type="text" class="form-control" name="User.Phone" asp-for="@Model.User.Phone" pattern=".{7,16}">
         <span class="text-info" style="font-size: small">* - pola obowiązkowe</span>
     </div>
     <button type="submit" class="btn btn-primary btn-lg btn-block">Zarejestruj się</button>
