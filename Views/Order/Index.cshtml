@@ -4,43 +4,60 @@
 @{
     Layout = "_OrderLayout";
 }
+<script>
+    function OnShippingUpdate() {
+        if (document.getElementById('ShippingType').value == "2") {
+            document.getElementById('info').style.display = "block";
+        }
+        else {
+            document.getElementById('info').style.display = "none";
+        }
+    }
+</script>
 @section top {
     <div class="jumbotron">
         <h1 class="display-3 text-center">Zamówienie</h1>
     </div>
 }
 
-
-@if (Context.User.Identity.IsAuthenticated)
+@if (Model.Cart.Count < 1)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        Jesteś zalogowany jako @Model.User.Name @Model.User.Surname! Twoje zamówienie zostanie zapisane na Twoim koncie.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    <h2 class="text-info">Koszyk jest pusty</h2>
+    <br />
+    <a href="@Url.Action("cart", "shop")" class="btn btn-outline-primary btn-block btn-lg margin-mobile">Powrót do sklepu</a>
 }
 else
 {
+    @if (Context.User.Identity.IsAuthenticated)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Jesteś zalogowany jako @Model.User.Name @Model.User.Surname! Twoje zamówienie zostanie zapisane na Twoim koncie.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    else
+    {
 
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <a href="@Url.Action("login", "account")?ReturnUrl=/order" class="nounderline text-dark">
-            Zaloguj się, aby zapisać zamówienie na swoim koncie.
-        </a>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-}
-@if (Model.Message != null && Model.Message != string.Empty)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <span style="white-space: pre-line">@Model.Message</span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <a href="@Url.Action("login", "account")?ReturnUrl=/order" class="nounderline text-dark">
+                Zaloguj się, aby zapisać zamówienie na swoim koncie.
+            </a>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    @if (Model.Message != null && Model.Message != string.Empty)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span style="white-space: pre-line">@Model.Message</span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
 <form method="post" id="orderForm">
     <div class="form-row">
         <div class="form-group col-md-6">
@@ -68,42 +85,53 @@ else
     </div>
     <div class="row form-group">
         <div class="col-6">
-            <select class="custom-select" name="Order.ShippingType" id="ShippingType" asp-for="@Model.Order.ShippingType">
-                <option @if (Model.Order.ShippingType == 0) {
-                    @:selected
-                }>Dostawa</option>
-                <option value="1" @if (Model.Order.ShippingType == 1) {
-                    @:selected
-                }>Kurier (+20 zł)</option>
-                <option value="2" @if (Model.Order.ShippingType == 2) {
-                    @:selected
-                }>Paczkomat (+8,99 zł)</option>
-                <option value="3" @if (Model.Order.ShippingType == 3) {
-                    @:selected
-                }>Odbiór osobisty</option>
+            <select class="custom-select" onchange="OnShippingUpdate()" name="Order.ShippingType" id="ShippingType" asp-for="@Model.Order.ShippingType">
+                <option @if (Model.Order.ShippingType == 0) { @: selected
+                        }>
+                    Dostawa
+                </option>
+                <option value="1" @if (Model.Order.ShippingType == 1) { @: selected
+                        }>
+                    Kurier (+20 zł)
+                </option>
+                <option value="2" @if (Model.Order.ShippingType == 2) { @: selected
+                        }>
+                    Paczkomat (+8,99 zł)
+                </option>
+                <option value="3" @if (Model.Order.ShippingType == 3) { @: selected
+                        }>
+                    Odbiór osobisty
+                </option>
             </select>
         </div>
         <div class="col-6">
             <select class="custom-select" name="Order.PaymentMethod" id="PaymentMethod" asp-for="@Model.Order.PaymentMethod">
-                <option @if (Model.Order.PaymentMethod == 0) {
-                    @:selected
-                }>Metoda płatności</option>
-                <option value="1" @if (Model.Order.PaymentMethod == 1) {
-                    @:selected
-                }>Przelew</option>
-                <option value="2" @if (Model.Order.PaymentMethod == 2) {
-                    @:selected
-                }>Płatność przy odbiorze</option>
-                <option value="3" @if (Model.Order.PaymentMethod == 3) {
-                    @:selected
-                }>Przelewy24</option>
+                <option @if (Model.Order.PaymentMethod == 0) { @: selected
+                        }>
+                    Metoda płatności
+                </option>
+                <option value="1" @if (Model.Order.PaymentMethod == 1) { @: selected
+                        }>
+                    Przelew
+                </option>
+                <option value="2" @if (Model.Order.PaymentMethod == 2) { @: selected
+                        }>
+                    Płatność przy odbiorze
+                </option>
+                <option value="3" @if (Model.Order.PaymentMethod == 3) { @: selected
+                        }>
+                    Przelewy24
+                </option>
             </select>
         </div>
     </div>
-    <div class="form-group">
-        <input type="text" class="form-control" name="Order.ShippingInfo" id="ShippingInfo" asp-for="@Model.Order.ShippingInfo" value="@Model.Order.ShippingInfo" placeholder="Uwagi do zamówienia" pattern=".{,2048}" />
+    <div class="form-group" id="info" style="display: none">
+        <input type="text" class="form-control" name="Order.ShippingInfo" id="ShippingInfo" asp-for="@Model.Order.ShippingInfo" value="@Model.Order.ShippingInfo" placeholder="Kod paczkomatu" pattern=".{,64}" />
     </div>
-    
+    <div class="form-group">
+        <input type="text" class="form-control" name="Order.Comments" id="Comments" asp-for="@Model.Order.Comments" value="@Model.Order.Comments" placeholder="Uwagi do zamówienia" pattern=".{,2048}" />
+    </div>
+
     <div class="row" style="margin-top: 30px">
         <div class="col-sm-4">
             <a href="@Url.Action("cart", "shop")" class="btn btn-outline-primary btn-block btn-lg margin-mobile">Powrót do sklepu</a>
@@ -113,5 +141,4 @@ else
         </div>
     </div>
 </form>
-
-
+}

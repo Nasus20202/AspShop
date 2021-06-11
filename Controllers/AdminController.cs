@@ -69,9 +69,9 @@ namespace ShopWebApp
                     if(int.TryParse(name, out id))
                         user = DbFunctions.FindUserById(id);
                 }
-                model.Title = "Użytkownik : " + user.Email;
                 if (user == null)
                     return Redirect("/Error/404");
+                model.Title = "Użytkownik : " + user.Email;
                 model.Dict.Add("ID", user.UserId.ToString());
                 model.Dict.Add("Imię", user.Name);
                 model.Dict.Add("Nazwisko", user.Surname);
@@ -109,9 +109,9 @@ namespace ShopWebApp
                                     select c).FirstOrDefault();
                     }
                 }
-                model.Title = "Kategoria : " + category.Name;
                 if (category == null)
                     return Redirect("/Error/404");
+                model.Title = "Kategoria : " + category.Name;
                 model.Dict.Add("ID", category.CategoryId.ToString());
                 model.Dict.Add("Nazwa", category.Name);
                 model.Dict.Add("Kod", category.Code);
@@ -158,9 +158,9 @@ namespace ShopWebApp
                                     select c).FirstOrDefault();
                     }
                 }
-                model.Title = "Podkategoria : " + subcategory.Name;
                 if (subcategory == null)
                     return Redirect("/Error/404");
+                model.Title = "Podkategoria : " + subcategory.Name;
                 model.Dict.Add("ID", subcategory.SubcategoryId.ToString());
                 model.Dict.Add("Nazwa", subcategory.Name);
                 model.Dict.Add("Kod", subcategory.Code);
@@ -223,6 +223,53 @@ namespace ShopWebApp
                 ViewBag.PermissionLevelToEdit = 4;
                 ViewData["Name"] = "Produkt";
                 ViewData["ObjectName"] = product.Brand + " " + product.Name;
+            }
+            else if(table == "orders")
+            {
+                var order = new Order();
+                using (var db = new ShopDatabase())
+                {
+                    order = (from c in db.Orders
+                                   where c.Code == name
+                                   select c).FirstOrDefault();
+                }
+                if (order == null)
+                    return Redirect("/Error/404");
+                model.Title = "Zamówienie : " + order.Code;
+                model.Dict.Add("ID", order.OrderId.ToString());
+                model.Dict.Add("Numer zamówienia", order.Code);
+                model.Dict.Add("Data założenia", order.DateOfOrder.ToString());
+                model.Dict.Add("Imię", order.ClientName);
+                model.Dict.Add("Nazwisko", order.ClientSurname);
+                model.Dict.Add("Adres", order.Address);
+                model.Dict.Add("Email", order.ClientEmail);
+                model.Dict.Add("Telefon", order.ClientPhone);
+                model.Dict.Add("Kwota", order.Amount.ToString());
+                model.Dict.Add("Status", order.Status.ToString());
+                model.Dict.Add("Dostawa", order.ShippingType.ToString());
+                model.Dict.Add("Informacje do dostawy", order.ShippingInfo);
+                model.Dict.Add("Metoda płatności", order.PaymentMethod.ToString());
+                model.Dict.Add("Uwagi", order.Comments);
+                model.Dict.Add("Aktywny", order.Enabled.ToString());
+                using (var db = new ShopDatabase())
+                {
+                    var loadedOrder = db.Orders.Single(o => o.OrderId == order.OrderId);
+                    db.Entry(loadedOrder).Collection(o => o.ProductOrders).Load();
+                    List<Product> products = new List<Product>();
+                    foreach(ProductOrder productOrder in loadedOrder.ProductOrders)
+                    {
+                        Product product = db.Products.Where(p => p.ProductId == productOrder.ProductId).FirstOrDefault();
+                        products.Add(product);
+                    }
+                    ViewData["childtype"] = "products";
+                    if (products == null)
+                        ViewBag.ChildObjects = new List<Product>();
+                    ViewBag.ChildObjects = products;
+                }
+                ViewBag.Id = order.ProductOrders;
+                ViewBag.PermissionLevelToEdit = 4;
+                ViewData["Name"] = "Zamówienie";
+                ViewData["ObjectName"] = order.Code;
             }
             else
             { 
@@ -364,6 +411,31 @@ namespace ShopWebApp
                     model.Table = table;
                     model.Page = page; model.LastPage = lastPage;
                     ViewData["Name"] = "Produkty";
+                }
+            }
+            else if(tablename == "orders")
+            {
+                using (var db = new ShopDatabase())
+                {
+                    List<Order> ordersList = db.Orders.OrderByDescending(o => o.DateOfOrder).ToList();
+                    AdminModel.AdminList table = new AdminModel.AdminList();
+                    int start = (page - 1) * objectsPerPage, end = Math.Min(page * objectsPerPage, ordersList.Count()), lastPage = ordersList.Count() / objectsPerPage + (ordersList.Count() % objectsPerPage == 0 ? 0 : 1);
+                    if (start < ordersList.Count)
+                    {
+                        for (int i = start; i < end; i++)
+                        {
+                            table.Names.Add(ordersList[i].Code == null ? "Podkategoria bez nazwy" : ordersList[i].Code);
+                            table.Codes.Add(ordersList[i].Code);
+                        }
+                    }
+                    if (table.Names.Count() == 0)
+                    {
+                        return Redirect("/Error/404");
+                    }
+                    table.Path = "/admin/orders/";
+                    model.Table = table;
+                    model.Page = page; model.LastPage = lastPage;
+                    ViewData["Name"] = "Zamówienia";
                 }
             }
             else
@@ -855,6 +927,7 @@ namespace ShopWebApp
 
             if (name == null)
                 return Redirect("/Error/404");
+            //name = name.ToLower();
             const int objectsPerPage = 30;
             var model = new BaseViewModel();
             if (User.Identity.IsAuthenticated)
@@ -873,7 +946,7 @@ namespace ShopWebApp
             model.Title = "Szukaj: " + name;
             using (var db = new ShopDatabase()) {
                 Dictionary<string, string> products = new Dictionary<string, string>();
-                List<Product> productList = db.Products.Where(p => p.Name.Contains(name) || p.Brand.Contains(name) || p.Code == name || p.ProductId.ToString() == name).OrderBy(p => p.Brand).ToList();
+                List<Product> productList = db.Products.Where(p => p.Name.ToLower().Contains(name) || p.Brand.ToLower().Contains(name) || p.Code.ToLower() == name || p.ProductId.ToString() == name).OrderBy(p => p.Brand).ToList();
                 if (page > 0 && page <= productList.Count / objectsPerPage + (productList.Count % objectsPerPage != 0 ? 1 : 0))
                 {
                     for (int i = (page - 1) * objectsPerPage; i < Math.Min(page * objectsPerPage, productList.Count); i++)
@@ -884,7 +957,7 @@ namespace ShopWebApp
                 }
                 ViewBag.products = products;
                 Dictionary<string, string> users = new Dictionary<string, string>();
-                List<User> usersList = db.Users.Where(u => u.Email.Contains(name) || u.Name.Contains(name) || u.Surname.Contains(name) || u.UserId.ToString() == name).OrderBy(u => u.Email).ToList();
+                List<User> usersList = db.Users.Where(u => u.Email.ToLower().Contains(name) || u.Name.ToLower().Contains(name) || u.Surname.ToLower().Contains(name) || u.UserId.ToString() == name).OrderBy(u => u.Email).ToList();
                 if (page > 0 && page <= usersList.Count / objectsPerPage + (usersList.Count % objectsPerPage != 0 ? 1 : 0))
                 {
                     for (int i = (page - 1) * objectsPerPage; i < Math.Min(page * objectsPerPage, usersList.Count); i++)
@@ -893,15 +966,26 @@ namespace ShopWebApp
                         users.Add(user.Email + " (" + user.Name + " " + user.Surname + ")", "/admin/users/" + user.UserId);
                     }
                 }
-                if (page < 0 || page > Math.Max(usersList.Count / objectsPerPage + (usersList.Count % objectsPerPage != 0 ? 1 : 0), productList.Count / objectsPerPage + (productList.Count % objectsPerPage != 0 ? 1 : 0)))
-                    return Redirect("/Error/404");
+                Dictionary<string, string> orders = new Dictionary<string, string>();
+                List<Order> ordersList = db.Orders.Where(o => o.Code.ToLower().Contains(name)).OrderByDescending(o => o.DateOfOrder).ToList();
+                if (page > 0 && page <= ordersList.Count / objectsPerPage + (ordersList.Count % objectsPerPage != 0 ? 1 : 0))
+                {
+                    for (int i = (page - 1) * objectsPerPage; i < Math.Min(page * objectsPerPage, ordersList.Count); i++)
+                    {
+                        Order order = ordersList[i];
+                        orders.Add(order.Code, "/admin/orders/" + order.Code);
+                    }
+                }
+                ViewBag.orders = orders;
+                /*if (page < 0 || page > Math.Max(Math.Max(usersList.Count / objectsPerPage + (usersList.Count % objectsPerPage != 0 ? 1 : 0), productList.Count / objectsPerPage + (productList.Count % objectsPerPage != 0 ? 1 : 0)), ordersList.Count / objectsPerPage + (ordersList.Count % objectsPerPage != 0 ? 1 : 0)))
+                    return Redirect("/Error/404");*/
                 ViewData["name"] = name;
                 if (User.Identity.IsAuthenticated && Functions.PermissionLevel(model.User.Role) > 2)
                     ViewBag.users = users;
                 else
                     ViewBag.users = new Dictionary<string, string>();
                 ViewBag.page = page;
-                ViewBag.lastPage = Math.Max(productList.Count / objectsPerPage + (productList.Count % objectsPerPage != 0 ? 1 : 0), usersList.Count / objectsPerPage + (usersList.Count % objectsPerPage != 0 ? 1 : 0));
+                ViewBag.lastPage = Math.Max(Math.Max(usersList.Count / objectsPerPage + (usersList.Count % objectsPerPage != 0 ? 1 : 0), productList.Count / objectsPerPage + (productList.Count % objectsPerPage != 0 ? 1 : 0)), ordersList.Count / objectsPerPage + (ordersList.Count % objectsPerPage != 0 ? 1 : 0));
             }
             return View(model);
         }

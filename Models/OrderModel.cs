@@ -8,7 +8,7 @@ namespace ShopWebApp
     public class OrderModel : BaseViewModel
     {
         public OrderModel() : base() { }
-        public List<Product> Products { get; set; }
+        public Dictionary<String, int> Cart { get; set; }
         public Order Order { get; set; }
         public string Message { get; set; }
     }
