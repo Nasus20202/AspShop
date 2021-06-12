@@ -30,7 +30,7 @@ namespace ShopWebApp
 
 
 
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public User User { get; set; }
         public IList<ProductOrder> ProductOrders { get; set; }
     }

@@ -7,6 +7,24 @@ namespace ShopWebApp
 {
     public class Functions
     {
+        public static string GenerateOrderCode()
+        {
+            string code;
+            Random random = new Random();
+            using (var db = new ShopDatabase()) {
+                do
+                {
+                    code = string.Empty;
+                    for (int i = 0; i < 12; i++)
+                    {
+                        code += random.Next(10).ToString();
+                    }
+                }
+                while (db.Orders.Where(p => p.Code == code).FirstOrDefault() != null);
+            }
+            return code;
+        }
+
         public static string Status(int id)
         {
             string statusStr = string.Empty;
