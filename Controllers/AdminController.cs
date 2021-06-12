@@ -230,7 +230,7 @@ namespace ShopWebApp
                 using (var db = new ShopDatabase())
                 {
                     order = (from c in db.Orders
-                                   where c.Code == name
+                                   where c.Code == name || c.OrderId.ToString() == name
                                    select c).FirstOrDefault();
                 }
                 if (order == null)
@@ -239,6 +239,7 @@ namespace ShopWebApp
                 model.Dict.Add("ID", order.OrderId.ToString());
                 model.Dict.Add("Numer zamówienia", order.Code);
                 model.Dict.Add("Data założenia", order.DateOfOrder.ToString());
+                model.Dict.Add("ID użytkownika", order.UserId >= 1 ? order.UserId.ToString() : "Niepołączone z kontem");
                 model.Dict.Add("Imię", order.ClientName);
                 model.Dict.Add("Nazwisko", order.ClientSurname);
                 model.Dict.Add("Adres", order.Address);
@@ -259,6 +260,7 @@ namespace ShopWebApp
                     foreach(ProductOrder productOrder in loadedOrder.ProductOrders)
                     {
                         Product product = db.Products.Where(p => p.ProductId == productOrder.ProductId).FirstOrDefault();
+                        product.Name = product.Brand + " " + product.Name + "  -  " + productOrder.Count.ToString() + " szt.";
                         products.Add(product);
                     }
                     ViewData["childtype"] = "products";
@@ -266,7 +268,7 @@ namespace ShopWebApp
                         ViewBag.ChildObjects = new List<Product>();
                     ViewBag.ChildObjects = products;
                 }
-                ViewBag.Id = order.ProductOrders;
+                ViewBag.Id = order.OrderId;
                 ViewBag.PermissionLevelToEdit = 4;
                 ViewData["Name"] = "Zamówienie";
                 ViewData["ObjectName"] = order.Code;
@@ -472,7 +474,7 @@ namespace ShopWebApp
                 {
                     return Forbid();
                 }
-                using(var db = new ShopDatabase())
+                using (var db = new ShopDatabase())
                 {
                     Category category = (from c in db.Categories
                                          where c.CategoryId.ToString() == name || c.Name == name || c.Code == name
@@ -500,8 +502,8 @@ namespace ShopWebApp
                 using (var db = new ShopDatabase())
                 {
                     Subcategory subcategory = (from c in db.Subcategories
-                                         where c.SubcategoryId.ToString() == name || c.Name == name || c.Code == name
-                                         select c).FirstOrDefault();
+                                               where c.SubcategoryId.ToString() == name || c.Name == name || c.Code == name
+                                               select c).FirstOrDefault();
                     if (subcategory == null)
                         return Redirect("/Error/404");
                     var values = new Dictionary<string, string>();
@@ -527,8 +529,8 @@ namespace ShopWebApp
                 using (var db = new ShopDatabase())
                 {
                     Product product = (from c in db.Products
-                                         where c.ProductId.ToString() == name || c.Name == name || c.Code == name
-                                         select c).FirstOrDefault();
+                                       where c.ProductId.ToString() == name || c.Name == name || c.Code == name
+                                       select c).FirstOrDefault();
                     if (product == null)
                         return Redirect("/Error/404");
                     var values = new Dictionary<string, string>();
@@ -559,7 +561,7 @@ namespace ShopWebApp
                     model.Title = "Edytuj produkt " + product.Brand + " " + product.Name;
                 }
             }
-            else if(table == "users")
+            else if (table == "users")
             {
                 if (Functions.PermissionLevel(model.User.Role) < 5)
                 {
@@ -568,8 +570,8 @@ namespace ShopWebApp
                 using (var db = new ShopDatabase())
                 {
                     User user = (from c in db.Users
-                                       where c.UserId.ToString() == name || c.Email == name
-                                       select c).FirstOrDefault();
+                                 where c.UserId.ToString() == name || c.Email == name
+                                 select c).FirstOrDefault();
                     if (user == null)
                         return Redirect("/Error/404");
                     var values = new Dictionary<string, string>();
@@ -585,6 +587,40 @@ namespace ShopWebApp
                     ViewData["Id"] = user.UserId.ToString();
                     ViewData["table"] = table;
                     model.Title = "Edytuj użytkownika " + user.Email;
+                }
+            }
+            else if (table == "orders")
+            {
+                if (Functions.PermissionLevel(model.User.Role) < 5)
+                {
+                    return Forbid();
+                }
+                using (var db = new ShopDatabase())
+                {
+                    Order order = (from o in db.Orders
+                                 where o.OrderId.ToString() == name || o.Code == name
+                                 select o).FirstOrDefault();
+                    if (order == null)
+                        return Redirect("/Error/404");
+                    var values = new Dictionary<string, string>();
+                    values.Add("Code", order.Code);
+                    values.Add("Amount", order.Amount.ToString());
+                    values.Add("Address", order.Address);
+                    values.Add("UserId", order.UserId.ToString());
+                    values.Add("ClientName", order.ClientName);
+                    values.Add("ClientSurname", order.ClientSurname);
+                    values.Add("ClientEmail", order.ClientEmail);
+                    values.Add("ClientPhone", order.ClientPhone);
+                    values.Add("Status", order.Status.ToString());
+                    values.Add("PaymentMethod", order.PaymentMethod.ToString());
+                    values.Add("ShippingType", order.ShippingType.ToString());
+                    values.Add("ShippingInfo", order.ShippingInfo);
+                    values.Add("Comments", order.Comments);
+                    ViewBag.values = values;
+                    ViewData["Name"] = order.Code;
+                    ViewData["Id"] = order.OrderId.ToString();
+                    ViewData["table"] = table;
+                    model.Title = "Edytuj zamówienie " + order.Code;
                 }
             }
             else
@@ -761,6 +797,50 @@ namespace ShopWebApp
                         return Redirect(Url.Action("logout", "account"));
                 }
             }
+            else if(table == "orders")
+            {
+                if (Functions.PermissionLevel(user.Role) < 5)
+                {
+                    return Forbid();
+                }
+                using (var db = new ShopDatabase())
+                {
+                    Order order = (from o in db.Orders
+                                     where o.OrderId.ToString() == objectName || o.Code == objectName
+                                     select o).FirstOrDefault();
+                    if (order == null)
+                        return Redirect("/Error/404");
+                    int number;
+                    if (values["Code"] != null) { order.Code = values["Code"]; }
+                    if (values["Amount"] != null)
+                        if (int.TryParse(values["Amount"], out number))
+                            order.Amount = number;
+                    if (values["Address"] != null) { order.Address = values["Address"]; }
+                    if (values["UserId"] != null)
+                        if (int.TryParse(values["UserId"], out number))
+                            order.UserId = number;
+                    if (values["ClientName"] != null) { order.ClientName = values["ClientName"]; }
+                    if (values["ClientSurname"] != null) { order.ClientSurname = values["ClientSurname"]; }
+                    if (values["ClientEmail"] != null) { order.ClientEmail = values["ClientEmail"]; }
+                    if (values["ClientPhone"] != null) { order.ClientPhone = values["ClientPhone"]; }
+                    if (values["Status"] != null)
+                        if (int.TryParse(values["Status"], out number))
+                            order.Status = number;
+                    if (values["PaymentMethod"] != null)
+                        if (int.TryParse(values["PaymentMethod"], out number))
+                            order.PaymentMethod = number;
+                    if (values["ShippingType"] != null)
+                        if (int.TryParse(values["ShippingType"], out number))
+                            order.ShippingType = number;
+                    if (values["ShippingInfo"] != null) { order.ShippingInfo = values["ShippingInfo"]; }
+                    else { order.ShippingInfo = ""; }
+                    if (values["Comments"] != null) { order.Comments = values["Comments"]; }
+                    else { order.Comments = ""; }
+
+                    DbFunctions.UpdateOrder(order);
+                    objectName = order.OrderId.ToString();
+                }
+            }
             else
                 return Redirect("/Error/404");
             return Redirect("/admin/" + table + "/" + objectName);
@@ -916,6 +996,21 @@ namespace ShopWebApp
                 }
                 return Redirect("/admin/table/categories");
 
+            }
+            else if (table == "orders")
+            {
+                if (Functions.PermissionLevel(role) < 5)
+                    return Forbid();
+                Order order;
+                using (var db = new ShopDatabase())
+                {
+                    order = db.Orders.Where(o => o.Code == code || o.OrderId.ToString() == code).FirstOrDefault();
+                    if (order == null)
+                        return Redirect("/Error/404");
+                    db.Orders.Remove(order);
+                    db.SaveChanges();
+                }
+                return Redirect("/admin/table/orders");
             }
             else
                 return Redirect("/Error/404");
