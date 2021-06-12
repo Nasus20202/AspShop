@@ -83,7 +83,29 @@ namespace ShopWebApp.Controllers
         public IActionResult Status(string code)
         {
             OrderModel model = new OrderModel();
-            model.Title = "Zamówienie " + code; 
+            Order order;
+            using (var db = new ShopDatabase()) {
+                int userId = 0;
+                if (User.Identity.IsAuthenticated)
+                {
+                    var user = (from c in db.Users
+                                where c.Email == User.Identity.Name
+                                select c).FirstOrDefault();
+                    model.User.Name = user.Name;
+                    model.User.Surname = user.Surname;
+                    model.User.Email = user.Email;
+                    userId = user.UserId;
+                }
+                order = db.Orders.Where(o => o.Code == code || o.OrderId.ToString() == code).FirstOrDefault();
+                if (order == null)
+                    return Redirect("/Error/404");
+                if (!(order.UserId >= 1 && userId != 0 && order.UserId == userId)) {
+                    return Forbid();
+                }
+            }
+
+            model.Title = "Zamówienie " + code;
+            model.Order = order;
             return View(model);
         }
     }
