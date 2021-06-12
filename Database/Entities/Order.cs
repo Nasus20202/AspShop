@@ -16,6 +16,7 @@ namespace ShopWebApp
         public int Amount { get; set; }
         public string Address { get; set; }
         public int PaymentMethod { get; set; }
+        public bool Paid { get; set; }
         public int Status { get; set; }
         public DateTime DateOfOrder { get; set; }
         public string ClientName { get; set; }

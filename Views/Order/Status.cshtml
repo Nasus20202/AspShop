@@ -4,4 +4,41 @@
     Layout = "_Layout";
 }
 
-@Model.Order.ClientName
+@section top{
+    <div class="jumbotron jumbotron-fluid" style="margin-top: 5vh; margin-bottom: -30px">
+        <h1 class="text-center display-4 align-bottom">Zamówienie @Model.Order.Code</h1>
+    </div>
+}
+<div class="row">
+    <ul class="list-group col-sm-8">
+        <li class="list-group-item list-group-item-primary">Produkty</li>
+        @foreach (KeyValuePair<Product, int> kvp in ViewBag.products)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="/p/@kvp.Key.Code" class="text-dark nounderline">@kvp.Key.Brand @kvp.Key.Name</a>
+                @if (kvp.Value > 1)
+                {
+                    <span class="badge badge-primary badge-pill">@kvp.Value szt.</span>
+                }
+            </li>
+        }
+    </ul>
+    <ul class="list-group col-sm-4">
+        <li class="list-group-item list-group-item-primary">Status zamówienia</li>
+        @if (Model.Order.Paid)
+        {
+            <li class="list-group-item list-group-item-success d-flex">
+                Opłacone  -  @((Model.Order.Amount / 100).ToString("C"))
+            </li>
+        }
+        else
+        {
+            <li class="list-group-item list-group-item-danger d-flex">
+                Nieopłacone  -  @((Model.Order.Amount / 100).ToString("C"))
+            </li>
+        }
+        <li class="list-group-item list-group-item d-flex">
+            Status  -  @Functions.Status(Model.Order.Status)
+        </li>
+    </ul>
+</div>

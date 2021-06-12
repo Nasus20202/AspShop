@@ -318,6 +318,7 @@ namespace ShopWebApp
                 order.Amount = updatedOrder.Amount;
                 order.Address = updatedOrder.Address;
                 order.PaymentMethod = updatedOrder.PaymentMethod;
+                order.Paid = updatedOrder.Paid;
                 order.Status = updatedOrder.Status;
                 order.ClientName = updatedOrder.ClientName;
                 order.ClientSurname = updatedOrder.ClientSurname;
