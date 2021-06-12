@@ -84,6 +84,7 @@ namespace ShopWebApp.Controllers
         {
             OrderModel model = new OrderModel();
             Order order;
+            Dictionary<Product, int> products = new Dictionary<Product, int>();
             using (var db = new ShopDatabase()) {
                 int userId = 0;
                 if (User.Identity.IsAuthenticated)
@@ -102,8 +103,15 @@ namespace ShopWebApp.Controllers
                 if (!(order.UserId >= 1 && userId != 0 && order.UserId == userId)) {
                     return Forbid();
                 }
+                db.Entry(order).Collection(o => o.ProductOrders).Load();
+                foreach (ProductOrder productOrder in order.ProductOrders)
+                {
+                    db.Entry(productOrder).Reference(po => po.Product).Load();
+                    products.Add(productOrder.Product, productOrder.Count);
+                }
             }
 
+            ViewBag.products = products;
             model.Title = "Zamówienie " + code;
             model.Order = order;
             return View(model);

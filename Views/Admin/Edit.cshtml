@@ -5,6 +5,20 @@
 <br />
 <h1>Edytuj @ViewData["Name"]</h1>
 <br />
+@if(ViewData["table"].ToString() == "orders")
+{
+    @section left{ 
+        <div class="sticky-top flex-column" style="top: 65px">
+            <ul class="list-group">
+                <li class="list-group-item disabled">Status zamówienia</li>
+                @for (int i = 0; i <= 5; i++)
+                {
+                    <li class="list-group-item">@i - @Functions.Status(i)</li>
+                }
+            </ul>
+        </div>
+    }
+}
 
 <form class="form-group" action="/admin/@ViewData["table"]/@ViewData["Id"]/edit" method="post">
     @foreach (KeyValuePair<string, string> kvp in ViewBag.values)

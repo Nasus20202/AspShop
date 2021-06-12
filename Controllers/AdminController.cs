@@ -246,12 +246,13 @@ namespace ShopWebApp
                 model.Dict.Add("Email", order.ClientEmail);
                 model.Dict.Add("Telefon", order.ClientPhone);
                 model.Dict.Add("Kwota", order.Amount.ToString());
-                model.Dict.Add("Status", order.Status.ToString());
+                model.Dict.Add("Status", Functions.Status(order.Status) + " (" + order.Status.ToString() +")");
                 model.Dict.Add("Dostawa", order.ShippingType.ToString());
                 model.Dict.Add("Informacje do dostawy", order.ShippingInfo);
                 model.Dict.Add("Metoda płatności", order.PaymentMethod.ToString());
+                model.Dict.Add("Opłacone", order.Paid.ToString());
                 model.Dict.Add("Uwagi", order.Comments);
-                model.Dict.Add("Aktywny", order.Enabled.ToString());
+                //model.Dict.Add("Aktywny", order.Enabled.ToString());
                 using (var db = new ShopDatabase())
                 {
                     var loadedOrder = db.Orders.Single(o => o.OrderId == order.OrderId);
@@ -613,6 +614,7 @@ namespace ShopWebApp
                     values.Add("ClientPhone", order.ClientPhone);
                     values.Add("Status", order.Status.ToString());
                     values.Add("PaymentMethod", order.PaymentMethod.ToString());
+                    values.Add("Paid", order.Paid.ToString());
                     values.Add("ShippingType", order.ShippingType.ToString());
                     values.Add("ShippingInfo", order.ShippingInfo);
                     values.Add("Comments", order.Comments);
@@ -829,6 +831,10 @@ namespace ShopWebApp
                     if (values["PaymentMethod"] != null)
                         if (int.TryParse(values["PaymentMethod"], out number))
                             order.PaymentMethod = number;
+                    if (values["Paid"] != null && (values["Paid"].ToLower() == "true" || values["Paid"].ToLower() == "1"))
+                        order.Paid = true;
+                    else if (values["Paid"] != null && (values["Paid"].ToLower() == "false" || values["Paid"].ToLower() == "0"))
+                        order.Paid = false;
                     if (values["ShippingType"] != null)
                         if (int.TryParse(values["ShippingType"], out number))
                             order.ShippingType = number;
