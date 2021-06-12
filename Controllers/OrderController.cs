@@ -74,7 +74,42 @@ namespace ShopWebApp.Controllers
                 input.Message += "Niepoprawny adres\n"; isValid = false; }
             if (isValid)
             {
-                return Ok("Good");
+                if (string.IsNullOrEmpty(HttpContext.Session.GetString("_Cart")))
+                    return Redirect("/cart");
+                Dictionary<string, int> cartDict = JsonSerializer.Deserialize<Dictionary<string, int>>(HttpContext.Session.GetString("_Cart"));
+                if (cartDict.Count < 1)
+                    return Redirect("/cart");
+                using (var db = new ShopDatabase())
+                {
+                    input.Order.Code = Functions.GenerateOrderCode();
+                    DbFunctions.AddOrder(input.Order);
+                    int amount = 0;
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        var user = (from c in db.Users
+                                    where c.Email == User.Identity.Name
+                                    select c).FirstOrDefault();
+                         input.Order.UserId = user.UserId;
+                    }
+                    foreach (KeyValuePair<string, int> kvp in cartDict)
+                    {
+                        Product product = db.Products.Where(p => p.Code == kvp.Key).FirstOrDefault();
+                        if (product == null)
+                            continue;
+                        amount += product.Price;
+                        ProductOrder po = new ProductOrder();
+                        po.OrderId = input.Order.OrderId;
+                        po.ProductId = product.ProductId;
+                        po.Count = kvp.Value;
+                        db.ProductOrders.Add(po);
+                    }
+                    input.Order.Amount = amount;
+                    DbFunctions.UpdateOrder(input.Order);
+                    db.SaveChanges();
+                }
+                HttpContext.Session.SetString("_Cart", JsonSerializer.Serialize(new Dictionary<string, int>()));
+                return Redirect("/order/" + input.Order.Code);
+
             }
             else
                 return Index(input);
@@ -100,7 +135,7 @@ namespace ShopWebApp.Controllers
                 order = db.Orders.Where(o => o.Code == code || o.OrderId.ToString() == code).FirstOrDefault();
                 if (order == null)
                     return Redirect("/Error/404");
-                if (!(order.UserId >= 1 && userId != 0 && order.UserId == userId)) {
+                if (order.UserId != null && order.UserId != userId) {
                     return Forbid();
                 }
                 db.Entry(order).Collection(o => o.ProductOrders).Load();
