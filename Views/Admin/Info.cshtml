@@ -53,7 +53,7 @@
         }
     </tbody>
 </table>
-@if ((Functions.PermissionLevel(Model.User.Role) >= 4 && (type == "categories" || type == "subcategories" || type == "products") || (Functions.PermissionLevel(Model.User.Role) >= 5) && type == "users"))
+@if (Functions.PermissionLevel(Model.User.Role) >= 4 && (type == "categories" || type == "subcategories" || type == "products") || Functions.PermissionLevel(Model.User.Role) >= 5 && (type == "users" || type == "orders"))
 {
     <a href="" id="removebutton" class="btn btn-outline-danger btn-block" data-toggle="modal" data-target="#staticBackdrop">
         Usuń obiekt <i class="bi-dash-circle-fill"></i>

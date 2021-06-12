@@ -16,16 +16,24 @@
     string subcategoriesPath = rootPath + "/subcategories/";
     string categoriesPath = rootPath + "/categories/";
     string photosPath = "admin/photos/";
+
+    int newOrders = 0;
+    using (var db = new ShopDatabase()) {
+        newOrders = db.Orders.Where(o => o.Status == 0).Count();
+    }
 }
 
 <ul class="list-group">
     <li class="list-group-item d-flex justify-content-between align-items-center">
         <a href="@ordersPath" class="text-dark">Zamówienia</a>
-        <span class="badge badge-success badge-pill">3</span>
+        @if (newOrders > 0)
+        {
+            <span class="badge badge-success badge-pill">@newOrders</span>
+        }
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
         <a href="@customOrdersPath" class="text-dark">Zamówienia niestandardowe</a>
-        <span class="badge badge-success badge-pill">1</span>
+        <!--<span class="badge badge-success badge-pill">Soon</span>-->
     </li>
     @if (Functions.PermissionLevel(Model.User.Role) >= 3)
     {

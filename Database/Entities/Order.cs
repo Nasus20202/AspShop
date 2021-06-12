@@ -16,11 +16,14 @@ namespace ShopWebApp
         public int Amount { get; set; }
         public string Address { get; set; }
         public int PaymentMethod { get; set; }
+        public bool Paid { get; set; }
         public int Status { get; set; }
         public DateTime DateOfOrder { get; set; }
         public string ClientName { get; set; }
+        public string ClientSurname { get; set; }
         public string ClientEmail { get; set; }
         public string ClientPhone { get; set; }
+        public string Comments { get; set; }
 
         public int ShippingType { get; set; }
         public string ShippingInfo { get; set; }
