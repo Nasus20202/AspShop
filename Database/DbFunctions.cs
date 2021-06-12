@@ -318,10 +318,15 @@ namespace ShopWebApp
                 order.Amount = updatedOrder.Amount;
                 order.Address = updatedOrder.Address;
                 order.PaymentMethod = updatedOrder.PaymentMethod;
+                order.Paid = updatedOrder.Paid;
                 order.Status = updatedOrder.Status;
                 order.ClientName = updatedOrder.ClientName;
+                order.ClientSurname = updatedOrder.ClientSurname;
                 order.ClientEmail = updatedOrder.ClientEmail;
                 order.ClientPhone = updatedOrder.ClientPhone;
+                order.ShippingType = updatedOrder.ShippingType;
+                order.ShippingInfo = updatedOrder.ShippingInfo;
+                order.Comments = updatedOrder.Comments;
 
                 order.UserId = updatedOrder.UserId;
                 order.ProductOrders = updatedOrder.ProductOrders;

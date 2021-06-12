@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopWebApp;
 
 namespace ShopWebApp.Migrations
 {
     [DbContext(typeof(ShopDatabase))]
-    partial class ShopDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20210611205235_comments")]
+    partial class comments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,9 +83,6 @@ namespace ShopWebApp.Migrations
 
                     b.Property<DateTime?>("Modified")
                         .HasColumnType("datetime");
-
-                    b.Property<bool>("Paid")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
@@ -177,9 +176,6 @@ namespace ShopWebApp.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Count")
                         .HasColumnType("int");
 
                     b.HasKey("OrderId", "ProductId");

@@ -7,6 +7,27 @@ namespace ShopWebApp
 {
     public class Functions
     {
+        public static string Status(int id)
+        {
+            string statusStr = string.Empty;
+            switch (id)
+            {
+                case 0:
+                    statusStr = "Złożone"; break;
+                case 1:
+                    statusStr = "Przyjęte do realizacji"; break;
+                case 2:
+                    statusStr = "Przygotowane do wysyłki"; break;
+                case 3:
+                    statusStr = "W trakcie dostawy"; break;
+                case 4:
+                    statusStr = "Gotowe do odbioru"; break;
+                case 5:
+                    statusStr = "Zakończone"; break;
+            }
+            return statusStr;
+        }
+
         public static int PermissionLevel(string role)
         {
             if (role == null)

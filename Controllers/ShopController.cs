@@ -231,8 +231,6 @@ namespace ShopWebApp.Controllers
                         if (filters.ContainsKey(tag.Key + "to")) { int.TryParse(filters[tag.Key + "to"], out to); };
                         foreach(Product product in productList)
                         {
-                            /*if (newProductList.Where(p => p.Code == product.Code).FirstOrDefault() != null)
-                                continue;*/
                             if (!productTags.ContainsKey(product.Code) || !productTags[product.Code].ContainsKey(tag.Key))
                             {
                                 continue;

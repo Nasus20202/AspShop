@@ -1,12 +1,144 @@
-﻿@using ShopWebApp
-@model BaseViewModel
+﻿@using Microsoft.AspNetCore.Http;
+@using ShopWebApp
+@model OrderModel
 @{
+    Layout = "_OrderLayout";
 }
-<title>@Model.Title</title>
-@{ 
-    string s = "249";
-    s = s.Replace('.', ',');
-    double d = -1.0;
-    double.TryParse(s, out d);
+<script>
+    function OnShippingUpdate() {
+        if (document.getElementById('ShippingType').value == "2") {
+            document.getElementById('info').style.display = "block";
+        }
+        else {
+            document.getElementById('info').style.display = "none";
+        }
+    }
+</script>
+@section top {
+    <div class="jumbotron">
+        <h1 class="display-3 text-center">Zamówienie</h1>
+    </div>
 }
-@d
+
+@if (Model.Cart.Count < 1)
+{
+    <h2 class="text-info">Koszyk jest pusty</h2>
+    <br />
+    <a href="@Url.Action("cart", "shop")" class="btn btn-outline-primary btn-block btn-lg margin-mobile">Powrót do sklepu</a>
+}
+else
+{
+    @if (Context.User.Identity.IsAuthenticated)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Jesteś zalogowany jako @Model.User.Name @Model.User.Surname! Twoje zamówienie zostanie zapisane na Twoim koncie.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    else
+    {
+
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <a href="@Url.Action("login", "account")?ReturnUrl=/order" class="nounderline text-dark">
+                Zaloguj się, aby zapisać zamówienie na swoim koncie.
+            </a>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    @if (Model.Message != null && Model.Message != string.Empty)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span style="white-space: pre-line">@Model.Message</span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+<form method="post" id="orderForm">
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="ClientName">Imię</label>
+            <input type="text" class="form-control" name="Order.ClientName" id="ClientName" asp-for="@Model.Order.ClientName" value="@Model.Order.ClientName" pattern=".{3,64}" required>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="ClientSurname">Nazwisko</label>
+            <input type="text" class="form-control" name="Order.ClientSurname" id="ClientSurname" asp-for="@Model.Order.ClientSurname" value="@Model.Order.ClientSurname" pattern=".{3,64}" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="Email">Kontaktowy adres email</label>
+            <input type="email" class="form-control" name="Order.ClientEmail" id="Email" asp-for="@Model.Order.ClientEmail" value="@Model.Order.ClientEmail" pattern=".{5,128}" required>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="Phone">Numer telefonu</label>
+            <input type="text" class="form-control" name="Order.ClientPhone" id="Phone" asp-for="@Model.Order.ClientPhone" value="@Model.Order.ClientPhone" pattern=".{7,16}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="Address">Adres</label>
+        <input type="text" class="form-control" name="Order.Address" id="Address" asp-for="@Model.Order.Address" value="@Model.Order.Address" pattern=".{5,256}" required>
+    </div>
+    <div class="row form-group">
+        <div class="col-6">
+            <select class="custom-select" onchange="OnShippingUpdate()" name="Order.ShippingType" id="ShippingType" asp-for="@Model.Order.ShippingType">
+                <option @if (Model.Order.ShippingType == 0) { @: selected
+                        }>
+                    Dostawa
+                </option>
+                <option value="1" @if (Model.Order.ShippingType == 1) { @: selected
+                        }>
+                    Kurier (+20 zł)
+                </option>
+                <option value="2" @if (Model.Order.ShippingType == 2) { @: selected
+                        }>
+                    Paczkomat (+8,99 zł)
+                </option>
+                <option value="3" @if (Model.Order.ShippingType == 3) { @: selected
+                        }>
+                    Odbiór osobisty
+                </option>
+            </select>
+        </div>
+        <div class="col-6">
+            <select class="custom-select" name="Order.PaymentMethod" id="PaymentMethod" asp-for="@Model.Order.PaymentMethod">
+                <option @if (Model.Order.PaymentMethod == 0) { @: selected
+                        }>
+                    Metoda płatności
+                </option>
+                <option value="1" @if (Model.Order.PaymentMethod == 1) { @: selected
+                        }>
+                    Przelew
+                </option>
+                <option value="2" @if (Model.Order.PaymentMethod == 2) { @: selected
+                        }>
+                    Płatność przy odbiorze
+                </option>
+                <option value="3" @if (Model.Order.PaymentMethod == 3) { @: selected
+                        }>
+                    Przelewy24
+                </option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group" id="info" style="display: none">
+        <input type="text" class="form-control" name="Order.ShippingInfo" id="ShippingInfo" asp-for="@Model.Order.ShippingInfo" value="@Model.Order.ShippingInfo" placeholder="Kod paczkomatu" pattern=".{,64}" />
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="Order.Comments" id="Comments" asp-for="@Model.Order.Comments" value="@Model.Order.Comments" placeholder="Uwagi do zamówienia" pattern=".{,2048}" />
+    </div>
+
+    <div class="row" style="margin-top: 30px">
+        <div class="col-sm-4">
+            <a href="@Url.Action("cart", "shop")" class="btn btn-outline-primary btn-block btn-lg margin-mobile">Powrót do sklepu</a>
+        </div>
+        <div class="col-sm-8">
+            <button type="submit" class="btn btn-success btn-block btn-lg margin-mobile">Przejdź do podsumowania</button>
+        </div>
+    </div>
+</form>
+}

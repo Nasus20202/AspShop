@@ -201,7 +201,7 @@ namespace ShopWebApp
                         user.Address = "";
                     else
                         user.Address = input.User.Address;
-                    if (input.User.Phone == null || input.User.Phone.Length > 16 || input.User.Phone.Length < 9)
+                    if (input.User.Phone == null || input.User.Phone.Length > 16 || input.User.Phone.Length < 7)
                         user.Phone = "";
                     else
                         user.Phone = input.User.Phone;

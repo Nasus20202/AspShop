@@ -5,14 +5,20 @@
 <br />
 <h2 style="text-align:center">Zaloguj się</h2>
 <br />
-<span class="text-danger">@Model.Message</span>
-<br />
+@if (Model.Message != null && Model.Message != string.Empty)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Model.Message
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
 <form asp-controller="Account" asp-action="Login" method="post">
     @Html.AntiForgeryToken()
     <div class="form-group">
         <label for="email" asp-for="@Model.Login">Adres email</label>
-        <input type="email" class="form-control" id="email" asp-for="@Model.Login" name="Login"><!--aria-describedby="emailHelp"-->
-        <!--<small id="emailHelp" class="form-text text-muted"></small>-->
+        <input type="email" class="form-control" id="email" asp-for="@Model.Login" name="Login">
     </div>
     <div class="form-group">
         <label for="password" asp-for="@Model.Password">Hasło</label>
