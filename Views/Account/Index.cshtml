@@ -1,4 +1,4 @@
-﻿
+﻿@using ShopWebApp
 @{
     Layout = "_Layout";
 }
@@ -30,3 +30,42 @@
     </tbody>
 </table>
 <a href="@Url.Action("edit", "account")" class="btn btn-outline-primary btn-lg btn-block">Zmień dane konta</a>
+@if (ViewBag.orders.Count > 0)
+{
+    <script>
+        function goToOrder(code) {
+            window.location.href = '/order/' + code;
+        }
+    </script>
+    <table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Kod zamówienia</th>
+            <th scope="col">Status</th>
+            <th scope="col">Kwota</th>
+            <th scope="col">Liczba produktów</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Order order in ViewBag.orders)
+        {
+            int productsCount = 0;
+            foreach (ProductOrder po in order.ProductOrders)
+                productsCount += po.Count;
+        <tr class="pointer" onclick="goToOrder(@order.Code)">
+            <th>@order.Code</th>
+            <td>@Functions.Status(order.Status)</td>
+            <td>@((order.Amount/100).ToString("C")) - @if (order.Paid)
+            {
+                @:Opłacone
+            }
+            else
+            {
+                @:Nieopłacone
+            }</td>
+            <td>@productsCount</td>
+        </tr>
+        }
+    </tbody>
+    </table>
+}
