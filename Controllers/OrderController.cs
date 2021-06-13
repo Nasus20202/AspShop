@@ -62,15 +62,15 @@ namespace ShopWebApp.Controllers
                 input.Message += "Niepoprawna metoda dostawy\n"; isValid = false; }
             if (input.Order.PaymentMethod < 1 || input.Order.PaymentMethod > 3) {
                 input.Message += "Niepoprawna metoda płatności\n"; isValid = false; }
-            if(input.Order.ClientName.Length < 3 || input.Order.ClientName.Length > 64){
+            if(input.Order.ClientName == null || input.Order.ClientName.Length < 3 || input.Order.ClientName.Length > 64){
                 input.Message += "Niepoprawne imię\n"; isValid = false; }
-            if(input.Order.ClientSurname.Length < 3 || input.Order.ClientSurname.Length > 64){
+            if(input.Order.ClientSurname == null || input.Order.ClientSurname.Length < 3 || input.Order.ClientSurname.Length > 64){
                 input.Message += "Niepoprawne nazwisko\n"; isValid = false; }
-            if(input.Order.ClientEmail.Length < 5 || input.Order.ClientEmail.Length > 128 || !input.Order.ClientEmail.Contains('@')){
+            if(input.Order.ClientEmail == null || input.Order.ClientEmail.Length < 5 || input.Order.ClientEmail.Length > 128 || !input.Order.ClientEmail.Contains('@')){
                 input.Message += "Niepoprawny adres email\n"; isValid = false; }
-            if(input.Order.ClientPhone.Length < 9 || input.Order.ClientPhone.Length > 16){
+            if(input.Order.ClientPhone == null || input.Order.ClientPhone.Length < 9 || input.Order.ClientPhone.Length > 16){
                 input.Message += "Niepoprawny numer telefonu\n"; isValid = false; }
-            if(input.Order.Address.Length < 5 || input.Order.Address.Length > 256){
+            if(input.Order.Address != null && input.Order.Address.Length > 256){
                 input.Message += "Niepoprawny adres\n"; isValid = false; }
             if (isValid)
             {
@@ -96,7 +96,7 @@ namespace ShopWebApp.Controllers
                         Product product = db.Products.Where(p => p.Code == kvp.Key).FirstOrDefault();
                         if (product == null)
                             continue;
-                        amount += product.Price;
+                        amount += product.Price * kvp.Value;
                         ProductOrder po = new ProductOrder();
                         po.OrderId = input.Order.OrderId;
                         po.ProductId = product.ProductId;
