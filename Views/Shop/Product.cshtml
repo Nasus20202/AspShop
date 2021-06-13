@@ -27,9 +27,11 @@
         photos = product.OtherPhotos.Split(';');
     if (product.Types != "" && product.Types != null)
         types = product.Types.Split(';');
-    if(product.Tags != "" && product.Tags != null) {
+    if (product.Tags != "" && product.Tags != null)
+    {
         string[] tagsTab = product.Tags.Split(';');
-        foreach(string s in tagsTab) {
+        foreach (string s in tagsTab)
+        {
             string[] oneTagTab = s.Split(':');
             if (oneTagTab.Length >= 2)
                 tags.Add(oneTagTab[0], oneTagTab[1]);
@@ -63,6 +65,17 @@
                 </div>
             </div>
         </div>
+    </div>
+}
+
+
+@section left{
+    <div class="sticky-top flex-column d-none d-md-block btn-block" style="top: 65px">
+        <ul class="list-group">
+            <li class="list-group-item btn btn-light btn-block" onclick="window.location.hash = '#about'">O produkcie</li>
+            <li class="list-group-item btn btn-light btn-block" onclick="window.location.hash = '#rating'">Oceń</li>
+            <li class="list-group-item btn btn-light btn-block" onclick="window.location.hash = '#specs'">Specyfikacja</li>
+        </ul>
     </div>
 }
 <style>
@@ -262,7 +275,7 @@ else
 </div>
 
 
-@{ 
+@{
     int? isReviewed = Context.Request.HttpContext.Session.GetInt32(product.Code);
     if (isReviewed == null)
         isReviewed = 0;
@@ -274,7 +287,8 @@ else
         {
             @:Dziękujemy
         }
-        else {
+        else
+        {
             @:Oceń produkt
         }
     </p>

@@ -66,7 +66,7 @@ namespace ShopWebApp
 
             // populate db
 
-            Order order = db.Orders.Where(o => o.OrderId == 1).FirstOrDefault();
+            //Order order = db.Orders.Where(o => o.OrderId == 1).FirstOrDefault();
             /*Product product1 = db.Products.Where(p => p.ProductId == 1).FirstOrDefault();
             Product product2 = db.Products.Where(p => p.ProductId == 2).FirstOrDefault();
             ProductOrder po1 = new ProductOrder();
@@ -89,15 +89,15 @@ namespace ShopWebApp
             product1.ProductOrders.Add(po1);
             product2.ProductOrders.Add(po2);*/
             //db.SaveChanges();
-            db.Entry(order)
-                .Collection(o => o.ProductOrders)
-                .Load();
+            //db.Entry(order)
+            //    .Collection(o => o.ProductOrders)
+            //    .Load();
 
-            foreach (ProductOrder po in order.ProductOrders)
+            /*foreach (ProductOrder po in order.ProductOrders)
             {
                 Product p = db.Products.Where(p => p.ProductId == po.ProductId).FirstOrDefault();
                 Console.WriteLine(p.Name);
-            }
+            }*/
 
             app.UseStatusCodePagesWithRedirects("/Error/{0}");
             app.UseEndpoints(endpoints =>

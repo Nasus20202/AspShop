@@ -30,6 +30,12 @@ namespace ShopWebApp
                     model.User.Email = user.Email;
                     model.User.Address = user.Address;
                     model.User.Phone = user.Phone;
+                    List<Order> orders = db.Orders.Where(o => o.UserId == user.UserId).OrderByDescending(o => o.DateOfOrder).ToList();
+                    foreach(Order order in orders)
+                    {
+                        db.Entry(order).Collection(o => o.ProductOrders).Load();
+                    }
+                    ViewBag.orders = orders;
                 }
             }
             

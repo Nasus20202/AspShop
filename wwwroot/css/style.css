@@ -1,4 +1,8 @@
-﻿.card:hover {
+﻿html {
+    scroll-behavior: smooth;
+}
+
+.card:hover {
     box-shadow: 0 0 1em gray;
     transform: scale(1.05);
 }
