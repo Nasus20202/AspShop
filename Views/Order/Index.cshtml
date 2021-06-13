@@ -81,7 +81,7 @@ else
     </div>
     <div class="form-group">
         <label for="Address">Adres</label>
-        <input type="text" class="form-control" name="Order.Address" id="Address" asp-for="@Model.Order.Address" value="@Model.Order.Address" pattern=".{5,256}" required>
+        <input type="text" class="form-control" name="Order.Address" id="Address" asp-for="@Model.Order.Address" value="@Model.Order.Address" pattern=".{,256}">
     </div>
     <div class="row form-group">
         <div class="col-6">
