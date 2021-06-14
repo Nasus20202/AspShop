@@ -9,7 +9,6 @@ namespace ShopWebApp
     public class ShopDatabase : DbContext
     {
         public static string ConnectionString = "";
-        //public static string ConnectionString = "Server = 127.0.0.1; Database = shop; Uid = nasus; Pwd = KNu17g2003cdVLO;";
 
 
         public DbSet<Category> Categories { get; set; }
