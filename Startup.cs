@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -15,8 +16,15 @@ namespace ShopWebApp
 {
     public class Startup
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        private string _developmentConnectionString = null, _productionConnectionString = null;
+
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
@@ -43,12 +51,13 @@ namespace ShopWebApp
                 options.Cookie.IsEssential = true;
                 options.Cookie.Name = ".Nasus.Session";
             });
+            _productionConnectionString = Configuration["production_string"];
+            _developmentConnectionString = Configuration["development_string"];
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            ShopDatabase.ConnectionString = !env.IsDevelopment() ? "production_string" : ***REMOVED*** ;
+            ShopDatabase.ConnectionString = !env.IsDevelopment() ? _productionConnectionString:  _developmentConnectionString;
 
             if (env.IsDevelopment())
             {
@@ -63,41 +72,6 @@ namespace ShopWebApp
             app.UseSession();
             var db = new ShopDatabase();
             db.Database.EnsureCreated();
-
-            // populate db
-
-            //Order order = db.Orders.Where(o => o.OrderId == 1).FirstOrDefault();
-            /*Product product1 = db.Products.Where(p => p.ProductId == 1).FirstOrDefault();
-            Product product2 = db.Products.Where(p => p.ProductId == 2).FirstOrDefault();
-            ProductOrder po1 = new ProductOrder();
-            ProductOrder po2 = new ProductOrder();
-
-
-            db.Entry(product1)
-                .Collection(o => o.ProductOrders)
-                .Load();
-            db.Entry(product2)
-                .Collection(o => o.ProductOrders)
-                .Load();
-
-            po1.OrderId = order.OrderId;
-            po1.ProductId = product1.ProductId;
-            po2.OrderId = order.OrderId;
-            po2.ProductId = product2.ProductId;
-            order.ProductOrders.Add(po1);
-            order.ProductOrders.Add(po2);
-            product1.ProductOrders.Add(po1);
-            product2.ProductOrders.Add(po2);*/
-            //db.SaveChanges();
-            //db.Entry(order)
-            //    .Collection(o => o.ProductOrders)
-            //    .Load();
-
-            /*foreach (ProductOrder po in order.ProductOrders)
-            {
-                Product p = db.Products.Where(p => p.ProductId == po.ProductId).FirstOrDefault();
-                Console.WriteLine(p.Name);
-            }*/
 
             app.UseStatusCodePagesWithRedirects("/Error/{0}");
             app.UseEndpoints(endpoints =>

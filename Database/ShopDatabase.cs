@@ -8,8 +8,8 @@ namespace ShopWebApp
 {
     public class ShopDatabase : DbContext
     {
-        //public static string ConnectionString = "";
-        public static string ConnectionString = ***REMOVED***;
+        public static string ConnectionString = "";
+        //public static string ConnectionString = ***REMOVED***;
 
 
         public DbSet<Category> Categories { get; set; }
