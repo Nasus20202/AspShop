@@ -1,39 +1,105 @@
 ﻿@using ShopWebApp
 @{
     Layout = "_Layout";
+    Product prod = ViewBag.product;
 }
 
-@section left{
-    @Model.User.Name
+<script>
+    function addToCart(code = '') {
+        $.post("/cart/add/" + code);
+    }
+</script>
+
+@section modal {
+    <div class="modal fade" id="staticBackdrop" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Koszyk</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4>Dodano nowy produkt do koszyka</h4>
+                    <p>@prod.Brand @prod.Name</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-block btn-outline-success" data-dismiss="modal">Kontynuuj zakupy</button>
+                    <a href="/cart" class="btn btn-block btn-success">Koszyk</a>
+                </div>
+            </div>
+        </div>
+    </div>
 }
-<br />
-    @{
-        using (var db = new ShopDatabase())
-        {
-            var categories = db.Categories.ToList();
-            foreach (Category category in categories)
-            {
-                @:<p>@category.Name:</p>
-                var subcategories = db.Entry(category)
-                    .Collection(c => c.Subcategories)
-                    .Query()
-                    .ToList();
-                foreach (Subcategory subcategory in subcategories)
-                {
-                    @:<p style="margin-left: 20px">@subcategory.Name</p>
-                    var products = db.Entry(subcategory)
-                        .Collection(s => s.Products)
-                        .Query()
-                        .ToList();
-                    foreach (Product product in products)
+
+@section right{
+
+    @if (ViewBag.productExists)
+    {
+    <div class="">
+        <p class="h3 text-info">Polecamy</p>
+        <div class="card d-flex align-items-center" style="margin-top: 10px;">
+            <a href="/p/@prod.Code"><img class="card-img-top" src="/images/@prod.Photo" alt="@prod.Code" style="margin-top: 10px; padding-left:5px; padding-right:5px"></a>
+            <div class="card-body d-flex flex-column">
+                @{
+                    double price = prod.Price / 100.0, oldPrice = prod.OldPrice / 100.0, discount = oldPrice == 0 ? 0 : Math.Round((oldPrice - price) / oldPrice, 2) * 100;
+                    double rate = -1;
+                    int stars = 0, halfStars = 0;
+                    if (prod.RatingVotes > 0)
                     {
-                        @:<div class="row">
-                            @:<p class="col-8" style="margin-left: 40px">@product.Name</p><br />
-                            @:<img class="img-fluid float-right col-4" style="max-width:20%" src="/images/@product.Photo" alt="@product.Code" />
-                        @:</div>
+                        rate = Math.Round(prod.RatingSum / (double)prod.RatingVotes, 2);
+                        halfStars = Convert.ToInt32(rate / 0.5);
+                        double rest = rate - halfStars * 0.5;
+                        if (rest >= 0.5)
+                            halfStars++;
+                        stars = halfStars / 2;
+                        if (halfStars % 2 == 1)
+                            halfStars = 1;
+                        else
+                            halfStars = 0;
                     }
                 }
-                @:<br /><br />
-            }
-        }
+                <a href="/p/@prod.Code" class="text-dark nounderline"><h5 class="card-title">@prod.Brand @prod.Name</h5></a>
+                <p class="card-text">@prod.About</p>
+                <p class="text-warning mt-auto">
+                    @if (rate != -1)
+                    {
+                        @for (int i = 0; i < stars; i++)
+                        {
+                            @:<i class="bi-star-fill"></i>
+                        }
+                        @if (halfStars == 1)
+                        {
+                            @:<i class="bi-star-half"></i>
+                        }
+                        @for (int i = stars + halfStars; i < 5; i++)
+                        {
+                            @:<i class="bi-star"></i>
+                        }
+                        @:(@prod.RatingVotes)
+                    }
+                </p>
+                @if (prod.Price < prod.OldPrice)
+                {
+                    <div>
+                        <span style="color: orangered; text-decoration: line-through; text-decoration-color: darkred">@oldPrice zł</span><span class="ml-2" style="color: forestgreen">- @discount%</span>
+                    </div>
+                }
+                @if (prod.Stock != 0)
+                {
+                    <div class="btn-group mt-auto">
+                        <a href="/p/@prod.Code" class="btn btn-outline-primary">@price.ToString("C")</a>
+                        <a href="#" class="btn btn-outline-success" data-toggle="modal" data-target="#staticBackdrop" onclick="addToCart('@prod.Code')"><i class="bi-cart-plus-fill"></i></a>
+                    </div>
+                }
+                else
+                {
+                    <a href="#" class="btn btn-outline-warning mt-auto">Niedostępny</a>
+                }
+            </div>
+        </div>
+    </div>
     }
+}
+
