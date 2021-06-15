@@ -23,7 +23,7 @@ namespace ShopWebApp
                     model.User.Surname = user.Surname;
                     model.User.Email = user.Email;
                 }
-                if (db.Products.Count() > 0)
+                if (db.Products.Where(p => p.Enabled && p.Stock != 0).Count() > 0)
                 {
                     int maxId = db.Products.Max(p => p.ProductId), id;
                     Random random = new Random();
