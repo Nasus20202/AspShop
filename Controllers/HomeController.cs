@@ -39,6 +39,13 @@ namespace ShopWebApp
                 {
                     ViewBag.productExists = false;
                 }
+                Dictionary<string, string> Categories = new Dictionary<string, string>();
+                foreach(Category category in db.Categories)
+                {
+                    Categories.Add(category.Name, category.Code);
+                }
+                ViewBag.categoriesExist = Categories.Count > 0 ? true : false;
+                ViewBag.categories = Categories;
             }
 
             return View(model);

@@ -331,10 +331,6 @@ namespace ShopWebApp
                             table.Codes.Add(userList[i].UserId.ToString());
                         }
                     }
-                    if (table.Names.Count == 0)
-                    {
-                        return Redirect("/Error/404");
-                    }
                     table.Path = "/admin/users/";
                     model.Table = table;
                     model.Page = page; model.LastPage = lastPage;
@@ -355,10 +351,6 @@ namespace ShopWebApp
                             table.Names.Add(categoryList[i].Name == null ? "Kategoria bez nazwy" : categoryList[i].Name);
                             table.Codes.Add(categoryList[i].Code);
                         }
-                    }
-                    if (table.Names.Count == 0)
-                    {
-                        return Redirect("/Error/404");
                     }
                     table.Path = "/admin/categories/";
                     model.Table = table;
@@ -381,10 +373,6 @@ namespace ShopWebApp
                             table.Codes.Add(subcategoryList[i].Code);
                         }
                     }
-                    if(table.Names.Count() == 0)
-                    {
-                        return Redirect("/Error/404");
-                    }
                     table.Path = "/admin/subcategories/";
                     model.Table = table;
                     model.Page = page; model.LastPage = lastPage;
@@ -406,10 +394,6 @@ namespace ShopWebApp
                             table.Codes.Add(productList[i].Code);
                         }
                     }
-                    if (table.Names.Count() == 0)
-                    {
-                        return Redirect("/Error/404");
-                    }
                     table.Path = "/admin/products/";
                     model.Table = table;
                     model.Page = page; model.LastPage = lastPage;
@@ -430,10 +414,6 @@ namespace ShopWebApp
                             table.Names.Add(ordersList[i].Code == null ? "Podkategoria bez nazwy" : ordersList[i].Code);
                             table.Codes.Add(ordersList[i].Code);
                         }
-                    }
-                    if (table.Names.Count() == 0)
-                    {
-                        return Redirect("/Error/404");
                     }
                     table.Path = "/admin/orders/";
                     model.Table = table;

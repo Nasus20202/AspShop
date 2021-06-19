@@ -51,7 +51,7 @@
             c++;
             <div class="col-lg-4 d-flex align-items-stretch" style="padding-left: 5px; padding-right: 5px">
                 <div class="card" style="margin-top: 10px;">
-                    <img class="card-img-top" src="/images/@prod.Photo" alt="@prod.Code" style="margin-top: 10px; padding-left:5px; padding-right:5px">
+                    <a href="/p/@prod.Code"><img class="card-img-top" src="/images/@prod.Photo" alt="@prod.Code" style="margin-top: 10px; padding-left:5px; padding-right:5px"></a>
                     <div class="card-body d-flex flex-column">
                         @{
                             double price = prod.Price / 100.0;
@@ -71,7 +71,7 @@
                                     halfStars = 0;
                             }
                         }
-                        <h5 class="card-title">@prod.Brand @prod.Name</h5>
+                        <a href="/p/@prod.Code" class="text-dark nounderline"><h5 class="card-title">@prod.Brand @prod.Name</h5></a>
                         <p class="card-text">@prod.About</p>
                         <p class="text-warning mt-auto">
                             @if (rate != -1)

@@ -37,7 +37,7 @@
 
     @if (ViewBag.productExists)
     {
-    <div class="">
+    <div class="sticky-top flex-column center-margin" style="top: 65px">
         <p class="h3 text-info">Polecamy</p>
         <div class="card d-flex align-items-center" style="margin-top: 10px;">
             <a href="/p/@prod.Code"><img class="card-img-top" src="/images/@prod.Photo" alt="@prod.Code" style="margin-top: 10px; padding-left:5px; padding-right:5px"></a>
@@ -102,4 +102,19 @@
     </div>
     }
 }
+@section left{ 
+    @if (ViewBag.categoriesExist)
+        {
+        <div class="sticky-top flex-column" style="top: 80px">
+            <p class="h3 text-info">Kategorie</p>
+            <div class="list-group">
+                @foreach (KeyValuePair<string, string> kvp in ViewBag.categories) {
+                <a href="/s/@kvp.Value" class="list-group-item list-group-item-action">@kvp.Key</a>
+                }
+            </div>
+        </div>
+        }
+
+    }
+            
 
