@@ -82,7 +82,7 @@ namespace ShopWebApp.Controllers
                     default: productList = productList.OrderByDescending(p => p.RatingVotes).ToList(); break;
                 }
                 var cutProductList = new List<Product>();
-                if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0))
+                if (page <= 0 || page > productList.Count / productsPerPage + (productList.Count % productsPerPage != 0 ? 1 : 0) && page != 1)
                     return Redirect("/Error/404");
                 for (int i = (page - 1) * productsPerPage; i < Math.Min(page * productsPerPage, productList.Count); i++)
                 {
