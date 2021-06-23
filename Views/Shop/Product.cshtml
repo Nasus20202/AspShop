@@ -71,7 +71,24 @@
 
 @section left{
     <div class="sticky-top flex-column d-none d-md-block btn-block" style="top: 65px">
-        <ul class="list-group">
+
+        @using (var db = new ShopDatabase())
+        {
+            Subcategory subcategory = db.Subcategories.Where(s => s.SubcategoryId == product.SubcategoryId).FirstOrDefault(); Category category = new Category();
+            if (subcategory != null)
+            {
+                category = db.Categories.Where(c => c.CategoryId == subcategory.CategoryId).FirstOrDefault();
+            }
+            if (subcategory != null && category != null)
+            {
+            <div class="list-group">
+                <a class="list-group-item btn btn-light btn-block" href="/s/@category.Code/@subcategory.Code">@subcategory.Name</a>
+                <a class="list-group-item btn btn-light btn-block" href="/s/@category.Code/">@category.Name</a>
+            </div>
+            }
+
+        }
+        <ul class="list-group" style="margin-top: 30px">
             <li class="list-group-item btn btn-light btn-block" onclick="window.location.hash = '#about'">O produkcie</li>
             <li class="list-group-item btn btn-light btn-block" onclick="window.location.hash = '#rating'">Oceń</li>
             <li class="list-group-item btn btn-light btn-block" onclick="window.location.hash = '#specs'">Specyfikacja</li>

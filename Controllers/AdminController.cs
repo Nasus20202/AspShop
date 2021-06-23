@@ -638,13 +638,13 @@ namespace ShopWebApp
                                          select c).FirstOrDefault();
                     if (category == null)
                         return Redirect("/Error/404");
-                    if (values["Name"] != null) { category.Name = values["Name"]; }
-                    if (values["Code"] != null) { category.Code = values["Code"]; }
-                    if (values["About"] != null) { category.About = values["About"]; }
+                    if (values.ContainsKey("Name") && values["Name"] != null) { category.Name = values["Name"]; }
+                    if (values.ContainsKey("Code") && values["Code"] != null) { category.Code = values["Code"]; }
+                    if (values.ContainsKey("About") && values["About"] != null) { category.About = values["About"]; }
                     else { category.About = ""; }
-                    if (values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
+                    if (values.ContainsKey("Enabled") && values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
                         category.Enabled = true;
-                    else if (values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0"))
+                    else if (!values.ContainsKey("Enabled") || values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0"))
                         category.Enabled = false;
                     DbFunctions.UpdateCategory(category);
                     objectName = category.Code;
@@ -663,18 +663,18 @@ namespace ShopWebApp
                                                select c).FirstOrDefault();
                     if (subcategory == null)
                         return Redirect("/Error/404");
-                    if (values["Name"] != null) { subcategory.Name = values["Name"]; }
-                    if (values["Code"] != null) { subcategory.Code = values["Code"]; }
-                    if (values["About"] != null) { subcategory.About = values["About"]; }
+                    if (values.ContainsKey("Name") && values["Name"] != null) { subcategory.Name = values["Name"]; }
+                    if (values.ContainsKey("Code") && values["Code"] != null) { subcategory.Code = values["Code"]; }
+                    if (values.ContainsKey("About") && values["About"] != null) { subcategory.About = values["About"]; }
                     else { subcategory.About = ""; }
-                    if (values["Tags"] != null) { subcategory.Tags = values["Tags"]; }
+                    if (values.ContainsKey("Tags") && values["Tags"] != null) { subcategory.Tags = values["Tags"]; }
                     else { subcategory.Tags = ""; }
-                    if (values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
+                    if (values.ContainsKey("Enabled") && values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
                         subcategory.Enabled = true;
-                    else if (values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0"))
+                    else if (!values.ContainsKey("Enabled") || values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0"))
                         subcategory.Enabled = false;
                     int categoryId;
-                    if (values["CategoryId"] != null)
+                    if (values.ContainsKey("CategoryId") && values["CategoryId"] != null)
                         if (int.TryParse(values["CategoryId"], out categoryId))
                         {
                             if(db.Categories.Where(c => c.CategoryId == categoryId).FirstOrDefault() != null)
@@ -698,51 +698,48 @@ namespace ShopWebApp
                     if (product == null)
                         return Redirect("/Error/404");
                     int number;
-                    if (values["Name"] != null) { product.Name = values["Name"]; }
-                    if (values["Brand"] != null) { product.Brand = values["Brand"]; }
-                    if (values["Code"] != null) { product.Code = values["Code"]; }
+                    if (values.ContainsKey("Name") && values["Name"] != null) { product.Name = values["Name"]; }
+                    if (values.ContainsKey("Brand") && values["Brand"] != null) { product.Brand = values["Brand"]; }
+                    if (values.ContainsKey("Code") && values["Code"] != null) { product.Code = values["Code"]; }
                     if (Functions.PermissionLevel(user.Role) >= 5)
                     {
-                        if (values["Price"] != null)
+                        if (values.ContainsKey("Price") && values["Price"] != null)
                             if (int.TryParse(values["Price"], out number))
                                 product.Price = number;
-                        if (values["OldPrice"] != null)
+                        if (values.ContainsKey("OldPrice") && values["OldPrice"] != null)
                             if (int.TryParse(values["OldPrice"], out number))
                                 product.OldPrice = number;
-                    }
-                    if (values["Tags"] != null) { product.Tags = values["Tags"]; }
-                    else { product.Tags = ""; }
-                    if (values["Types"] != null) { product.Types = values["Types"]; }
-                    else { product.Types = ""; }
-                    if (values["About"] != null) { product.About = values["About"]; }
-                    else { product.About = ""; }
-                    if (values["LongAbout"] != null) { product.LongAbout = values["LongAbout"]; }
-                    else { product.LongAbout = ""; }
-                    if (Functions.PermissionLevel(user.Role)>=5)
-                    {
-                        if (values["RatingSum"] != null)
+                        if (values.ContainsKey("RatingSum") && values["RatingSum"] != null)
                             if (int.TryParse(values["RatingSum"], out number))
                                 product.RatingSum = number;
-                        if (values["RatingVotes"] != null)
+                        if (values.ContainsKey("RatingVotes") && values["RatingVotes"] != null)
                             if (int.TryParse(values["RatingVotes"], out number))
                                 product.RatingVotes = number;
                     }
-                    if (values["Photo"] != null) { product.Photo = values["Photo"]; }
-                    if (values["OtherPhotos"] != null) { product.OtherPhotos = values["OtherPhotos"]; }
+                    if (values.ContainsKey("Tags") && values["Tags"] != null) { product.Tags = values["Tags"]; }
+                    else { product.Tags = ""; }
+                    if (values.ContainsKey("Types") && values["Types"] != null) { product.Types = values["Types"]; }
+                    else { product.Types = ""; }
+                    if (values.ContainsKey("About") && values["About"] != null) { product.About = values["About"]; }
+                    else { product.About = ""; }
+                    if (values.ContainsKey("LongAbout") && values["LongAbout"] != null) { product.LongAbout = values["LongAbout"]; }
+                    else { product.LongAbout = ""; }
+                    if (values.ContainsKey("Photo") && values["Photo"] != null) { product.Photo = values["Photo"]; }
+                    if (values.ContainsKey("OtherPhotos") && values["OtherPhotos"] != null) { product.OtherPhotos = values["OtherPhotos"]; }
                     else { product.OtherPhotos = ""; }
-                    if (values["Stock"] != null)
+                    if (values.ContainsKey("Stock") && values["Stock"] != null)
                         if (int.TryParse(values["Stock"], out number))
                             product.Stock = number;
 
-                    if (values["SubcategoryId"] != null)
+                    if (values.ContainsKey("SubcategoryId") && values["SubcategoryId"] != null)
                         if (int.TryParse(values["SubcategoryId"], out number))
                         {
                             if (db.Subcategories.Where(c => c.SubcategoryId == number).FirstOrDefault() != null)
                                 product.SubcategoryId = number;
                         }
-                    if (values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
+                    if (values.ContainsKey("Enabled") && values.ContainsKey("Enabled") && values["Enabled"] != null && (values["Enabled"].ToLower() == "true" || values["Enabled"].ToLower() == "1"))
                         product.Enabled = true;
-                    else if (values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0"))
+                    else if (!values.ContainsKey("Enabled") || (!values.ContainsKey("Enabled") || values["Enabled"] != null && (values["Enabled"].ToLower() == "false" || values["Enabled"].ToLower() == "0")))
                         product.Enabled = false;
                     DbFunctions.UpdateProduct(product);
                     objectName = product.Code;
@@ -764,14 +761,14 @@ namespace ShopWebApp
                     bool isCurrentUserBeingChanged = false;
                     if (shopUser.Email == user.Email)
                         isCurrentUserBeingChanged = true;
-                    if (values["Email"] != null) { shopUser.Email = values["Email"]; }
-                    if (values["Name"] != null) { shopUser.Name = values["Name"]; }
-                    if (values["Surname"] != null) { shopUser.Surname = values["Surname"]; }
-                    if (values["Role"] != null) { shopUser.Role = values["Role"]; }
-                    if (values["Password"] != null) { shopUser.Password = values["Password"]; }
-                    if (values["Address"] != null) { shopUser.Address = values["Address"]; }
+                    if (values.ContainsKey("Email") && values["Email"] != null) { shopUser.Email = values["Email"]; }
+                    if (values.ContainsKey("Name") && values["Name"] != null) { shopUser.Name = values["Name"]; }
+                    if (values.ContainsKey("Surname") && values["Surname"] != null) { shopUser.Surname = values["Surname"]; }
+                    if (values.ContainsKey("Role") && values["Role"] != null) { shopUser.Role = values["Role"]; }
+                    if (values.ContainsKey("Password") && values["Password"] != null) { shopUser.Password = values["Password"]; }
+                    if (values.ContainsKey("Address") && values["Address"] != null) { shopUser.Address = values["Address"]; }
                     else { shopUser.Address = ""; }
-                    if (values["Phone"] != null) { shopUser.Surname = values["Phone"]; }
+                    if (values.ContainsKey("Phone") && values["Phone"] != null) { shopUser.Surname = values["Phone"]; }
                     else { shopUser.Phone = ""; }
                     DbFunctions.UpdateUser(shopUser);
                     objectName = shopUser.UserId.ToString();
@@ -793,34 +790,34 @@ namespace ShopWebApp
                     if (order == null)
                         return Redirect("/Error/404");
                     int number;
-                    if (values["Code"] != null) { order.Code = values["Code"]; }
-                    if (values["Amount"] != null)
+                    if (values.ContainsKey("Code") && values["Code"] != null) { order.Code = values["Code"]; }
+                    if (values.ContainsKey("Amount") && values["Amount"] != null)
                         if (int.TryParse(values["Amount"], out number))
                             order.Amount = number;
-                    if (values["Address"] != null) { order.Address = values["Address"]; }
+                    if (values.ContainsKey("Address") && values["Address"] != null) { order.Address = values["Address"]; }
                     if (values["UserId"] != null)
                         if (int.TryParse(values["UserId"], out number))
                             order.UserId = number;
-                    if (values["ClientName"] != null) { order.ClientName = values["ClientName"]; }
-                    if (values["ClientSurname"] != null) { order.ClientSurname = values["ClientSurname"]; }
-                    if (values["ClientEmail"] != null) { order.ClientEmail = values["ClientEmail"]; }
-                    if (values["ClientPhone"] != null) { order.ClientPhone = values["ClientPhone"]; }
-                    if (values["Status"] != null)
+                    if (values.ContainsKey("ClientName") && values["ClientName"] != null) { order.ClientName = values["ClientName"]; }
+                    if (values.ContainsKey("ClientSurname") && values["ClientSurname"] != null) { order.ClientSurname = values["ClientSurname"]; }
+                    if (values.ContainsKey("ClientEmail") && values["ClientEmail"] != null) { order.ClientEmail = values["ClientEmail"]; }
+                    if (values.ContainsKey("ClientPhone") && values["ClientPhone"] != null) { order.ClientPhone = values["ClientPhone"]; }
+                    if (values.ContainsKey("Status") && values["Status"] != null)
                         if (int.TryParse(values["Status"], out number))
                             order.Status = number;
-                    if (values["PaymentMethod"] != null)
+                    if (values.ContainsKey("PaymentMethod") && values["PaymentMethod"] != null)
                         if (int.TryParse(values["PaymentMethod"], out number))
                             order.PaymentMethod = number;
-                    if (values["Paid"] != null && (values["Paid"].ToLower() == "true" || values["Paid"].ToLower() == "1"))
+                    if (values.ContainsKey("Paid") &&  values["Paid"] != null && (values["Paid"].ToLower() == "true" || values["Paid"].ToLower() == "1"))
                         order.Paid = true;
-                    else if (values["Paid"] != null && (values["Paid"].ToLower() == "false" || values["Paid"].ToLower() == "0"))
+                    else if (!values.ContainsKey("Paid") || values["Paid"] != null && (values["Paid"].ToLower() == "false" || values["Paid"].ToLower() == "0"))
                         order.Paid = false;
-                    if (values["ShippingType"] != null)
+                    if (values.ContainsKey("ShippingType") && values["ShippingType"] != null)
                         if (int.TryParse(values["ShippingType"], out number))
                             order.ShippingType = number;
-                    if (values["ShippingInfo"] != null) { order.ShippingInfo = values["ShippingInfo"]; }
+                    if (values.ContainsKey("ShippingInfo") && values["ShippingInfo"] != null) { order.ShippingInfo = values["ShippingInfo"]; }
                     else { order.ShippingInfo = ""; }
-                    if (values["Comments"] != null) { order.Comments = values["Comments"]; }
+                    if (values.ContainsKey("Comments") && values["Comments"] != null) { order.Comments = values["Comments"]; }
                     else { order.Comments = ""; }
 
                     DbFunctions.UpdateOrder(order);

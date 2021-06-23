@@ -5,20 +5,6 @@
 <br />
 <h1>Edytuj @ViewData["Name"]</h1>
 <br />
-@if(ViewData["table"].ToString() == "orders")
-{
-    @section left{ 
-        <div class="sticky-top flex-column" style="top: 65px">
-            <ul class="list-group">
-                <li class="list-group-item disabled">Status zamówienia</li>
-                @for (int i = 0; i <= 5; i++)
-                {
-                    <li class="list-group-item">@i - @Functions.Status(i)</li>
-                }
-            </ul>
-        </div>
-    }
-}
 
 <form class="form-group" action="/admin/@ViewData["table"]/@ViewData["Id"]/edit" method="post">
     @foreach (KeyValuePair<string, string> kvp in ViewBag.values)
@@ -62,6 +48,30 @@
                 </select>
             </div>
         }
+        else if(kvp.Key == "Status" && ViewData["table"].ToString() == "orders") 
+        { 
+            <div class="form-group">
+                <select class="form-control" name="@kvp.Key">
+                    @for(int i = 0; i <= 5; i++)
+                    {
+                        <option value="@i" @if(kvp.Value == i.ToString()) { @: selected
+                                }>
+                            @Functions.Status(i)
+                        </option>
+                    }
+                </select>
+            </div>
+        }
+        // Needs to be finished!
+        else if(kvp.Key == "Enabled" || (kvp.Key == "Paid" && ViewData["table"].ToString() == "orders"))
+                {
+            <div class="form-check">
+                <input type="checkbox" value="1" name="@kvp.Key" @if(kvp.Value == "True")
+                    {
+                        @:checked
+                    } />
+            </div>
+                }
         else
         {
             <input type="text" name="@kvp.Key" value="@kvp.Value" class="form-control" />
