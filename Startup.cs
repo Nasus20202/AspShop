@@ -38,7 +38,7 @@ namespace ShopWebApp
             }).AddCookie(options =>
             {
                 options.LoginPath = new PathString("/Account/Login");
-                options.Cookie.Name = "NasusCookie";
+                options.Cookie.Name = "ShopCookie";
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
                 options.SlidingExpiration = true;
                 options.AccessDeniedPath = new PathString("/Account/Denied");
@@ -49,10 +49,11 @@ namespace ShopWebApp
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.IsEssential = true;
-                options.Cookie.Name = ".Nasus.Session";
+                options.Cookie.Name = ".Shop.Session";
             });
             _productionConnectionString = Configuration["production_string"];
             _developmentConnectionString = Configuration["development_string"];
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
