@@ -42,6 +42,10 @@ namespace ShopWebApp
                 Dictionary<string, string> Categories = new Dictionary<string, string>();
                 foreach(Category category in db.Categories)
                 {
+                    if(category.Code == null)
+                        category.Code = "";
+                    if(category.Name == null)
+                        category.Name = "";
                     Categories.Add(category.Name, category.Code);
                 }
                 ViewBag.categoriesExist = Categories.Count > 0 ? true : false;
