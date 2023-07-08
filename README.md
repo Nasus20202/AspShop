@@ -2,7 +2,7 @@
 
 ### Try me:
 Example credentials: login - test@example.com, password - 12345678
-[Login here](https://shop.knasuta.me/account/login)
+[Login here](https://shop.nasuta.dev/account/login)
 
 AspShop is a simple online store web application. It's created with ASP.NET Core 5.0. The default database is mySQL, but it can be easily changed. 
 I created this application as a educational project. It is mostly complete. 
