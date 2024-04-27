@@ -16,7 +16,6 @@ namespace ShopWebApp
 {
     public class Startup
     {
-        private string _developmentConnectionString = null, _productionConnectionString = null;
 
         public Startup(IConfiguration configuration)
         {
@@ -51,14 +50,10 @@ namespace ShopWebApp
                 options.Cookie.IsEssential = true;
                 options.Cookie.Name = ".Nasus.Session";
             });
-            _productionConnectionString = Configuration["production_string"];
-            _developmentConnectionString = Configuration["development_string"];
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            ShopDatabase.ConnectionString = !env.IsDevelopment() ? _productionConnectionString:  _developmentConnectionString;
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

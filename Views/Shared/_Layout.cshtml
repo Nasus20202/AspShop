@@ -68,10 +68,6 @@
                         foreach(KeyValuePair<string, int> kvp in JsonConvert.DeserializeObject<Dictionary<string, int>>(Context.Session.GetString("_Cart"))){ itemsInCart += kvp.Value; };
                     }
                 }
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Custom</a>
-                </li>
             </ul>
             <ul class="navbar-nav justify-content-right">
                 <li class="nav-item dropdown">

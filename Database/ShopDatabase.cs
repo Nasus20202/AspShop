@@ -8,8 +8,6 @@ namespace ShopWebApp
 {
     public class ShopDatabase : DbContext
     {
-        public static string ConnectionString = "";
-
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Subcategory> Subcategories { get; set; }
@@ -22,7 +20,7 @@ namespace ShopWebApp
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySQL(ConnectionString);
+            optionsBuilder.UseSqlite("Data Source=shop.db");
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
