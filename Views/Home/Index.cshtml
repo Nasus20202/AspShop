@@ -20,10 +20,13 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                @if (ViewBag.productExists)
+                {
                 <div class="modal-body">
                     <h4>Dodano nowy produkt do koszyka</h4>
                     <p>@prod.Brand @prod.Name</p>
                 </div>
+                }
                 <div class="modal-footer">
                     <button type="button" class="btn btn-block btn-outline-success" data-dismiss="modal">Kontynuuj zakupy</button>
                     <a href="/cart" class="btn btn-block btn-success">Koszyk</a>
