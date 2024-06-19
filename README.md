@@ -12,16 +12,6 @@ add some information and then change it. The app has also an admin panel, which 
 shop structure. Minimum required role to access admin panel is "employee" (other: "editor", "manager", "admin"). To firstly access admin panel you have to 
 update your role using SQL. Orders system is also fully implemented. However, there is no payment avaiable. 
 
-
-## Configuration
-
-.NET CLI
-```
-dotnet user-secrets init
-dotnet user-secrets set "production_string" "Server = XXX; Database = XXX; Uid = XXX; Pwd = XXX;"
-dotnet user-secrets set "development_string" "Server = XXX; Database = XXX; Uid = XXX; Pwd = XXX;"
-```
-
 ### Database 
 Filters can be added by changing the "Tags" value in admin panel subcategory settings. To create a new filter, just add "filterName:filterType" to "Tags".
 Avaiable types are "string" and "int", string is a list of all the avaiable values, and int is a numercial value range. 
