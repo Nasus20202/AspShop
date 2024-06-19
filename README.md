@@ -1,22 +1,16 @@
 # Online store - ASP.NET Core
 
-AspShop is a simple online store web application. It's created with ASP.NET Core 5.0. The default database is mySQL, but it can be easily changed. 
-I created this application as a educational project. It is mostly complete. 
+### Try me:
+Example credentials: login - test@example.com, password - 12345678
+[Login here](https://shop.nasuta.dev/account/login)
+
+AspShop is a simple online store web application. It's created with ASP.NET Core 3.0, updated to 8.0. The default database is Sqlite, but it can be easily changed. 
+I created this application as a educational project.
 
 You can browse products, which are divided into subcategories and categories. You can also sort and filter products. The simple account system is fully implemented and it's possible to create new account,
 add some information and then change it. The app has also an admin panel, which can be used to easily change, add and remove products, or even update
 shop structure. Minimum required role to access admin panel is "employee" (other: "editor", "manager", "admin"). To firstly access admin panel you have to 
 update your role using SQL. Orders system is also fully implemented. However, there is no payment avaiable. 
-
-
-## Configuration
-
-.NET CLI
-```
-dotnet user-secrets init
-dotnet user-secrets set "production_string" "Server = XXX; Database = XXX; Uid = XXX; Pwd = XXX;"
-dotnet user-secrets set "development_string" "Server = XXX; Database = XXX; Uid = XXX; Pwd = XXX;"
-```
 
 ### Database 
 Filters can be added by changing the "Tags" value in admin panel subcategory settings. To create a new filter, just add "filterName:filterType" to "Tags".
