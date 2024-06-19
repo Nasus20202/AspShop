@@ -40,7 +40,7 @@ namespace ShopWebApp
                     ViewBag.productExists = false;
                 }
                 Dictionary<string, string> Categories = new Dictionary<string, string>();
-                foreach(Category category in db.Categories)
+                foreach(Category category in db.Categories.Where(c => c.Enabled))
                 {
                     Categories.Add(category.Name, category.Code);
                 }
