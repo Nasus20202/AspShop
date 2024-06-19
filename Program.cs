@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace ShopWebApp
     {
         public static void Main(string[] args)
         {
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pl-PL");
             CreateHostBuilder(args).ConfigureAppConfiguration((hostContext, builder) => { 
                 if(hostContext.HostingEnvironment.IsDevelopment())
                 {
