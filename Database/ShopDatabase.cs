@@ -18,9 +18,18 @@ namespace ShopWebApp
         // Many  to many  relationships
         public DbSet<ProductOrder> ProductOrders { get; set; }
 
+        public string DbPath { get; set; }
+
+        public ShopDatabase()
+        {
+            var folder = Environment.SpecialFolder.LocalApplicationData;
+            var path = Environment.GetFolderPath(folder);
+            DbPath = System.IO.Path.Join(path, "shop.db");
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=shop.db");
+            optionsBuilder.UseSqlite($"Data Source={DbPath}");
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
