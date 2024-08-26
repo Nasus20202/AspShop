@@ -4,7 +4,9 @@ WORKDIR /build
 
 COPY . .
 
-RUN dotnet publish ShopWebApp.sln -c Release -o out
+RUN dotnet restore
+
+RUN dotnet publish ShopWebApp.csproj -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim
 
