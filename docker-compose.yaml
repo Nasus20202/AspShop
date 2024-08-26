@@ -1,0 +1,9 @@
+services:
+  aspshop:
+    build: .
+    container_name: aspshop
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./images:/app/wwwroot/images
+      - ./data:/app/data

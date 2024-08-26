@@ -6,6 +6,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>@Model.Title</title>
     <meta charset="utf-8">
@@ -20,6 +21,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="~/js/javascript.js"></script>
 </head>
+
 <body onload="onStart()">
     <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
         <!-- Brand -->
@@ -44,53 +46,56 @@
                         foreach (Category cat in categories)
                         {
                             @:<li class="nav-item dropdown">
-                                @:<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                                    @cat.Name
-                                @:</a>
-                                db.Entry(cat)
-                                    .Collection(c => c.Subcategories)
-                                    .Load();
-                                var subcategories = cat.Subcategories.Where(s => s.Enabled).ToList();
-                                @:<div class="dropdown-menu fadein">
-                                    @:<a class="dropdown-item font-weight-bold" href="/s/@cat.Code">Wszystkie</a>
-                                    @:<div class="dropdown-divider"></div>
-                                    foreach (Subcategory subcat in subcategories)
-                                    {
-                                        @:<a class="dropdown-item" href="/s/@cat.Code/@subcat.Code">@subcat.Name</a>
-                                    }
-                                @:</div>
+                            @:<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            @cat.Name
+                            @:</a>
+                            db.Entry(cat)
+                            .Collection(c => c.Subcategories)
+                            .Load();
+                            var subcategories = cat.Subcategories.Where(s => s.Enabled).ToList();
+                            @:<div class="dropdown-menu fadein">
+                            @:<a class="dropdown-item font-weight-bold" href="/s/@cat.Code">Wszystkie</a>
+                            @:<div class="dropdown-divider"></div>
+                            foreach (Subcategory subcat in subcategories)
+                            {
+                                @:<a class="dropdown-item" href="/s/@cat.Code/@subcat.Code">@subcat.Name</a>
+                            }
+                            @:</div>
                             @:</li>
                         }
                     }
                     int itemsInCart = 0;
-                    if(!string.IsNullOrEmpty(Context.Session.GetString("_Cart")))
+                    if (!string.IsNullOrEmpty(Context.Session.GetString("_Cart")))
                     {
-                        foreach(KeyValuePair<string, int> kvp in JsonConvert.DeserializeObject<Dictionary<string, int>>(Context.Session.GetString("_Cart"))){ itemsInCart += kvp.Value; };
+                        foreach (KeyValuePair<string, int> kvp in JsonConvert.DeserializeObject<Dictionary<string,
+                        int>>(Context.Session.GetString("_Cart"))) { itemsInCart += kvp.Value; };
                     }
                 }
             </ul>
             <ul class="navbar-nav justify-content-right">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                        Szukaj  <i class="bi-search text-light" style="margin-left:2px"></i>
+                        Szukaj <i class="bi-search text-light" style="margin-left:2px"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right fadein">
                         <form class="px-2 py-1" action="/search" method="get">
                             <div class="form-group">
                                 <input type="search" class="form-control" name="name" placeholder="Szukaj..." required>
                             </div>
-                            <button type="submit" class="btn btn-sm btn-block btn-outline-success">Szukaj <i class="bi-search"></i> </button>
+                            <button type="submit" class="btn btn-sm btn-block btn-outline-success">Szukaj <i
+                                    class="bi-search"></i> </button>
                         </form>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                        Konto  <i class="bi-person-circle text-light" style="margin-left:2px"></i>
+                        Konto <i class="bi-person-circle text-light" style="margin-left:2px"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right fadein">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <a class="dropdown-item" href="@Url.Action("index", "account")">@Model.User.Name @Model.User.Surname</a>
+                            <a class="dropdown-item" href="@Url.Action("index", "account")">@Model.User.Name
+                                @Model.User.Surname</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="@Url.Action("logout", "account")">Wyloguj się</a>
                         }
@@ -103,9 +108,10 @@
                     </div>
                 </li>
                 <li class="nav-item mr-1">
-                    <a class="nav-link" href="/cart" id="cartbutton">Koszyk @if (itemsInCart > 0) {
-                        @:(@itemsInCart.ToString()) 
-                    }  <i class="bi-cart  text-light" style="margin-left:2px"></i></a>
+                    <a class="nav-link" href="/cart" id="cartbutton">Koszyk @if (itemsInCart > 0)
+                        {
+                            @:(@itemsInCart.ToString())
+                        } <i class="bi-cart  text-light" style="margin-left:2px"></i></a>
                 </li>
             </ul>
         </div>
@@ -127,11 +133,12 @@
     </div>
     <div style="margin-top:50px"></div>
     <div class="navbar fixed-bottom bg-light navbar-light" style="margin-top:15px">
-        Sklep &copy 2021
+        Sklep
 
         <div class="float-left" id="cookieInfo">
             Ta strona korzysta z ciasteczek. Dalsze korzystanie ze strony oznacza, że zgadzasz się na ich użycie.
-            <button type="button" class="btn btn-sm btn-outline-success" onclick="hideCookies()" style="margin-left: 10px">OK</button>
+            <button type="button" class="btn btn-sm btn-outline-success" onclick="hideCookies()"
+                style="margin-left: 10px">OK</button>
         </div>
         @if (User.Identity.IsAuthenticated)
         {
@@ -144,4 +151,5 @@
     </div>
 </body>
 @RenderSection("modal", false)
+
 </html>

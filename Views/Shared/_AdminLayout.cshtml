@@ -12,6 +12,7 @@
 }
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>@Model.Title</title>
     <meta charset="utf-8">
@@ -25,6 +26,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="~/js/javascript.js"></script>
 </head>
+
 <body onload="onStart()">
     <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
         <!-- Brand -->
@@ -72,7 +74,8 @@
                 </li>
             </ul>
             <form class="form-inline my-2 my-lg-0 mr-1" action="/admin/search" method="get">
-                <input class="form-control mr-sm-2 bg-dark text-white" type="search" placeholder="Szukaj..." name="name" required>
+                <input class="form-control mr-sm-2 bg-dark text-white" type="search" placeholder="Szukaj..." name="name"
+                    required>
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="bi-search"></i></button>
             </form>
             <ul class="navbar-nav justify-content-right">
@@ -100,7 +103,7 @@
     </div>
     <div style="margin-top:50px"></div>
     <div class="navbar fixed-bottom bg-light navbar-light" style="margin-top:15px">
-        Sklep - Admin &copy 2021
+        Sklep - Admin
         <a class="btn btn-sm btn-outline-success float-left" href="@Url.Action("index", "home")">Sklep</a>
         <div class="float-left" id="cookieInfo">
             Ta strona korzysta z ciasteczek. Dalsze korzystanie ze strony oznacza, że zgadzasz się na ich użycie.
@@ -109,4 +112,5 @@
     </div>
 </body>
 @RenderSection("modal", false)
+
 </html>
