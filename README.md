@@ -1,9 +1,5 @@
 # Online store - ASP.NET Core
 
-### Try me:
-Example credentials: login - test@example.com, password - 12345678
-[Login here](https://shop.nasuta.dev/account/login)
-
 AspShop is a simple online store web application. It's created with ASP.NET Core 3.0, updated to 8.0. The default database is Sqlite, but it can be easily changed. 
 I created this application as a educational project.
 
