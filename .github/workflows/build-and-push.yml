@@ -35,7 +35,7 @@ jobs:
             latest
             type=sha
             type=raw,value={{date 'YYYYMMDD-HHmmss'}}
-            1.${{ github.run_number }}
+            1.${{ github.run_number }}.0
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
