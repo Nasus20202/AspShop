@@ -1,6 +1,6 @@
 services:
   aspshop:
-    image: nasus2023/aspshop:latest
+    build: .
     container_name: aspshop
     restart: always
     ports:
