@@ -1,6 +1,26 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
+  "extends": ["config:recommended"],
+  "regexManagers": [
+    {
+      "fileMatch": ["^.*\\.csproj$"],
+      "matchStrings": [
+        "<TargetFramework>net(?<currentValue>.+)</TargetFramework>"
+      ],
+      "depNameTemplate": "dotnet-targetframework",
+      "datasourceTemplate": "docker",
+      "packageNameTemplate": "mcr.microsoft.com/dotnet/runtime",
+      "versioningTemplate": "dotnet"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "dotnet-targetframework",
+        "mcr.microsoft.com/dotnet/*"
+      ],
+      "groupName": ".NET version",
+      "groupSlug": "dotnet-version"
+    }
   ]
 }
