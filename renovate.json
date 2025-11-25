@@ -20,12 +20,16 @@
   ],
   "packageRules": [
     {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }.
+    {
       "matchPackageNames": [
         "dotnet-targetframework",
         "mcr.microsoft.com/dotnet/*"
       ],
       "groupName": ".NET version",
       "groupSlug": "dotnet-version"
-    }
+    },
   ]
 }
