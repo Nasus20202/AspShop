@@ -22,7 +22,7 @@
     {
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
-    }.
+    },
     {
       "matchPackageNames": [
         "dotnet-targetframework",
