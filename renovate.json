@@ -22,15 +22,6 @@
     {
       "matchUpdateTypes": ["patch", "minor"],
       "automerge": true
-    },
-    {
-      "matchUpdateTypes": ["major"],
-      "automerge": false
-    },
-    {
-      "matchFiles": ["Dockerfile"],
-      "matchPackageNames": ["mcr.microsoft.com/dotnet/runtime"],
-      "rangeStrategy": "pin"
     }
   ]
 }
