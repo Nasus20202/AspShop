@@ -9,18 +9,28 @@
       "depNameTemplate": "dotnet-targetframework",
       "datasourceTemplate": "github-tags",
       "packageNameTemplate": "dotnet/runtime",
-      "versioningTemplate": "semver-coerced"
+      "versioningTemplate": "semver-coerced",
+      "extractVersionTemplate": "^v?(?<version>\\d+\\.\\d+)"
     }
   ],
   "packageRules": [
+    {
+      "matchPackageNames": ["dotnet-targetframework", "mcr.microsoft.com/dotnet/runtime"],
+      "groupName": ".NET version",
+      "groupSlug": "dotnet-version"
+    },
     {
       "matchUpdateTypes": ["patch", "minor"],
       "automerge": true
     },
     {
-      "matchPackageNames": ["dotnet-targetframework"],
-      "groupName": ".NET version",
-      "groupSlug": "dotnet-version"
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "matchFiles": ["Dockerfile"],
+      "matchPackageNames": ["mcr.microsoft.com/dotnet/runtime"],
+      "rangeStrategy": "pin"
     }
   ]
 }
