@@ -5,14 +5,11 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["/\\.csproj$/"],
-      "matchStrings": [
-        "<TargetFramework>net(?<currentValue>\\d+\\.\\d+)</TargetFramework>"
-      ],
+      "matchStrings": ["<TargetFramework>net(?<currentValue>.+)</TargetFramework>"],
       "depNameTemplate": "dotnet-targetframework",
       "datasourceTemplate": "github-tags",
       "packageNameTemplate": "dotnet/runtime",
-      "extractVersionTemplate": "^v?(?<version>\\d+\\.\\d+)",
-      "versioningTemplate": "semver"
+      "versioningTemplate": "semver-coerced"
     }
   ],
   "packageRules": [
@@ -21,10 +18,7 @@
       "automerge": true
     },
     {
-      "matchPackageNames": [
-        "dotnet-targetframework",
-        "mcr.microsoft.com/dotnet/*"
-      ],
+      "matchPackageNames": ["dotnet-targetframework"],
       "groupName": ".NET version",
       "groupSlug": "dotnet-version"
     }
