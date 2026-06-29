@@ -15,7 +15,7 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["dotnet-targetframework", "mcr.microsoft.com/dotnet/runtime"],
+      "matchPackageNames": ["dotnet-targetframework", "mcr.microsoft.com/dotnet/**"],
       "groupName": ".NET version",
       "groupSlug": "dotnet-version"
     },
